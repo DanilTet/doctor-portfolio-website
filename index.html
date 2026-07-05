@@ -157,14 +157,21 @@
           <div class="hero__photo-glow" aria-hidden="true"></div>
 
           <div class="hero__photo">
-            <img src="img/hero-photo.jpg" alt="Д-р Тетернік Олег Олександрович" class="hero__img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <!-- Заглушка показується тільки якщо файлу hero-photo.jpg ще немає -->
+            <picture onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <source srcset="img/hero-photo.webp" type="image/webp">
+              <source srcset="img/hero-photo.png" type="image/png">
+              <source srcset="img/hero-photo.jpg" type="image/jpeg">
+              <!-- Fallback img -->
+              <img src="img/hero-photo.jpg" alt="Д-р Тетернік Олег Олександрович" class="hero__img" onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';">
+            </picture>
+            
+            <!-- Заглушка показується тільки якщо жодного файлу немає -->
             <div class="hero__photo-placeholder" style="display: none;">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              <span>Фото лікаря<br>Додайте img/hero-photo.jpg</span>
+              <span>Фото лікаря<br>Додайте img/hero-photo.jpg або .png</span>
             </div>
           </div>
 
