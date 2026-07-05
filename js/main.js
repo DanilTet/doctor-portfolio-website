@@ -1,0 +1,219 @@
+/**
+ * Main JavaScript — Navigation, Scroll Effects, Language Switcher
+ * Doctor Portfolio Website — Тетернік О.О.
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  initHeader();
+  initBurgerMenu();
+  initSmoothScroll();
+  initLanguageSwitcher();
+});
+
+
+/* ============================================================
+   HEADER — Scroll Effect (glassmorphism on scroll)
+   ============================================================ */
+function initHeader() {
+  const header = document.getElementById('header');
+  if (!header) return;
+
+  const SCROLL_THRESHOLD = 50;
+
+  function onScroll() {
+    if (window.scrollY > SCROLL_THRESHOLD) {
+      header.classList.add('header--scrolled');
+    } else {
+      header.classList.remove('header--scrolled');
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // check initial state
+}
+
+
+/* ============================================================
+   BURGER MENU — Mobile Navigation Toggle
+   ============================================================ */
+function initBurgerMenu() {
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('nav');
+  const navLinks = document.querySelectorAll('.nav__link');
+
+  if (!burger || !nav) return;
+
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('active');
+    nav.classList.toggle('nav--open');
+    document.body.style.overflow = nav.classList.contains('nav--open') ? 'hidden' : '';
+  });
+
+  // Close nav when a link is clicked
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      burger.classList.remove('active');
+      nav.classList.remove('nav--open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.classList.contains('nav--open')) {
+      burger.classList.remove('active');
+      nav.classList.remove('nav--open');
+      document.body.style.overflow = '';
+    }
+  });
+}
+
+
+/* ============================================================
+   SMOOTH SCROLL — Navigate to sections
+   ============================================================ */
+function initSmoothScroll() {
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+
+      const target = document.querySelector(targetId);
+      if (!target) return;
+
+      const headerHeight = document.getElementById('header')?.offsetHeight || 80;
+      const targetPosition = target.getBoundingClientRect().top + window.scrollY - headerHeight;
+
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    });
+  });
+}
+
+
+/* ============================================================
+   LANGUAGE SWITCHER — UA / EN
+   ============================================================ */
+const translations = {
+  ua: {
+    // Navigation
+    'nav.about': 'Про лікаря',
+    'nav.services': 'Послуги',
+    'nav.diplomas': 'Дипломи',
+    'nav.reviews': 'Відгуки',
+    'nav.contacts': 'Контакти',
+    'nav.appointment': 'Записатися на прийом',
+
+    // Hero
+    'hero.badge': 'Лікар вищої категорії',
+    'hero.name.first': 'Тетернік',
+    'hero.name.last': 'Олег Олександрович',
+    'hero.specialization': 'Професійний лікар з багаторічним досвідом. Індивідуальний підхід до кожного пацієнта та сучасні методи лікування.',
+    'hero.experience.number': '20+',
+    'hero.experience.label': 'Років професійного\nдосвіду в медицині',
+    'hero.btn.appointment': 'Записатися на прийом',
+    'hero.btn.more': 'Дізнатися більше',
+    'hero.float.value': '5000+',
+    'hero.float.label': 'Задоволених пацієнтів',
+    'hero.scroll': 'Гортайте вниз',
+
+    // Sections
+    'section.stats': 'Цифри довіри',
+    'section.about': 'Про лікаря',
+    'section.services': 'Послуги',
+    'section.diplomas': 'Дипломи та сертифікати',
+    'section.reviews': 'Відгуки пацієнтів',
+    'section.contacts': 'Контакти',
+
+    // Footer
+    'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
+  },
+  en: {
+    // Navigation
+    'nav.about': 'About',
+    'nav.services': 'Services',
+    'nav.diplomas': 'Diplomas',
+    'nav.reviews': 'Reviews',
+    'nav.contacts': 'Contacts',
+    'nav.appointment': 'Book Appointment',
+
+    // Hero
+    'hero.badge': 'Highest Category Physician',
+    'hero.name.first': 'Teternick',
+    'hero.name.last': 'Oleg Oleksandrovych',
+    'hero.specialization': 'Professional physician with years of experience. Individual approach to each patient and modern treatment methods.',
+    'hero.experience.number': '20+',
+    'hero.experience.label': 'Years of professional\nexperience in medicine',
+    'hero.btn.appointment': 'Book Appointment',
+    'hero.btn.more': 'Learn More',
+    'hero.float.value': '5000+',
+    'hero.float.label': 'Satisfied patients',
+    'hero.scroll': 'Scroll down',
+
+    // Sections
+    'section.stats': 'Trust in Numbers',
+    'section.about': 'About the Doctor',
+    'section.services': 'Services',
+    'section.diplomas': 'Diplomas & Certificates',
+    'section.reviews': 'Patient Reviews',
+    'section.contacts': 'Contacts',
+
+    // Footer
+    'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
+  }
+};
+
+let currentLang = 'ua';
+
+function initLanguageSwitcher() {
+  const langButtons = document.querySelectorAll('.lang-switch__btn');
+
+  langButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      if (lang === currentLang) return;
+
+      currentLang = lang;
+
+      // Update active button
+      langButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Update html lang attribute
+      document.documentElement.lang = lang === 'ua' ? 'uk' : 'en';
+
+      // Apply translations
+      applyTranslations(lang);
+    });
+  });
+}
+
+function applyTranslations(lang) {
+  const t = translations[lang];
+  if (!t) return;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) {
+      // Preserve HTML inside the element (e.g., icons within buttons)
+      const childNodes = el.querySelectorAll('svg, img, .hero__badge-dot');
+      if (childNodes.length > 0) {
+        // Find the text node and update it
+        const textContent = t[key];
+        // Re-render with children preserved
+        const fragment = document.createDocumentFragment();
+        childNodes.forEach(child => fragment.appendChild(child.cloneNode(true)));
+        el.textContent = textContent;
+        // Prepend children back
+        if (fragment.childNodes.length > 0) {
+          el.prepend(fragment);
+        }
+      } else {
+        el.textContent = t[key];
+      }
+    }
+  });
+}
