@@ -485,10 +485,133 @@
     </div>
   </section>
 
-  <!-- Contacts Section -->
-  <section class="placeholder-section section--light" id="contacts">
+  <!-- ============================================================
+       CONTACTS SECTION — «Контакти»
+       ============================================================ -->
+  <section class="contacts section--dark-alt" id="contacts" aria-label="Контакти">
     <div class="container">
-      <p class="placeholder-section__title" data-i18n="section.contacts">📍 Секція: Контакти</p>
+      <div class="section__header" data-animate data-animate-delay="1">
+        <span class="section-subtitle" data-i18n="contacts.subtitle">Локація та зв'язок</span>
+        <h2 class="section-title" data-i18n="contacts.title">Контактна інформація</h2>
+        <div class="section__line"></div>
+      </div>
+
+      <div class="contacts__inner">
+        <!-- Left Column: Contact Cards & Links -->
+        <div class="contacts__info" data-animate data-animate-delay="2">
+          
+          <!-- Card 1: Location -->
+          <div class="contact-card">
+            <div class="contact-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <div class="contact-card__content">
+              <span class="contact-card__label" data-i18n="contacts.address.label">Місце прийому</span>
+              <span class="contact-card__value" data-i18n="contacts.address.value">17-та міська лікарня, м. Харків, пр. Героїв Харкова 195</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Working Hours -->
+          <div class="contact-card">
+            <div class="contact-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="contact-card__content">
+              <span class="contact-card__label" data-i18n="contacts.schedule.label">Графік прийому</span>
+              <span class="contact-card__value" data-i18n="contacts.schedule.value">Пн – Сб: 08:00 – 15:00</span>
+              <span class="contact-card__sub" data-i18n="contacts.schedule.sub">Неділя: вихідний</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Phone -->
+          <div class="contact-card">
+            <div class="contact-card__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </div>
+            <div class="contact-card__content">
+              <span class="contact-card__label" data-i18n="contacts.phone.label">Телефон для запису</span>
+              <a href="tel:+380994750967" class="contact-card__value contact-card__link">+380 99 475 09 67</a>
+            </div>
+          </div>
+
+          <!-- Card 4: Instagram Profile Link -->
+          <div class="contact-card">
+            <div class="contact-card__icon contact-card__icon--instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </div>
+            <div class="contact-card__content">
+              <span class="contact-card__label" data-i18n="contacts.instagram.label">Офіційний Instagram</span>
+              <a href="https://www.instagram.com/dr.teternik" target="_blank" rel="noopener noreferrer" class="contact-card__value contact-card__link">@dr.teternik</a>
+            </div>
+          </div>
+
+          <!-- Highlight Banner: How to find Surgery Building (Instagram Story link) -->
+          <a href="https://www.instagram.com/s/aGlnaGxpZ2h0OjE3OTI5MTUwNDQ4ODkxNTMz?story_media_id=3382227683352410926&igsh=MWZ0cHdybTY4cmtoNQ==" target="_blank" rel="noopener noreferrer" class="contacts-nav-banner">
+            <div class="contacts-nav-banner__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </div>
+            <div class="contacts-nav-banner__info">
+              <h4 class="contacts-nav-banner__title" data-i18n="contacts.navigation.title">Як знайти корпус хірургії?</h4>
+              <p class="contacts-nav-banner__desc" data-i18n="contacts.navigation.desc">Дивіться покрокову відеоінструкцію у збережених Історіях Instagram</p>
+            </div>
+            <div class="contacts-nav-banner__arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- Right Column: Interactive Map & Actions -->
+        <div class="contacts__map-container" data-animate data-animate-delay="3">
+          <div class="contacts__map-wrapper">
+            <iframe 
+              src="https://maps.google.com/maps?q=%D0%A5%D0%B0%D1%80%D0%BA%D1%96%D0%B2+%D0%BF%D1%80%D0%BE%D1%81%D0%BF%D0%B5%D0%BA%D1%82+%D0%93%D0%B5%D1%80%D0%BE%D1%97%D0%B2+%D0%A5%D0%B0%D1%80%D0%BA%D0%BE%D0%B2%D0%B0+195+17+%D0%BB%D1%96%D0%BA%D0%B0%D1%80%D0%BD%D1%8F&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+              class="contacts__map-iframe" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade"
+              title="17 лікарня м. Харків на Google Картах">
+            </iframe>
+          </div>
+
+          <div class="contacts__actions">
+            <a href="https://maps.app.goo.gl/kEGktosgB5HcLp6W6" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+              </svg>
+              <span data-i18n="contacts.map.btn">Відкрити в Google Maps</span>
+            </a>
+
+            <button class="btn btn--primary btn--full" data-open-appointment>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span data-i18n="contacts.appointment.btn">Записатися на прийом</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 

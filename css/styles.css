@@ -1920,5 +1920,203 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: var(--space-md);
 }
 
+/* ============================================================
+   CONTACTS SECTION
+   ============================================================ */
+.contacts {
+  padding: var(--space-section) 0;
+  position: relative;
+}
+
+.contacts__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+.contacts__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-bg-dark);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.contact-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.contact-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(78, 205, 196, 0.1);
+  color: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-card__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.contact-card__icon--instagram {
+  background: rgba(225, 48, 108, 0.12);
+  color: #e1306c;
+}
+
+.contact-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-card__label {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-light-muted);
+}
+
+.contact-card__value {
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-light);
+}
+
+.contact-card__sub {
+  font-size: var(--fs-small);
+  color: var(--color-primary-light);
+}
+
+.contact-card__link {
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.contact-card__link:hover {
+  color: var(--color-primary-light);
+}
+
+/* Instagram Navigation Story Banner */
+.contacts-nav-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, rgba(225, 48, 108, 0.15) 0%, rgba(131, 58, 180, 0.15) 100%);
+  border: 1px solid rgba(225, 48, 108, 0.3);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  margin-top: var(--space-xs);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.contacts-nav-banner:hover {
+  transform: translateY(-2px);
+  border-color: rgba(225, 48, 108, 0.6);
+  box-shadow: 0 10px 30px rgba(225, 48, 108, 0.2);
+}
+
+.contacts-nav-banner__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(225, 48, 108, 0.4);
+}
+
+.contacts-nav-banner__icon svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+  fill: currentColor;
+}
+
+.contacts-nav-banner__info {
+  flex: 1;
+}
+
+.contacts-nav-banner__title {
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-bold);
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.contacts-nav-banner__desc {
+  font-size: var(--fs-small);
+  color: var(--color-text-light-muted);
+  line-height: var(--lh-normal);
+}
+
+.contacts-nav-banner__arrow {
+  color: #e1306c;
+  transition: transform var(--transition-fast);
+}
+
+.contacts-nav-banner:hover .contacts-nav-banner__arrow {
+  transform: translateX(4px);
+  color: #fff;
+}
+
+/* Map & Actions Column */
+.contacts__map-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.contacts__map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--color-border-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.contacts__map-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: invert(90%) hue-rotate(180deg) contrast(90%);
+}
+
+.contacts__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+@media (max-width: 992px) {
+  .contacts__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 

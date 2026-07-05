@@ -182,6 +182,22 @@ const translations = {
     'appointment.success.desc': 'Ми зателефонуємо вам найближчим часом для підтвердження часу прийому.',
     'appointment.success.btn': 'Зрозуміло',
 
+    // Contacts
+    'contacts.subtitle': 'Локація та зв\'язок',
+    'contacts.title': 'Контактна інформація',
+    'contacts.address.label': 'Місце прийому',
+    'contacts.address.value': '17-та міська лікарня, м. Харків, пр. Героїв Харкова 195',
+    'contacts.schedule.label': 'Графік прийому',
+    'contacts.schedule.value': 'Пн – Сб: 08:00 – 15:00',
+    'contacts.schedule.sub': 'Неділя: вихідний',
+    'contacts.phone.label': 'Телефон для запису',
+    'contacts.instagram.label': 'Офіційний Instagram',
+    'contacts.navigation.title': 'Як знайти корпус хірургії?',
+    'contacts.navigation.desc': 'Дивіться покрокову відеоінструкцію у збережених Історіях Instagram',
+    'contacts.navigation.btn': 'Переглянути маршрут',
+    'contacts.map.btn': 'Відкрити в Google Maps',
+    'contacts.appointment.btn': 'Записатися на прийом',
+
     // Footer
     'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
   },
@@ -266,6 +282,22 @@ const translations = {
     'appointment.success.title': 'Thank You! Request Received',
     'appointment.success.desc': 'We will call you shortly to confirm your appointment time.',
     'appointment.success.btn': 'Got it',
+
+    // Contacts
+    'contacts.subtitle': 'Location & Contacts',
+    'contacts.title': 'Contact Information',
+    'contacts.address.label': 'Location',
+    'contacts.address.value': '17th City Hospital, Kharkiv, Heroiv Kharkova Ave 195',
+    'contacts.schedule.label': 'Working Hours',
+    'contacts.schedule.value': 'Mon – Sat: 08:00 – 15:00',
+    'contacts.schedule.sub': 'Sunday: Closed',
+    'contacts.phone.label': 'Phone Number',
+    'contacts.instagram.label': 'Official Instagram',
+    'contacts.navigation.title': 'How to find the Surgery Building?',
+    'contacts.navigation.desc': 'Watch the step-by-step video guide in Instagram Highlight Stories',
+    'contacts.navigation.btn': 'View Route',
+    'contacts.map.btn': 'Open in Google Maps',
+    'contacts.appointment.btn': 'Book Appointment',
 
     // Footer
     'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
