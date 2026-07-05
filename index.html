@@ -157,17 +157,14 @@
           <div class="hero__photo-glow" aria-hidden="true"></div>
 
           <div class="hero__photo">
-            <!-- 
-              PLACEHOLDER: Replace with actual doctor photo
-              Recommended size: 800x1000px, JPG
-              <img src="assets/images/hero-photo.jpg" alt="Д-р Тетернік Олег Олександрович" width="800" height="1000">
-            -->
-            <div class="hero__photo-placeholder">
+            <img src="img/hero-photo.jpg" alt="Д-р Тетернік Олег Олександрович" class="hero__img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <!-- Заглушка показується тільки якщо файлу hero-photo.jpg ще немає -->
+            <div class="hero__photo-placeholder" style="display: none;">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              <span>Фото лікаря<br>800 × 1000 px</span>
+              <span>Фото лікаря<br>Додайте img/hero-photo.jpg</span>
             </div>
           </div>
 
