@@ -226,49 +226,13 @@ async function fetchReviews(page = 1, pageSize = 6) {
 
 
 /**
- * Submits a new review to Supabase REST API (status default: 'pending')
+ * Submits a new review (currently simulated — does not insert to Supabase as requested)
  * @param {Object} data - { user_name, stars, text }
  * @returns {Promise<boolean>}
  */
 async function submitReview(data) {
-  const { url, anonKey } = SITE_CONFIG.supabase;
-
-  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID') || anonKey.includes('YOUR_ANON_KEY_HERE')) {
-    console.info('[Supabase] Credentials not configured — simulating successful review submit:', data);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    return true;
-  }
-
-  try {
-    const endpoint = `${url}/rest/v1/reviews`;
-
-    const payload = {
-      user_name: data.user_name || 'Анонім',
-      stars: Number(data.stars) || 5,
-      text: data.text,
-      status: 'pending',
-    };
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'apikey': anonKey,
-        'Authorization': `Bearer ${anonKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const err = await response.text();
-      console.warn('[Supabase] Insert review error:', err);
-    }
-
-    return true;
-  } catch (error) {
-    console.warn('[Supabase] Failed to submit review:', error);
-    return true;
-  }
+  console.info('[Supabase] Review submission is set to dummy mode as requested:', data);
+  await new Promise(resolve => setTimeout(resolve, 600));
+  return true;
 }
 

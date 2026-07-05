@@ -826,10 +826,6 @@ async function loadReviewsPage(page = 1) {
   if (result && result.reviews && result.reviews.length > 0) {
     reviews = result.reviews;
     total = result.total;
-  } else if (page === 1) {
-    // Fallback on first page if DB empty or unavailable
-    reviews = FALLBACK_REVIEWS;
-    total = FALLBACK_REVIEWS.length;
   }
 
   if (reviews.length === 0) {
