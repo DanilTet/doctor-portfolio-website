@@ -9,56 +9,47 @@
  * @returns {Promise<number|null>} count or null on error
  */
 async function fetchAppointmentCount() {
-  const { url, anonKey, appointmentsTable, dateColumn, countFrom } = SITE_CONFIG.supabase;
+  const { url, anonKey } = SITE_CONFIG.supabase;
 
-  // If credentials are not configured yet — return null
-  if (!url || url.includes('YOUR_PROJECT_ID') || !anonKey || anonKey.includes('YOUR_ANON_KEY')) {
-    console.info('[Supabase] Credentials not configured yet — using static fallback.');
+  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID') || anonKey.includes('YOUR_ANON_KEY_HERE')) {
+    console.info('[Supabase] Credentials not configured — using static fallback.');
     return null;
   }
 
   try {
-    // Use Supabase REST API with HEAD request to get count efficiently
-    const endpoint = `${url}/rest/v1/${appointmentsTable}`;
-    const params = new URLSearchParams({
-      select: 'id',
-      [`${dateColumn}`]: `gte.${countFrom}`,
-    });
+    // Call the secure RPC function (bypasses RLS, returns only the count number)
+    const endpoint = `${url}/rest/v1/rpc/get_appointments_count`;
 
-    const response = await fetch(`${endpoint}?${params}`, {
-      method: 'GET',
+    console.info(`[Supabase] Calling RPC: ${endpoint}`);
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
       headers: {
         'apikey': anonKey,
         'Authorization': `Bearer ${anonKey}`,
-        'Prefer': 'count=exact',
-        // Only fetch count metadata, not actual data
-        'Range-Unit': 'items',
-        'Range': '0-0',
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({}),
     });
 
+    console.info(`[Supabase] Response status: ${response.status}`);
+
     if (!response.ok) {
-      throw new Error(`Supabase error: ${response.status} ${response.statusText}`);
+      const errorBody = await response.text();
+      console.error('[Supabase] Error body:', errorBody);
+      throw new Error(`Supabase RPC error: ${response.status} — ${errorBody}`);
     }
 
-    // Parse count from Content-Range header: "0-0/COUNT"
-    const contentRange = response.headers.get('Content-Range');
-    if (contentRange) {
-      const total = contentRange.split('/')[1];
-      if (total && total !== '*') {
-        return parseInt(total, 10);
-      }
-    }
-
-    // Fallback: count the returned items
-    const data = await response.json();
-    return Array.isArray(data) ? data.length : null;
+    const count = await response.json();
+    console.info(`[Supabase] ✅ Patient count: ${count}`);
+    return typeof count === 'number' ? count : null;
 
   } catch (error) {
-    console.warn('[Supabase] Failed to fetch appointment count:', error.message);
+    console.warn('[Supabase] Failed to fetch patient count:', error.message);
     return null;
   }
 }
+
 
 
 /**

@@ -19,8 +19,6 @@ const SITE_CONFIG = {
     url:               ENV.SUPABASE_URL      || '',
     anonKey:           ENV.SUPABASE_ANON_KEY || '',
     appointmentsTable: 'appointments',
-    dateColumn:        'created_at',
-    countFrom:         '2026-02-01',
   },
 
   // ──────────────────────────────────────────────
@@ -35,9 +33,10 @@ const SITE_CONFIG = {
   },
 
   // ──────────────────────────────────────────────
-  //  TELEGRAM BOT — підключається через js/env.js
+  //  TELEGRAM BOT — публічне посилання (не секрет)
+  //  Просто вставте посилання на вашого бота:
   // ──────────────────────────────────────────────
   telegram: {
-    botLink: ENV.TELEGRAM_BOT_LINK || '#',
+    botLink: 'https://t.me/YOUR_BOT_USERNAME', // ← замініть тут
   },
 };
