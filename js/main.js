@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBurgerMenu();
   initSmoothScroll();
   initLanguageSwitcher();
+  initServiceModal();
 });
 
 
@@ -155,6 +156,14 @@ const translations = {
     'about.card.phone.label': 'Телефон',
     'about.btn': 'Записатися через Telegram',
 
+    // Services
+    'services.subtitle': 'Напрямки та дослідження',
+    'services.title': 'Медичні послуги',
+    'services.card.btn': 'Детальніше про процедуру',
+    'services.modal.close': 'Закрити',
+    'services.modal.appointment': 'Записатися на прийом',
+    'services.modal.steps_title': 'Покроковий перебіг процедури',
+
     // Footer
     'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
   },
@@ -215,6 +224,14 @@ const translations = {
     'about.card.phone.label': 'Phone',
     'about.btn': 'Book via Telegram',
 
+    // Services
+    'services.subtitle': 'Fields & Diagnostics',
+    'services.title': 'Medical Services',
+    'services.card.btn': 'Learn More About Procedure',
+    'services.modal.close': 'Close',
+    'services.modal.appointment': 'Book Appointment',
+    'services.modal.steps_title': 'Step-by-Step Procedure Process',
+
     // Footer
     'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
   }
@@ -271,3 +288,218 @@ function applyTranslations(lang) {
     }
   });
 }
+
+/* ============================================================
+   SERVICES MODAL DATA & CONTROLLER
+   ============================================================ */
+const SERVICES_DATA = {
+  gastroscopy: {
+    title: { ua: 'Гастроскопія (ВГДС)', en: 'Gastroscopy (EGD)' },
+    subtitle: { ua: 'Ендоскопічне дослідження стравоходу, шлунка та 12-палої кишки', en: 'Endoscopic examination of esophagus, stomach and duodenum' },
+    desc: {
+      ua: 'Високоточний метод діагностики, що дозволяє детально оглянути слизову оболонку верхніх відділів шлунково-кишкового тракту, виявити запалення, виразки, поліпи або інші зміни на ранніх стадіях.',
+      en: 'A high-precision diagnostic method for inspecting the upper GI mucosa, detecting inflammation, ulcers, polyps, or early-stage changes.'
+    },
+    steps: [
+      {
+        title: { ua: '1. Підготовка', en: '1. Preparation' },
+        text: { ua: 'Дослідження проводиться суворо натщесерце (не їсти за 6-8 годин до прийому, не пити за 2-3 години). Напередодні рекомендується легка вечеря.', en: 'Performed strictly on an empty stomach (no food for 6-8 hours, no liquids for 2-3 hours before). Light dinner the evening before.' }
+      },
+      {
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
+        text: { ua: 'Пацієнт лягає на лівий бік. Тонкий гнучкий ендоскоп з відеокамерою високої роздільної здатності обережно вводиться через ротову порожнину. Обстеження триває всього 5–10 хвилин.', en: 'Patient lies on the left side. A thin flexible video endoscope is gently inserted through the mouth. The exam takes only 5–10 minutes.' }
+      },
+      {
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
+        text: { ua: 'Використовується місцева спрей-анестезія горла (лідокаїн). За бажанням пацієнта або за медичними показаннями процедуру можна провести «уві сні» (медикаментозний сон / седація) під наглядом анестезіолога.', en: 'Local throat spray (lidocaine) is used. At the patient\'s request, sedation ("sleep endoscopy") can be administered under an anesthesiologist\'s care.' }
+      }
+    ]
+  },
+  colonoscopy: {
+    title: { ua: 'Колоноскопія (КС)', en: 'Colonoscopy' },
+    subtitle: { ua: 'Повна ендоскопічна діагностика товстого кишечника', en: 'Full endoscopic diagnostic of the colon' },
+    desc: {
+      ua: 'Найбільш інформативний метод діагностики захворювань товстої кишки, що дозволяє не лише виявити патології на ранніх стадіях, а й одночасно провести видалення поліпів або взяти біопсію.',
+      en: 'The gold standard for diagnosing colon conditions, enabling early detection and immediate polyp removal or biopsy.'
+    },
+    steps: [
+      {
+        title: { ua: '1. Підготовка', en: '1. Preparation' },
+        text: { ua: 'Потребує безшлакової дієти протягом 2-3 днів та прийому спеціального препарату для очищення кишечника напередодні за призначенням лікаря.', en: 'Requires a low-fiber diet for 2-3 days and a specific bowel preparation solution taken the day before as prescribed.' }
+      },
+      {
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
+        text: { ua: 'Дослідження виконується гнучким колоноскопом з оглядом слизової по всій довжині товстого кишечника. Тривалість процедури — близько 15–25 хвилин.', en: 'Examined using a flexible colonoscope assessing mucosa across the entire colon. Duration is approx. 15–25 minutes.' }
+      },
+      {
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
+        text: { ua: 'Для максимального комфорту рекомендується медикаментозний сон (седація), під час якого пацієнт не відчуває ніякого дискомфорту та болю.', en: 'For optimal comfort, intravenous sedation is recommended so the patient feels no pain or anxiety during the study.' }
+      }
+    ]
+  },
+  ercp: {
+    title: { ua: 'ЕРХПГ', en: 'ERCP Procedure' },
+    subtitle: { ua: 'Діагностика та малоінвазивне лікування жовчних протоків', en: 'Diagnostics & minimally invasive treatment of bile ducts' },
+    desc: {
+      ua: 'Спеціалізоване високотехнологічне втручання, що поєднує ендоскопію та рентгеноскопію для діагностики та видалення каменів із жовчних протоків або відновлення їх прохідності.',
+      en: 'Advanced intervention combining endoscopy and fluoroscopy to diagnose and clear bile duct stones or restore patency.'
+    },
+    steps: [
+      {
+        title: { ua: '1. Підготовка', en: '1. Preparation' },
+        text: { ua: 'Обов\'язкова попередня консультація, аналізи крові та інструментальне обстеження (УЗД/КТ). Строго натщесерце.', en: 'Requires pre-procedure blood work, ultrasound/CT review, and strict fasting.' }
+      },
+      {
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
+        text: { ua: 'Спеціальний дуоденоскоп вводиться у 12-палу кишку до великого дуоденального сосочка, через який вводиться контраст та виконуються необхідні маніпуляції.', en: 'A specialized duodenoscope is passed to the papilla of Vater, contrast is injected, and therapeutic steps are performed.' }
+      },
+      {
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
+        text: { ua: 'Проводиться виключно під загальним знеболенням або глибокою седацією у стаціонарних умовах.', en: 'Performed exclusively under general anesthesia or deep sedation in a hospital room.' }
+      }
+    ]
+  },
+  bronchoscopy: {
+    title: { ua: 'Бронхоскопія', en: 'Bronchoscopy' },
+    subtitle: { ua: 'Огляд та діагностика дихальних шляхів і бронхіального дерева', en: 'Inspection & diagnostics of airways and bronchial tree' },
+    desc: {
+      ua: 'Метод прямого візуального обстеження трахеї та бронхів за допомогою ультратонкого гнучкого бронхоскопа для оцінки стану дихальної системи та забору матеріалу.',
+      en: 'Direct visualization of the trachea and bronchi using an ultra-thin flexible scope for respiratory assessment and sampling.'
+    },
+    steps: [
+      {
+        title: { ua: '1. Підготовка', en: '1. Preparation' },
+        text: { ua: 'Виконується натщесерце (не їсти та не пити зранку). Необхідно попередити лікаря про наявність алергій або астми.', en: 'Done fasting (no food or drinks in the morning). Inform the doctor of any allergies or asthma history.' }
+      },
+      {
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
+        text: { ua: 'Бронхоскоп через ніс або рот м\'яко проводиться у дихальні шляхи. Процедура займає 5–15 хвилин.', en: 'The bronchoscope is gently passed via nose or mouth into the airways. Lasts 5–15 minutes.' }
+      },
+      {
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
+        text: { ua: 'Застосовується якісна місцева анестезія слизових носоглотки та трахеї, що усуває кашльовий рефлекс.', en: 'Local anesthetic spray is applied to the airway mucosa to block the cough reflex effectively.' }
+      }
+    ]
+  },
+  ultrasound: {
+    title: { ua: 'УЗД діагностика', en: 'Ultrasound Diagnostics' },
+    subtitle: { ua: 'Ультразвукове дослідження органів черевної порожнини', en: 'Ultrasound study of abdominal organs' },
+    desc: {
+      ua: 'Безпечний, безболісний та швидкий метод обстеження печінки, жовчного міхура, підшлункової залози, селезінки та нирок у реальному часі.',
+      en: 'Safe, non-invasive real-time imaging of liver, gallbladder, pancreas, spleen, and kidneys.'
+    },
+    steps: [
+      {
+        title: { ua: '1. Підготовка', en: '1. Preparation' },
+        text: { ua: 'Бажано проводити натщесерце або через 6 годин після прийому їжі. За день утриматися від продуктів, що викликають газоутворення.', en: 'Best performed on an empty stomach (or 6 hours after meals). Avoid gas-inducing foods the day before.' }
+      },
+      {
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
+        text: { ua: 'Пацієнт розташовується на кушетці, лікар наносить гіпоалергенний гель на шкіру та сканує органи датчиком. Займає 15–20 хвилин.', en: 'Patient lies on a couch, hypoallergenic gel is applied, and organs are scanned. Takes 15–20 minutes.' }
+      },
+      {
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
+        text: { ua: 'Процедура абсолютно безболісна, не має протипоказань та не потребує анестезії.', en: 'Completely painless, safe for all ages, requires no anesthesia.' }
+      }
+    ]
+  },
+  surgery: {
+    title: { ua: 'Оперативна ендоскопія та хірургія', en: 'Operative Endoscopy & Surgery' },
+    subtitle: { ua: 'Малоінвазивні втручання та ендоскопічна хірургія', en: 'Minimally invasive interventions and endoscopic surgery' },
+    desc: {
+      ua: 'Видалення поліпів шлунка та кишечника (поліпектомія), зупинка кровотеч, забір біопсії, видалення чужорідних тіл без розрізів та тривалої реабілітації.',
+      en: 'Polyp removal (polypectomy), hemostasis, biopsies, foreign body retrieval without surgical cuts.'
+    },
+    steps: [
+      {
+        title: { ua: '1. Підготовка', en: '1. Preparation' },
+        text: { ua: 'Визначається індивідуально залежно від обсягу втручання після попереднього діагностичного обстеження.', en: 'Determined individually based on procedure scope following initial diagnostic assessment.' }
+      },
+      {
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
+        text: { ua: 'Виконується за допомогою спеціальних інструментів, що проводяться через канал ендоскопа безпосередньо до осередку ураження.', en: 'Executed using surgical accessories guided through the endoscope channel directly to the target area.' }
+      },
+      {
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
+        text: { ua: 'Забезпечується повний анальгетичний захист або комбінована анестезія для максимальної безпеки.', en: 'Full pain management or general sedation is provided for complete safety and tranquility.' }
+      }
+    ]
+  }
+};
+
+let activeModalServiceKey = null;
+
+function initServiceModal() {
+  const modal = document.getElementById('service-modal');
+  if (!modal) return;
+
+  const closeBtns = modal.querySelectorAll('[data-modal-close]');
+  const modalTitle = document.getElementById('modal-service-title');
+  const modalSubtitle = document.getElementById('modal-service-subtitle');
+  const modalDesc = document.getElementById('modal-service-desc');
+  const modalStepsContainer = document.getElementById('modal-service-steps');
+
+  // Open modal triggers
+  document.querySelectorAll('[data-service-key]').forEach(card => {
+    card.addEventListener('click', (e) => {
+      const key = card.dataset.serviceKey;
+      openModal(key);
+    });
+  });
+
+  function openModal(key) {
+    const data = SERVICES_DATA[key];
+    if (!data) return;
+
+    activeModalServiceKey = key;
+    renderModalContent(data);
+
+    modal.classList.add('modal--active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('modal--active');
+    document.body.style.overflow = '';
+    activeModalServiceKey = null;
+  }
+
+  function renderModalContent(data) {
+    const lang = currentLang;
+    if (modalTitle) modalTitle.textContent = data.title[lang] || data.title.ua;
+    if (modalSubtitle) modalSubtitle.textContent = data.subtitle[lang] || data.subtitle.ua;
+    if (modalDesc) modalDesc.textContent = data.desc[lang] || data.desc.ua;
+
+    if (modalStepsContainer) {
+      modalStepsContainer.innerHTML = data.steps.map(step => `
+        <div class="modal-step">
+          <h4 class="modal-step__title">${step.title[lang] || step.title.ua}</h4>
+          <p class="modal-step__text">${step.text[lang] || step.text.ua}</p>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Event listeners for close
+  closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('modal__overlay')) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('modal--active')) {
+      closeModal();
+    }
+  });
+
+  // Re-render open modal on language switch
+  window.addEventListener('languageChanged', (e) => {
+    if (activeModalServiceKey && SERVICES_DATA[activeModalServiceKey]) {
+      renderModalContent(SERVICES_DATA[activeModalServiceKey]);
+    }
+  });
+}
+
