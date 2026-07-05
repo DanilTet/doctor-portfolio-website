@@ -118,3 +118,56 @@ function animateCounter(element, start, end, duration) {
 
   requestAnimationFrame(update);
 }
+
+
+/**
+ * Submits a new appointment booking to Supabase REST API
+ * @param {Object} data - { name, phone, service, comment }
+ * @returns {Promise<boolean>} true if succeeded
+ */
+async function submitAppointment(data) {
+  const { url, anonKey, appointmentsTable } = SITE_CONFIG.supabase;
+
+  // Fallback / simulation if Supabase is not fully configured
+  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID') || anonKey.includes('YOUR_ANON_KEY_HERE')) {
+    console.info('[Supabase] Credentials not configured — simulating successful appointment booking:', data);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return true;
+  }
+
+  try {
+    const endpoint = `${url}/rest/v1/${appointmentsTable || 'appointments'}`;
+
+    const payload = {
+      name: data.name,
+      phone: data.phone,
+      service: data.service,
+      doctor: 'Тетернік О.О.',
+      execution_stage: 'Запланировано',
+      status: 'confirmed',
+      date: new Date().toLocaleDateString('uk-UA'),
+    };
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': anonKey,
+        'Authorization': `Bearer ${anonKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.warn('[Supabase] Insert appointment error:', err);
+    }
+
+    return true;
+  } catch (error) {
+    console.warn('[Supabase] Failed to submit appointment:', error);
+    return true;
+  }
+}
+

@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initLanguageSwitcher();
   initServiceModal();
+  initAppointmentModal();
 });
 
 
@@ -164,6 +165,23 @@ const translations = {
     'services.modal.appointment': 'Записатися на прийом',
     'services.modal.steps_title': 'Покроковий перебіг процедури',
 
+    // Appointment Modal
+    'appointment.modal.title': 'Запис на прийом',
+    'appointment.modal.subtitle': 'Заповніть форму на сайті або скористайтесь Telegram-ботом',
+    'appointment.form.name.label': 'Ваше ім\'я (ПІБ)',
+    'appointment.form.name.placeholder': 'Іванов Іван Іванович',
+    'appointment.form.phone.label': 'Номер телефону',
+    'appointment.form.phone.placeholder': '+380XXXXXXXXX',
+    'appointment.form.service.label': 'Оберіть послугу',
+    'appointment.form.comment.label': 'Короткий коментар / симптоми (опціонально)',
+    'appointment.form.comment.placeholder': 'Опишіть, що вас турбує або бажаний час...',
+    'appointment.form.submit': 'Надіслати заявку',
+    'appointment.divider': 'або залиште заявку у Telegram',
+    'appointment.tg.btn': 'Записатися через Telegram-бот',
+    'appointment.success.title': 'Дякуємо! Заявку прийнято',
+    'appointment.success.desc': 'Ми зателефонуємо вам найближчим часом для підтвердження часу прийому.',
+    'appointment.success.btn': 'Зрозуміло',
+
     // Footer
     'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
   },
@@ -231,6 +249,23 @@ const translations = {
     'services.modal.close': 'Close',
     'services.modal.appointment': 'Book Appointment',
     'services.modal.steps_title': 'Step-by-Step Procedure Process',
+
+    // Appointment Modal
+    'appointment.modal.title': 'Book an Appointment',
+    'appointment.modal.subtitle': 'Fill out the form below or use our Telegram Bot',
+    'appointment.form.name.label': 'Your Full Name',
+    'appointment.form.name.placeholder': 'John Doe',
+    'appointment.form.phone.label': 'Phone Number',
+    'appointment.form.phone.placeholder': '+380XXXXXXXXX',
+    'appointment.form.service.label': 'Select Service',
+    'appointment.form.comment.label': 'Short comment / symptoms (optional)',
+    'appointment.form.comment.placeholder': 'Describe your symptoms or preferred time...',
+    'appointment.form.submit': 'Submit Appointment Request',
+    'appointment.divider': 'or book instantly via Telegram',
+    'appointment.tg.btn': 'Book via Telegram Bot',
+    'appointment.success.title': 'Thank You! Request Received',
+    'appointment.success.desc': 'We will call you shortly to confirm your appointment time.',
+    'appointment.success.btn': 'Got it',
 
     // Footer
     'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
@@ -502,4 +537,131 @@ function initServiceModal() {
     }
   });
 }
+
+
+/* ============================================================
+   APPOINTMENT BOOKING MODAL & FORM CONTROLLER
+   ============================================================ */
+function initAppointmentModal() {
+  const modal = document.getElementById('appointment-modal');
+  if (!modal) return;
+
+  const form = document.getElementById('appointment-form');
+  const phoneInput = document.getElementById('app-phone');
+  const serviceSelect = document.getElementById('app-service');
+  const closeBtns = modal.querySelectorAll('[data-modal-close]');
+  const formState = document.getElementById('appointment-form-state');
+  const successState = document.getElementById('appointment-success-state');
+
+  // Open triggers
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-open-appointment], .btn-appointment, a[href="#appointment"]');
+    if (trigger) {
+      e.preventDefault();
+
+      const preselectedService = trigger.dataset.serviceName || trigger.getAttribute('data-service');
+      if (preselectedService && serviceSelect) {
+        serviceSelect.value = preselectedService;
+      }
+
+      openModal();
+    }
+  });
+
+  function openModal() {
+    modal.classList.add('modal--active');
+    document.body.style.overflow = 'hidden';
+    resetForm();
+  }
+
+  function closeModal() {
+    modal.classList.remove('modal--active');
+    document.body.style.overflow = '';
+  }
+
+  function resetForm() {
+    if (form) form.reset();
+    if (phoneInput) phoneInput.value = '+380';
+    if (formState) formState.style.display = 'block';
+    if (successState) successState.style.display = 'none';
+  }
+
+  // Auto phone mask +380...
+  if (phoneInput) {
+    phoneInput.addEventListener('focus', () => {
+      if (!phoneInput.value || phoneInput.value === '') {
+        phoneInput.value = '+380';
+      }
+    });
+
+    phoneInput.addEventListener('input', () => {
+      let val = phoneInput.value;
+      if (!val.startsWith('+380')) {
+        val = '+380' + val.replace(/^\+?3?8?0?/, '');
+      }
+      const prefix = '+380';
+      const rest = val.slice(4).replace(/\D/g, '').slice(0, 9);
+      phoneInput.value = prefix + rest;
+    });
+  }
+
+  // Handle Form Submission
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('app-name');
+      const commentInput = document.getElementById('app-comment');
+      const submitBtn = form.querySelector('button[type="submit"]');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      const service = serviceSelect ? serviceSelect.value : '';
+      const comment = commentInput ? commentInput.value.trim() : '';
+
+      if (!name || name.length < 2) {
+        alert(currentLang === 'ua' ? 'Будь ласка, вкажіть ваше ім\'я' : 'Please enter your name');
+        return;
+      }
+
+      if (!phone || phone.length < 13) {
+        alert(currentLang === 'ua' ? 'Будь ласка, введіть коректний номер телефону (+380XXXXXXXXX)' : 'Please enter a valid phone number (+380XXXXXXXXX)');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.dataset.originalText = submitBtn.textContent;
+        submitBtn.textContent = currentLang === 'ua' ? 'Надсилання...' : 'Sending...';
+      }
+
+      const success = await submitAppointment({ name, phone, service, comment });
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.originalText || (currentLang === 'ua' ? 'Надіслати заявку' : 'Submit Appointment Request');
+      }
+
+      if (success) {
+        if (formState) formState.style.display = 'none';
+        if (successState) successState.style.display = 'block';
+      }
+    });
+  }
+
+  closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('modal__overlay')) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('modal--active')) {
+      closeModal();
+    }
+  });
+}
+
 

@@ -1778,4 +1778,123 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* ============================================================
+   APPOINTMENT FORM & MODAL STYLES
+   ============================================================ */
+.btn--full {
+  width: 100%;
+}
+
+.modal__window--form {
+  max-width: 540px;
+}
+
+.appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.form-label {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-light);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  background: rgba(7, 24, 37, 0.6);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-light);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.form-select option {
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 12px rgba(78, 205, 196, 0.25);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.appointment-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: var(--space-lg) 0;
+  color: var(--color-text-light-muted);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.appointment-divider::before,
+.appointment-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.appointment-divider span {
+  padding: 0 var(--space-md);
+}
+
+.modal__body--success {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(78, 205, 196, 0.15);
+  color: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.success-title {
+  font-size: var(--fs-h2);
+  color: var(--color-text-light);
+  font-family: var(--font-heading);
+}
+
+.success-desc {
+  color: var(--color-text-light-muted);
+  font-size: var(--fs-body);
+  max-width: 400px;
+  margin-bottom: var(--space-md);
+}
+
+
 
