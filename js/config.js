@@ -25,7 +25,7 @@ const SITE_CONFIG = {
   //  СТАТИСТИКА
   // ──────────────────────────────────────────────
   stats: {
-    experience:          45,
+    experience:          42,
     
     // БАЗА ДАНИХ: вимикаємо через сміття в таблиці
     patientsFromSupabase: false,
