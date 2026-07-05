@@ -1381,13 +1381,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .about__role {
   font-size: var(--fs-body-lg);
-  color: var(--color-primary-light);
+  color: var(--color-primary);
   font-weight: var(--fw-semibold);
   margin-top: var(--space-xs);
 }
 
 .about__bio p {
-  color: var(--color-text-light-muted);
+  color: var(--color-text-dark-muted);
   line-height: var(--lh-relaxed);
   margin-bottom: var(--space-sm);
 }
@@ -1400,13 +1400,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .about__tag {
-  background: rgba(78, 205, 196, 0.1);
-  color: var(--color-primary-light);
-  border: 1px solid rgba(78, 205, 196, 0.2);
+  background: rgba(78, 205, 196, 0.15);
+  color: var(--color-primary);
+  border: 1px solid rgba(78, 205, 196, 0.3);
   padding: 0.4rem 1rem;
   border-radius: var(--radius-full);
   font-size: var(--fs-small);
-  font-weight: var(--fw-medium);
+  font-weight: var(--fw-semibold);
   transition: all var(--transition-base);
 }
 
