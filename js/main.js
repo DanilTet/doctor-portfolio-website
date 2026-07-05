@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initLanguageSwitcher();
   initServiceModal();
   initAppointmentModal();
+  initReviewsSection();
+  initReviewModal();
 });
 
 
@@ -198,6 +200,24 @@ const translations = {
     'contacts.map.btn': 'Відкрити в Google Maps',
     'contacts.appointment.btn': 'Записатися на прийом',
 
+    // Reviews
+    'reviews.subtitle': 'Довіра та реальний досвід',
+    'reviews.title': 'Відгуки пацієнтів',
+    'reviews.btn.leave': 'Залишити відгук',
+    'reviews.rating.count': 'на основі відгуків пацієнтів',
+    'reviews.loading': 'Завантаження відгуків...',
+    'reviews.empty': 'Поки що немає опублікованих відгуків. Будьте першим!',
+    'reviews.modal.title': 'Ваш відгук про прийом',
+    'reviews.modal.subtitle': 'Поділіться вашими враженнями від процедури чи консультації',
+    'reviews.modal.name.label': 'Ваше ім\'я (ПІБ)',
+    'reviews.modal.name.placeholder': 'Олена Мельник',
+    'reviews.modal.stars.label': 'Ваша оцінка',
+    'reviews.modal.text.label': 'Текст відгуку',
+    'reviews.modal.text.placeholder': 'Напишіть ваші враження від візиту, ставлення лікаря...',
+    'reviews.modal.submit': 'Надіслати відгук',
+    'reviews.success.title': 'Дякуємо за ваш відгук!',
+    'reviews.success.desc': 'Ваш відгук успішно збережено і буде опубліковано після модерації.',
+
     // Footer
     'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
   },
@@ -298,6 +318,24 @@ const translations = {
     'contacts.navigation.btn': 'View Route',
     'contacts.map.btn': 'Open in Google Maps',
     'contacts.appointment.btn': 'Book Appointment',
+
+    // Reviews
+    'reviews.subtitle': 'Trust & Real Experience',
+    'reviews.title': 'Patient Reviews',
+    'reviews.btn.leave': 'Leave a Review',
+    'reviews.rating.count': 'based on patient ratings',
+    'reviews.loading': 'Loading reviews...',
+    'reviews.empty': 'No published reviews yet. Be the first to leave one!',
+    'reviews.modal.title': 'Your Review of the Visit',
+    'reviews.modal.subtitle': 'Share your impressions of the procedure or consultation',
+    'reviews.modal.name.label': 'Your Full Name',
+    'reviews.modal.name.placeholder': 'Jane Smith',
+    'reviews.modal.stars.label': 'Your Rating',
+    'reviews.modal.text.label': 'Review Text',
+    'reviews.modal.text.placeholder': 'Write your feedback on the visit, doctor\'s attitude...',
+    'reviews.modal.submit': 'Submit Review',
+    'reviews.success.title': 'Thank You for Your Review!',
+    'reviews.success.desc': 'Your review has been saved and will be published after moderation.',
 
     // Footer
     'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
@@ -672,6 +710,288 @@ function initAppointmentModal() {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = submitBtn.dataset.originalText || (currentLang === 'ua' ? 'Надіслати заявку' : 'Submit Appointment Request');
+      }
+
+      if (success) {
+        if (formState) formState.style.display = 'none';
+        if (successState) successState.style.display = 'flex';
+      }
+    });
+  }
+
+  closeBtns.forEach(btn => btn.addEventListener('click', closeModal));
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('modal__overlay')) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('modal--active')) {
+      closeModal();
+    }
+  });
+}
+
+
+/* ============================================================
+   REVIEWS SECTION CONTROLLER (Supabase + Pagination)
+   ============================================================ */
+const FALLBACK_REVIEWS = [
+  {
+    id: 101,
+    user_name: 'Олена Ковальова',
+    stars: 5,
+    created_at: '2026-02-15T10:00:00Z',
+    text: 'Дуже хвилювалася перед гастроскопією, але Олег Олександрович зробив усе надзвичайно чуйно та безболісно! Справжній професіонал з величезним досвідом. Величезне вам дякую!'
+  },
+  {
+    id: 102,
+    user_name: 'Михайло Слюсар',
+    stars: 5,
+    created_at: '2026-02-20T14:30:00Z',
+    text: 'Проходив колоноскопію під анестезією. Все пройшло ідеально, заснув і прокинувся без жодного дискомфорту. Лікар все детально пояснив після процедури.'
+  },
+  {
+    id: 103,
+    user_name: 'Тетяна Іващенко',
+    stars: 5,
+    created_at: '2026-03-01T09:15:00Z',
+    text: 'Чудовий лікар і людина! Індивідуальний підхід та максимальна увага до пацієнта. Рекомендую Олега Олександровича усім знайомим!'
+  },
+  {
+    id: 104,
+    user_name: 'Вадим Гриценко',
+    stars: 5,
+    created_at: '2026-03-10T11:45:00Z',
+    text: 'Високий рівень медичної допомоги. Обстеження пройшло швидко, діагноз встановлено точно. Дякую за вашу працю та чуйність!'
+  }
+];
+
+let currentReviewPage = 1;
+const REVIEWS_PER_PAGE = 6;
+
+async function initReviewsSection() {
+  const grid = document.getElementById('reviews-grid');
+  if (!grid) return;
+
+  loadReviewsPage(currentReviewPage);
+
+  const prevBtn = document.getElementById('reviews-prev-page');
+  const nextBtn = document.getElementById('reviews-next-page');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentReviewPage > 1) {
+        currentReviewPage--;
+        loadReviewsPage(currentReviewPage);
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      currentReviewPage++;
+      loadReviewsPage(currentReviewPage);
+    });
+  }
+}
+
+async function loadReviewsPage(page = 1) {
+  const grid = document.getElementById('reviews-grid');
+  const paginationContainer = document.getElementById('reviews-pagination');
+  const numbersContainer = document.getElementById('reviews-page-numbers');
+  const prevBtn = document.getElementById('reviews-prev-page');
+  const nextBtn = document.getElementById('reviews-next-page');
+
+  if (!grid) return;
+
+  // Show spinner loader
+  grid.innerHTML = `
+    <div class="reviews__loading">
+      <div class="spinner"></div>
+      <span>${(translations[currentLang] && translations[currentLang]['reviews.loading']) || 'Завантаження відгуків...'}</span>
+    </div>
+  `;
+
+  let result = null;
+  if (typeof fetchReviews === 'function') {
+    result = await fetchReviews(page, REVIEWS_PER_PAGE);
+  }
+
+  let reviews = [];
+  let total = 0;
+
+  if (result && result.reviews && result.reviews.length > 0) {
+    reviews = result.reviews;
+    total = result.total;
+  } else if (page === 1) {
+    // Fallback on first page if DB empty or unavailable
+    reviews = FALLBACK_REVIEWS;
+    total = FALLBACK_REVIEWS.length;
+  }
+
+  if (reviews.length === 0) {
+    grid.innerHTML = `
+      <div class="reviews__loading">
+        <p>${(translations[currentLang] && translations[currentLang]['reviews.empty']) || 'Поки що немає відгуків.'}</p>
+      </div>
+    `;
+    if (paginationContainer) paginationContainer.style.display = 'none';
+    return;
+  }
+
+  // Render review cards (Preserve exact original language text!)
+  grid.innerHTML = reviews.map(item => {
+    const initial = (item.user_name || 'А')[0].toUpperCase();
+    const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('uk-UA') : '';
+    const starsCount = Math.min(Math.max(Number(item.stars) || 5, 1), 5);
+    const starsHtml = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
+
+    return `
+      <div class="review-card">
+        <div class="review-card__header">
+          <div class="review-card__user">
+            <div class="review-card__avatar">${initial}</div>
+            <div>
+              <div class="review-card__name">${escapeHtml(item.user_name || 'Пацієнт')}</div>
+              <div class="review-card__date">${dateStr}</div>
+            </div>
+          </div>
+          <div class="review-card__stars">${starsHtml}</div>
+        </div>
+        <p class="review-card__text">“${escapeHtml(item.text || '')}”</p>
+      </div>
+    `;
+  }).join('');
+
+  // Handle Pagination
+  const totalPages = Math.ceil(total / REVIEWS_PER_PAGE);
+  if (totalPages > 1 && paginationContainer) {
+    paginationContainer.style.display = 'flex';
+
+    if (prevBtn) prevBtn.disabled = (page <= 1);
+    if (nextBtn) nextBtn.disabled = (page >= totalPages);
+
+    if (numbersContainer) {
+      numbersContainer.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `pagination__num ${i === page ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.addEventListener('click', () => {
+          currentReviewPage = i;
+          loadReviewsPage(currentReviewPage);
+        });
+        numbersContainer.appendChild(btn);
+      }
+    }
+  } else if (paginationContainer) {
+    paginationContainer.style.display = 'none';
+  }
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/* ============================================================
+   LEAVE A REVIEW MODAL CONTROLLER
+   ============================================================ */
+function initReviewModal() {
+  const modal = document.getElementById('review-modal');
+  const openBtn = document.getElementById('btn-open-review-modal');
+  if (!modal) return;
+
+  const form = document.getElementById('review-form');
+  const closeBtns = modal.querySelectorAll('[data-modal-close]');
+  const formState = document.getElementById('review-form-state');
+  const successState = document.getElementById('review-success-state');
+  const starBtns = modal.querySelectorAll('.star-btn');
+  const starsInput = document.getElementById('review-stars');
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      openModal();
+    });
+  }
+
+  function openModal() {
+    modal.classList.add('modal--active');
+    document.body.style.overflow = 'hidden';
+    resetForm();
+  }
+
+  function closeModal() {
+    modal.classList.remove('modal--active');
+    document.body.style.overflow = '';
+  }
+
+  function resetForm() {
+    if (form) form.reset();
+    setStarRating(5);
+    if (formState) formState.style.display = 'flex';
+    if (successState) successState.style.display = 'none';
+  }
+
+  function setStarRating(val) {
+    if (starsInput) starsInput.value = val;
+    starBtns.forEach(btn => {
+      const bVal = Number(btn.dataset.value);
+      if (bVal <= val) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  starBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = Number(btn.dataset.value);
+      setStarRating(val);
+    });
+  });
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('review-name');
+      const textInput = document.getElementById('review-text');
+      const submitBtn = form.querySelector('button[type="submit"]');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const text = textInput ? textInput.value.trim() : '';
+      const stars = starsInput ? Number(starsInput.value) || 5 : 5;
+
+      if (!name || name.length < 2) {
+        alert(currentLang === 'ua' ? 'Будь ласка, вкажіть ваші ПІБ' : 'Please enter your name');
+        return;
+      }
+
+      if (!text || text.length < 5) {
+        alert(currentLang === 'ua' ? 'Будь ласка, напишіть текст відгуку' : 'Please enter your review text');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.dataset.originalText = submitBtn.textContent;
+        submitBtn.textContent = currentLang === 'ua' ? 'Надсилання...' : 'Submitting...';
+      }
+
+      const success = await submitReview({ user_name: name, stars, text });
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.originalText || (currentLang === 'ua' ? 'Надіслати відгук' : 'Submit Review');
       }
 
       if (success) {

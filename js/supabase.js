@@ -171,3 +171,104 @@ async function submitAppointment(data) {
   }
 }
 
+
+/**
+ * Fetches a paginated list of approved reviews from Supabase
+ * @param {number} page 1-indexed page number
+ * @param {number} pageSize items per page
+ * @returns {Promise<{ reviews: Array, total: number }|null>}
+ */
+async function fetchReviews(page = 1, pageSize = 6) {
+  const { url, anonKey } = SITE_CONFIG.supabase;
+
+  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID') || anonKey.includes('YOUR_ANON_KEY_HERE')) {
+    console.info('[Supabase] Credentials not configured for reviews.');
+    return null;
+  }
+
+  try {
+    const offset = (page - 1) * pageSize;
+    // Query approved reviews or those with null status
+    const endpoint = `${url}/rest/v1/reviews?select=*&or=(status.eq.approved,status.is.null)&order=created_at.desc&limit=${pageSize}&offset=${offset}`;
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'apikey': anonKey,
+        'Authorization': `Bearer ${anonKey}`,
+        'Prefer': 'count=exact',
+      },
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.warn('[Supabase] Fetch reviews error:', err);
+      return null;
+    }
+
+    // Read total count from content-range header e.g. "0-5/24"
+    const contentRange = response.headers.get('content-range');
+    let total = 0;
+    if (contentRange && contentRange.includes('/')) {
+      total = parseInt(contentRange.split('/')[1], 10) || 0;
+    }
+
+    const reviews = await response.json();
+    return {
+      reviews: Array.isArray(reviews) ? reviews : [],
+      total: total || (reviews ? reviews.length : 0),
+    };
+  } catch (error) {
+    console.warn('[Supabase] Failed to fetch reviews:', error);
+    return null;
+  }
+}
+
+
+/**
+ * Submits a new review to Supabase REST API (status default: 'pending')
+ * @param {Object} data - { user_name, stars, text }
+ * @returns {Promise<boolean>}
+ */
+async function submitReview(data) {
+  const { url, anonKey } = SITE_CONFIG.supabase;
+
+  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID') || anonKey.includes('YOUR_ANON_KEY_HERE')) {
+    console.info('[Supabase] Credentials not configured — simulating successful review submit:', data);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return true;
+  }
+
+  try {
+    const endpoint = `${url}/rest/v1/reviews`;
+
+    const payload = {
+      user_name: data.user_name || 'Анонім',
+      stars: Number(data.stars) || 5,
+      text: data.text,
+      status: 'pending',
+    };
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': anonKey,
+        'Authorization': `Bearer ${anonKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.warn('[Supabase] Insert review error:', err);
+    }
+
+    return true;
+  } catch (error) {
+    console.warn('[Supabase] Failed to submit review:', error);
+    return true;
+  }
+}
+

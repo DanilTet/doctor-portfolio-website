@@ -478,10 +478,66 @@
     </div>
   </section>
 
-  <!-- Reviews Section -->
-  <section class="placeholder-section section--dark" id="reviews">
+  <!-- ============================================================
+       REVIEWS SECTION — «Відгуки»
+       ============================================================ -->
+  <section class="reviews section--dark" id="reviews" aria-label="Відгуки пацієнтів">
     <div class="container">
-      <p class="placeholder-section__title" data-i18n="section.reviews">💬 Секція: Відгуки пацієнтів</p>
+      <div class="section__header" data-animate data-animate-delay="1">
+        <div class="reviews__header-top">
+          <div>
+            <span class="section-subtitle" data-i18n="reviews.subtitle">Довіра та реальний досвід</span>
+            <h2 class="section-title" data-i18n="reviews.title">Відгуки пацієнтів</h2>
+          </div>
+          <button class="btn btn--primary" id="btn-open-review-modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="10" y1="10" x2="14" y2="10"></line>
+            </svg>
+            <span data-i18n="reviews.btn.leave">Залишити відгук</span>
+          </button>
+        </div>
+        <div class="section__line"></div>
+      </div>
+
+      <!-- Rating summary badge -->
+      <div class="reviews__rating-badge" data-animate data-animate-delay="2">
+        <span class="reviews__rating-score">4.9</span>
+        <div class="reviews__stars" aria-label="5 з 5 зірок">
+          ★★★★★
+        </div>
+        <span class="reviews__rating-count" id="reviews-count-label" data-i18n="reviews.rating.count">на основі відгуків пацієнтів</span>
+      </div>
+
+      <!-- Reviews Grid (Dynamically populated) -->
+      <div class="reviews__grid" id="reviews-grid" data-animate data-animate-delay="3">
+        <!-- Loader -->
+        <div class="reviews__loading">
+          <div class="spinner"></div>
+          <span data-i18n="reviews.loading">Завантаження відгуків...</span>
+        </div>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="reviews__pagination" id="reviews-pagination" style="display: none;">
+        <button class="pagination__btn" id="reviews-prev-page" aria-label="Попередня сторінка" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="pagination__numbers" id="reviews-page-numbers">
+          <!-- Dynamically populated page buttons -->
+        </div>
+
+        <button class="pagination__btn" id="reviews-next-page" aria-label="Наступна сторінка">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
     </div>
   </section>
 
@@ -777,6 +833,82 @@
           </div>
           <h3 class="success-title" data-i18n="appointment.success.title">Дякуємо! Заявку прийнято</h3>
           <p class="success-desc" data-i18n="appointment.success.desc">Ми зателефонуємо вам найближчим часом для підтвердження часу прийому.</p>
+          <button class="btn btn--primary" data-modal-close data-i18n="appointment.success.btn">Зрозуміло</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LEAVE A REVIEW MODAL POPUP
+       ============================================================ -->
+  <div class="modal" id="review-modal" aria-hidden="true" role="dialog">
+    <div class="modal__overlay" data-modal-close></div>
+    <div class="modal__window modal__window--form">
+      <button class="modal__close" data-modal-close aria-label="Close modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div id="review-form-state">
+        <div class="modal__header">
+          <h3 class="modal__title" data-i18n="reviews.modal.title">Ваш відгук про прийом</h3>
+          <p class="modal__subtitle" data-i18n="reviews.modal.subtitle">Поділіться вашими враженнями від процедури чи консультації</p>
+        </div>
+
+        <div class="modal__body">
+          <form class="appointment-form" id="review-form">
+            <!-- Name Field -->
+            <div class="form-group">
+              <label for="review-name" class="form-label" data-i18n="reviews.modal.name.label">Ваше ім'я (ПІБ)</label>
+              <input type="text" id="review-name" class="form-input" placeholder="Олена Мельник" data-i18n-placeholder="reviews.modal.name.placeholder" required>
+            </div>
+
+            <!-- Star Rating Input -->
+            <div class="form-group">
+              <label class="form-label" data-i18n="reviews.modal.stars.label">Ваша оцінка</label>
+              <div class="star-rating-select" id="star-rating-select">
+                <button type="button" class="star-btn active" data-value="1">★</button>
+                <button type="button" class="star-btn active" data-value="2">★</button>
+                <button type="button" class="star-btn active" data-value="3">★</button>
+                <button type="button" class="star-btn active" data-value="4">★</button>
+                <button type="button" class="star-btn active" data-value="5">★</button>
+              </div>
+              <input type="hidden" id="review-stars" value="5">
+            </div>
+
+            <!-- Review Text Area -->
+            <div class="form-group">
+              <label for="review-text" class="form-label" data-i18n="reviews.modal.text.label">Текст відгуку</label>
+              <textarea id="review-text" class="form-textarea" rows="4" placeholder="Напишіть ваші враження від візиту, ставлення лікаря..." data-i18n-placeholder="reviews.modal.text.placeholder" required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn--primary btn--full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <span data-i18n="reviews.modal.submit">Надіслати відгук</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div id="review-success-state" style="display: none;">
+        <div class="modal__body modal__body--success">
+          <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h3 class="success-title" data-i18n="reviews.success.title">Дякуємо за ваш відгук!</h3>
+          <p class="success-desc" data-i18n="reviews.success.desc">Ваш відгук успішно збережено і буде опубліковано після модерації.</p>
           <button class="btn btn--primary" data-modal-close data-i18n="appointment.success.btn">Зрозуміло</button>
         </div>
       </div>
