@@ -582,7 +582,7 @@ function initAppointmentModal() {
   function resetForm() {
     if (form) form.reset();
     if (phoneInput) phoneInput.value = '+380';
-    if (formState) formState.style.display = 'block';
+    if (formState) formState.style.display = 'flex';
     if (successState) successState.style.display = 'none';
   }
 
@@ -644,7 +644,7 @@ function initAppointmentModal() {
 
       if (success) {
         if (formState) formState.style.display = 'none';
-        if (successState) successState.style.display = 'block';
+        if (successState) successState.style.display = 'flex';
       }
     });
   }
