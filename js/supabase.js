@@ -56,7 +56,7 @@ async function fetchAppointmentCount() {
  * Initializes the patient count stat with Supabase data or fallback
  */
 async function initPatientCount() {
-  const { patientsFromSupabase, patientsStaticCount } = SITE_CONFIG.stats;
+  const { patientsFromSupabase, patientsStaticCount, smartCounter } = SITE_CONFIG.stats;
   const statEl = document.getElementById('stat-patients');
   if (!statEl) return;
 
@@ -69,7 +69,20 @@ async function initPatientCount() {
     count = await fetchAppointmentCount();
   }
 
-  // Use static fallback if Supabase is unavailable or not configured
+  // Якщо БД вимкнена або недоступна — використовуємо "Розумний лічильник"
+  if (count === null && smartCounter && smartCounter.enabled) {
+    const start = new Date(smartCounter.baseDate);
+    const now = new Date();
+    
+    // Рахуємо різницю в часі
+    const diffTime = Math.max(0, now - start);
+    // Переводимо мілісекунди в місяці (приблизно 30.44 днів у місяці)
+    const diffMonths = diffTime / (1000 * 60 * 60 * 24 * 30.44); 
+    
+    count = Math.floor(smartCounter.baseCount + (diffMonths * smartCounter.patientsPerMonth));
+  }
+
+  // Use static fallback if everything else fails
   if (count === null) {
     count = patientsStaticCount;
   }
