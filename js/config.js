@@ -1,48 +1,43 @@
 /**
  * config.js — Site Configuration
- * Doctor Portfolio Website — Тетернік О.О.
+ * Reads secrets from js/env.js (gitignored, never committed)
  *
- * ⚠️  ВАЖЛИВО: Вставте ваші дані Supabase нижче!
- * Щоб знайти ці дані: Supabase Dashboard → Settings → API
+ * Щоб підключити Supabase:
+ *   1. Відкрийте js/env.js
+ *   2. Вставте реальні значення SUPABASE_URL і SUPABASE_ANON_KEY
+ *   3. Збережіть — готово!
  */
+
+// Читаємо секрети з env.js (або використовуємо безпечні порожні значення)
+const ENV = window.ENV || {};
 
 const SITE_CONFIG = {
   // ──────────────────────────────────────────────
-  //  SUPABASE — Підключення до бази даних
+  //  SUPABASE — підключається через js/env.js
   // ──────────────────────────────────────────────
   supabase: {
-    // Ваш Project URL (Settings → API → Project URL)
-    url: 'https://YOUR_PROJECT_ID.supabase.co',
-
-    // Ваш anon/public ключ (Settings → API → Project API Keys → anon public)
-    anonKey: 'YOUR_ANON_KEY_HERE',
-
-    // Назва таблиці з записами на прийом
+    url:               ENV.SUPABASE_URL      || '',
+    anonKey:           ENV.SUPABASE_ANON_KEY || '',
     appointmentsTable: 'appointments',
-
-    // Колонка з датою (якщо потрібно фільтрувати від певної дати)
-    dateColumn: 'created_at',
-
-    // Дата початку підрахунку (лютий 2026)
-    countFrom: '2026-02-01',
+    dateColumn:        'created_at',
+    countFrom:         '2026-02-01',
   },
 
   // ──────────────────────────────────────────────
-  //  СТАТИСТИКА — Дані для секції «Цифри довіри»
+  //  СТАТИСТИКА
   // ──────────────────────────────────────────────
   stats: {
-    experience: 45,           // Років досвіду
-    certificates: null,       // Сертифікатів (null = заховати блок поки немає даних)
-    patientsFromSupabase: true,  // true = брати з Supabase | false = використати staticCount
-    patientsStaticCount: 1200,   // Запасне значення якщо Supabase недоступний
-    patientsSince: 'лютого 2026',     // Текст підпису
-    patientsSinceEn: 'February 2026', // English
+    experience:          45,
+    patientsFromSupabase: true,
+    patientsStaticCount:  1200,
+    patientsSince:        'лютого 2026',
+    patientsSinceEn:      'February 2026',
   },
 
   // ──────────────────────────────────────────────
-  //  TELEGRAM BOT — Посилання для запису
+  //  TELEGRAM BOT — підключається через js/env.js
   // ──────────────────────────────────────────────
   telegram: {
-    botLink: 'https://t.me/YOUR_BOT_USERNAME', // Замініть на реальне посилання
+    botLink: ENV.TELEGRAM_BOT_LINK || '#',
   },
 };
