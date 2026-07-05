@@ -138,6 +138,23 @@ const translations = {
     'section.reviews': 'Відгуки пацієнтів',
     'section.contacts': 'Контакти',
 
+    // About
+    'about.subtitle': 'Знайомство з лікарем',
+    'about.title': 'Тетернік Олег Олександрович',
+    'about.role': 'Лікар Хірург Ендоскопіст',
+    'about.bio.1': 'Професіонал з 42-річним досвідом у проведенні високоточних ендоскопічних та хірургічних втручань. Основний пріоритет — максимальна безпека, безболісність та комфорт пацієнта під час кожної процедури.',
+    'about.bio.2': 'Завдяки сучасному обладнанню та індивідуальному підходу, ми забезпечуємо точну діагностику та ефективне лікування захворювань шлунково-кишкового тракту.',
+    'about.spec.1': 'Гастроскопія',
+    'about.spec.2': 'Колоноскопія',
+    'about.spec.3': 'ЕРХПГ',
+    'about.spec.4': 'Бронхоскопія',
+    'about.spec.5': 'УЗД',
+    'about.spec.6': 'Хірургія',
+    'about.card.location.label': 'Місце прийому',
+    'about.card.location.value': '17 лікарня, м.Харків, пр.Героїв Харкова 195',
+    'about.card.phone.label': 'Телефон',
+    'about.btn': 'Записатися через Telegram',
+
     // Footer
     'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
   },
@@ -180,6 +197,23 @@ const translations = {
     'section.diplomas': 'Diplomas & Certificates',
     'section.reviews': 'Patient Reviews',
     'section.contacts': 'Contacts',
+
+    // About
+    'about.subtitle': 'Meet the Doctor',
+    'about.title': 'Teternick Oleg Oleksandrovych',
+    'about.role': 'Surgeon Endoscopist',
+    'about.bio.1': 'A professional with 42 years of experience in performing highly precise endoscopic and surgical interventions. The main priority is maximum safety, painlessness, and patient comfort during every procedure.',
+    'about.bio.2': 'Thanks to modern equipment and an individual approach, we provide accurate diagnostics and effective treatment of gastrointestinal tract diseases.',
+    'about.spec.1': 'Gastroscopy',
+    'about.spec.2': 'Colonoscopy',
+    'about.spec.3': 'ERCP',
+    'about.spec.4': 'Bronchoscopy',
+    'about.spec.5': 'Ultrasound',
+    'about.spec.6': 'Surgery',
+    'about.card.location.label': 'Location',
+    'about.card.location.value': '17th Hospital, Kharkiv, Heroiv Kharkova Ave 195',
+    'about.card.phone.label': 'Phone',
+    'about.btn': 'Book via Telegram',
 
     // Footer
     'footer.copy': '© 2026 Teternick O.O. All rights reserved.',

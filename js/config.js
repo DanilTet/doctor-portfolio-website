@@ -48,6 +48,6 @@ const SITE_CONFIG = {
   //  Просто вставте посилання на вашого бота:
   // ──────────────────────────────────────────────
   telegram: {
-    botLink: 'https://t.me/YOUR_BOT_USERNAME', // ← замініть тут
+    botLink: 'https://t.me/AppointmentEndoscopyBot',
   },
 };
