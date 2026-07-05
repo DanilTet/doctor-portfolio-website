@@ -120,12 +120,12 @@
 
         <!-- Specialization -->
         <p class="hero__specialization" data-i18n="hero.specialization">
-          Професійний лікар з багаторічним досвідом. Індивідуальний підхід до кожного пацієнта та сучасні методи лікування.
+          Лікар-ендоскопіст вищої категорії з 45-річним досвідом. Діагностична та лікувальна ендоскопія — індивідуальний підхід до кожного пацієнта.
         </p>
 
         <!-- Experience Highlight -->
         <div class="hero__experience">
-          <span class="hero__experience-number" data-i18n="hero.experience.number">20+</span>
+          <span class="hero__experience-number" data-i18n="hero.experience.number">45</span>
           <span class="hero__experience-label" data-i18n="hero.experience.label">Років професійного<br>досвіду в медицині</span>
         </div>
 
@@ -206,10 +206,61 @@
        SECTION PLACEHOLDERS (to be implemented)
        ============================================================ -->
 
-  <!-- Stats Section -->
-  <section class="placeholder-section section--dark" id="stats">
+  <!-- ============================================================
+       STATS SECTION — «Цифри довіри»
+       ============================================================ -->
+  <section class="stats" id="stats" aria-label="Статистика">
+    <div class="stats__bg" aria-hidden="true"></div>
     <div class="container">
-      <p class="placeholder-section__title" data-i18n="section.stats">🔢 Секція: Цифри довіри</p>
+      <div class="stats__inner">
+
+        <!-- Stat 1: Experience -->
+        <div class="stats__item" data-animate data-animate-delay="1">
+          <div class="stats__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="stats__number" id="stat-experience">45</div>
+          <div class="stats__label" data-i18n="stats.exp.label">Років досвіду</div>
+          <div class="stats__sublabel" data-i18n="stats.exp.sub">в ендоскопії та медицині</div>
+        </div>
+
+        <!-- Stat 2: Patients (live from Supabase) -->
+        <div class="stats__item" data-animate data-animate-delay="2">
+          <div class="stats__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="stats__number" id="stat-patients">...</div>
+          <div class="stats__label" data-i18n="stats.patients.label">Прийомів з Telegram-боту</div>
+          <div class="stats__sublabel">
+            <span data-i18n="stats.patients.sub">з лютого 2026 року</span>
+          </div>
+          <div class="stats__live-badge">
+            <span class="stats__live-dot"></span>
+            <span data-i18n="stats.patients.live">Live</span>
+          </div>
+        </div>
+
+        <!-- Stat 3: Specialization highlight -->
+        <div class="stats__item" data-animate data-animate-delay="3">
+          <div class="stats__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+          </div>
+          <div class="stats__number" style="font-size: clamp(1.5rem, 2.5vw, 2rem); -webkit-text-fill-color: unset; background: none; color: var(--color-primary-light);" data-i18n="stats.spec.number">Ендоскопіст</div>
+          <div class="stats__label" data-i18n="stats.spec.label">Спеціалізація</div>
+          <div class="stats__sublabel" data-i18n="stats.spec.sub">діагностична та лікувальна ендоскопія</div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -262,8 +313,16 @@
 
 
   <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/main.js"></script>
   <script src="js/animations.js"></script>
+  <script>
+    // Init patient counter after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      initPatientCount();
+    });
+  </script>
 
 </body>
 </html>

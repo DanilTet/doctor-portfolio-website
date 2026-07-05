@@ -1148,3 +1148,182 @@ h1, h2, h3, h4, h5, h6 {
     font-size: var(--fs-xs);
   }
 }
+
+
+/* ============================================================
+   STATS SECTION — «Цифри довіри»
+   ============================================================ */
+.stats {
+  position: relative;
+  padding: var(--space-3xl) 0;
+  background: var(--color-bg-dark-lighter);
+  overflow: hidden;
+}
+
+/* Decorative top/bottom borders */
+.stats::before,
+.stats::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-primary) 20%,
+    var(--color-primary-light) 50%,
+    var(--color-primary) 80%,
+    transparent
+  );
+  opacity: 0.25;
+}
+
+.stats::before { top: 0; }
+.stats::after  { bottom: 0; }
+
+/* Subtle background pattern */
+.stats__bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(78, 205, 196, 0.04) 1px, transparent 0);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.stats__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+/* Vertical divider between cards */
+.stats__item:not(:last-child) {
+  border-right: 1px solid rgba(78, 205, 196, 0.1);
+}
+
+/* Single stat card */
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  position: relative;
+  transition: background var(--transition-base);
+}
+
+.stats__item:hover {
+  background: rgba(78, 205, 196, 0.04);
+}
+
+/* Icon */
+.stats__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-glow);
+  border: 1px solid var(--color-border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.stats__item:hover .stats__icon {
+  background: var(--color-primary-gradient);
+  border-color: transparent;
+  box-shadow: var(--shadow-glow);
+}
+
+.stats__icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary-light);
+  transition: color var(--transition-base);
+}
+
+.stats__item:hover .stats__icon svg {
+  color: #fff;
+}
+
+/* Number / Counter */
+.stats__number {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  background: var(--color-primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+/* Label */
+.stats__label {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-light);
+  margin-bottom: var(--space-xs);
+}
+
+/* Sub-label */
+.stats__sublabel {
+  font-size: var(--fs-xs);
+  color: var(--color-text-light-muted);
+  letter-spacing: 0.03em;
+  line-height: var(--lh-normal);
+}
+
+/* Live badge for patient counter */
+.stats__live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: var(--space-sm);
+  padding: 3px 10px;
+  background: rgba(78, 205, 196, 0.08);
+  border: 1px solid rgba(78, 205, 196, 0.2);
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  color: var(--color-primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stats__live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .stats__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .stats__item:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid rgba(78, 205, 196, 0.1);
+  }
+
+  .stats__item {
+    padding: var(--space-xl);
+  }
+
+  .stats__number {
+    font-size: 3rem;
+  }
+}
+
