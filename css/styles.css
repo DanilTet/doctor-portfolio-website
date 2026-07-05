@@ -1701,7 +1701,22 @@ h1, h2, h3, h4, h5, h6 {
 .modal__body {
   padding: var(--space-lg) var(--space-2xl) var(--space-xl);
   overflow-y: auto;
-  flex-grow: 1;
+  flex: 1;
+  min-height: 0;
+}
+
+.modal__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal__body::-webkit-scrollbar-track {
+  background: rgba(7, 24, 37, 0.4);
+  border-radius: 4px;
+}
+
+.modal__body::-webkit-scrollbar-thumb {
+  background: var(--color-primary-light);
+  border-radius: 4px;
 }
 
 .modal__desc {
@@ -1787,6 +1802,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .modal__window--form {
   max-width: 540px;
+}
+
+#appointment-form-state,
+#appointment-success-state {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .appointment-form {
