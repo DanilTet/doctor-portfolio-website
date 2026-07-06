@@ -471,12 +471,439 @@
     </div>
   </section>
 
-  <!-- Diplomas Section -->
-  <section class="placeholder-section section--light" id="diplomas">
+  <!-- ============================================================
+       DIPLOMAS SECTION — «Дипломи та сертифікати»
+       ============================================================ -->
+  <section class="diplomas section--dark-alt" id="diplomas" aria-label="Дипломи та сертифікати">
+    <div class="diplomas__bg" aria-hidden="true">
+      <div class="diplomas__bg-orb diplomas__bg-orb--1"></div>
+      <div class="diplomas__bg-orb diplomas__bg-orb--2"></div>
+    </div>
     <div class="container">
-      <p class="placeholder-section__title" data-i18n="section.diplomas">🎓 Секція: Дипломи та сертифікати</p>
+      <!-- Section Header -->
+      <div class="section__header" data-animate data-animate-delay="1">
+        <span class="section-subtitle">Освіта та досягнення</span>
+        <h2 class="section-title">Дипломи та сертифікати</h2>
+        <div class="section__line"></div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="diplomas__tabs" data-animate data-animate-delay="2" role="tablist" aria-label="Категорії">
+        <button class="diplomas__tab active" role="tab" aria-selected="true" data-tab="education" id="tab-education">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+          </svg>
+          Освіта
+        </button>
+        <button class="diplomas__tab" role="tab" aria-selected="false" data-tab="certificates" id="tab-certificates">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="6"></circle>
+            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+          </svg>
+          Сертифікати
+        </button>
+        <button class="diplomas__tab" role="tab" aria-selected="false" data-tab="exhibitions" id="tab-exhibitions">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <path d="M3 9h18M9 21V9"></path>
+          </svg>
+          Конференції та виставки
+        </button>
+      </div>
+
+      <!-- ── TAB: EDUCATION ── -->
+      <div class="diplomas__panel active" role="tabpanel" id="panel-education" aria-labelledby="tab-education">
+        <!-- University Diploma Card -->
+        <div class="education-card" data-animate data-animate-delay="3">
+          <div class="education-card__glow" aria-hidden="true"></div>
+          <div class="education-card__badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+          </div>
+          <div class="education-card__content">
+            <span class="education-card__type">Диплом про вищу освіту</span>
+            <h3 class="education-card__title">Харківський національний медичний університет</h3>
+            <p class="education-card__degree">Лікувальна справа · Лікар-хірург</p>
+            <div class="education-card__meta">
+              <span class="education-card__meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                м. Харків, Україна
+              </span>
+              <span class="education-card__meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Заснований у 1805 р.
+              </span>
+            </div>
+            <p class="education-card__desc">Один з найстаріших та найпрестижніших медичних університетів України. Після закінчення університету присвоєно кваліфікацію лікаря вищої категорії.</p>
+          </div>
+          <div class="education-card__seal" aria-hidden="true">
+            <div class="education-card__seal-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: CERTIFICATES ── -->
+      <div class="diplomas__panel" role="tabpanel" id="panel-certificates" aria-labelledby="tab-certificates">
+        <div class="certs__grid">
+
+          <!-- Cert 1: Olympus 04/06 -->
+          <div class="cert-card" data-animate data-animate-delay="1">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <span class="cert-card__year">2021</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">Olympus Continuum | Endo Academy</span>
+              <h3 class="cert-card__title">CERTIFICATE №04/06</h3>
+              <p class="cert-card__desc">Screening Colorectal Cancer in Ukraine #3. Kyiv, Ukraine.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-olympus-04-06" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 2: Ендо-24 -->
+          <div class="cert-card" data-animate data-animate-delay="2">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <span class="cert-card__year">2024</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">ГО "Українська асоціація клінічної фармакології..."</span>
+              <h3 class="cert-card__title">Майстер-клас "ЕНДО-24"</h3>
+              <p class="cert-card__desc">Сертифікат №2024-2429-1002313-113117. 20 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-endo24" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 3: Endoscopy Days Lviv -->
+          <div class="cert-card" data-animate data-animate-delay="3">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </div>
+              <span class="cert-card__year">2023</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">ЛОР "ЛОЦЕМД МК" та КНП "1 ТМО"</span>
+              <h3 class="cert-card__title">ENDOSCOPY DAYS LVIV</h3>
+              <p class="cert-card__desc">Науково-практична конференція. Львів. 10 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-lviv-2023" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 4: Одеса Ендо 2024 -->
+          <div class="cert-card" data-animate data-animate-delay="1">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <span class="cert-card__year">2024</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">ГО "Українська асоціація клінічної фармакології..."</span>
+              <h3 class="cert-card__title">Одеса Ендо, 2024</h3>
+              <p class="cert-card__desc">Майстер-клас. Сертифікат №2024-1136-3707808-113117. 20 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-odesa-2024" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 5: УЗ інтервенції -->
+          <div class="cert-card" data-animate data-animate-delay="2">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+              </div>
+              <span class="cert-card__year">2025</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">Школа штудерної ультразвукової діагностики</span>
+              <h3 class="cert-card__title">Інтервенції під контролем УЗ для початківців</h3>
+              <p class="cert-card__desc">Майстер-клас. Номер 2025-2330-1007123-310039. 20 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-uz-interventions" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 6: НМУ Ендоскопічні інтервенції -->
+          <div class="cert-card" data-animate data-animate-delay="3">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+              </div>
+              <span class="cert-card__year">2024</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">НМУ імені О.О. Богомольця</span>
+              <h3 class="cert-card__title">Ендоскопічні інтервенції...</h3>
+              <p class="cert-card__desc">Тренінг з практичних навичок. Номер 2024-2273-1001306-100030. 25 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-nmu-interventions" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 7: Запальні захворювання -->
+          <div class="cert-card" data-animate data-animate-delay="1">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <span class="cert-card__year">2022</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">ГО "УГА", ВГО "АДУ", ТОВ "Мед Експерт"</span>
+              <h3 class="cert-card__title">Запальні та функціональні захворювання кишечника</h3>
+              <p class="cert-card__desc">Семінар з міжнародною участю. Сертифікат №1043065700652-2022. 20 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-ibd-2022" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 8: Olympus 01/11 -->
+          <div class="cert-card" data-animate data-animate-delay="2">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <span class="cert-card__year">2022</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">Olympus Continuum | Endo Academy</span>
+              <h3 class="cert-card__title">CERTIFICATE №01/11</h3>
+              <p class="cert-card__desc">Virtual Medical Expert Training "Endoscopic Ultrasound #1".</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-olympus-01-11" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 9: Ендо Одеса Аркадія -->
+          <div class="cert-card" data-animate data-animate-delay="3">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>
+              <span class="cert-card__year">2024</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">ГО "Українська асоціація клінічної фармакології..."</span>
+              <h3 class="cert-card__title">Ендо Одеса: Аркадія</h3>
+              <p class="cert-card__desc">Майстер-клас. Сертифікат №2024-1136-3707807-113117. 10 балів БПР.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-odesa-arkadia" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cert 10: Olympus 06/08 -->
+          <div class="cert-card" data-animate data-animate-delay="1">
+            <div class="cert-card__header">
+              <div class="cert-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <span class="cert-card__year">2022</span>
+            </div>
+            <div class="cert-card__body">
+              <span class="cert-card__org">Olympus Continuum | Endo Academy</span>
+              <h3 class="cert-card__title">CERTIFICATE №06/08</h3>
+              <p class="cert-card__desc">Medical Expert Training "Upper Endoscopy" on biological model. 15 балів.</p>
+            </div>
+            <div class="cert-card__footer">
+              <button class="cert-card__btn" data-cert-id="cert-olympus-06-08" aria-label="Дізнатися більше про сертифікат">
+                Дізнатися більше
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── TAB: EXHIBITIONS ── -->
+      <div class="diplomas__panel" role="tabpanel" id="panel-exhibitions" aria-labelledby="tab-exhibitions">
+        <div class="exhibits__list">
+
+          <!--
+            ════════════════════════════════════════════════
+            ШАБЛОН РЯДКА ВИСТАВКИ / КОНФЕРЕНЦІЇ
+            ════════════════════════════════════════════════
+
+            <div class="exhibit-item" data-animate data-animate-delay="1">
+              <div class="exhibit-item__year">2024</div>
+              <div class="exhibit-item__dot" aria-hidden="true"></div>
+              <div class="exhibit-item__content">
+                <span class="exhibit-item__city">м. Київ, Україна</span>
+                <h3 class="exhibit-item__title">Назва конференції або виставки</h3>
+                <p class="exhibit-item__desc">Короткий опис події</p>
+              </div>
+            </div>
+          -->
+
+          <!-- Заглушка -->
+          <div class="certs__empty">
+            <div class="certs__empty-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <path d="M3 9h18M9 21V9"></path>
+              </svg>
+            </div>
+            <p class="certs__empty-title">Конференції будуть додані незабаром</p>
+            <p class="certs__empty-sub">Розділ знаходиться у розробці</p>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </section>
+
+  <!-- ============================================================
+       CERTIFICATE DETAIL MODAL
+       ============================================================ -->
+  <div class="cert-modal" id="cert-modal" role="dialog" aria-modal="true" aria-labelledby="cert-modal-title" aria-hidden="true">
+    <div class="cert-modal__backdrop" id="cert-modal-backdrop"></div>
+    <div class="cert-modal__box">
+      <button class="cert-modal__close" id="cert-modal-close" aria-label="Закрити">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="cert-modal__header">
+        <div class="cert-modal__icon" id="cert-modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="6"></circle>
+            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+          </svg>
+        </div>
+        <div>
+          <span class="cert-modal__org" id="cert-modal-org">Організація</span>
+          <h2 class="cert-modal__title" id="cert-modal-title">Назва сертифікату</h2>
+        </div>
+      </div>
+      <div class="cert-modal__body" id="cert-modal-body">
+        <p>Детальна інформація про сертифікат</p>
+      </div>
+      <div class="cert-modal__footer">
+        <button class="btn btn--ghost btn--sm" id="cert-modal-close-btn" onclick="document.getElementById('cert-modal').classList.remove('open'); document.getElementById('cert-modal').setAttribute('aria-hidden','true'); document.body.style.overflow='';">Закрити</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ============================================================
        REVIEWS SECTION — «Відгуки»

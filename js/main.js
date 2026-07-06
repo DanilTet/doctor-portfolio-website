@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAppointmentModal();
   initReviewsSection();
   initReviewModal();
+  initDiplomas();
 });
 
 
@@ -1009,6 +1010,259 @@ function initReviewModal() {
     if (e.key === 'Escape' && modal.classList.contains('modal--active')) {
       closeModal();
     }
+  });
+}
+
+/* ============================================================
+   CERTIFICATE DATA & TAB CONTROLLER
+   ============================================================ */
+const CERT_DATA = {
+  'cert-olympus-04-06': {
+    org: 'endo academy | OLYMPUS CONTINUUM',
+    title: 'CERTIFICATE №04/06',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> MEDICAL EXPERT TRAINING "SCREENING COLORECTAL CANCER IN UKRAINE #3"</p>
+        <p><strong>Дата:</strong> 17 July 2021</p>
+        <p><strong>Місце:</strong> Kyiv, Ukraine</p>
+        <p><strong>Учасник:</strong> TETERNIK OLEG</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Vadym Korpiak, Serhii Polishchuk, David Janelidze</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-olympus-04-06.jpg" alt="CERTIFICATE №04/06" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-olympus-04-06.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-endo24': {
+    org: 'Провайдер №2429 ГО "Українська асоціація клінічної фармакології та фармакотерапії"',
+    title: 'Сертифікат учасника №2024-2429-1002313-113117',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Дводенний майстер-клас "ЕНДО-24"</p>
+        <p><strong>Дата:</strong> 01-02.11.2024</p>
+        <p><strong>Реєстраційний номер заходу:</strong> 1002313</p>
+        <p><strong>Учасник:</strong> Олег Тетернік</p>
+        <p><strong>Бали БПР:</strong> 20 балів БПР (дійсний для лікарів усіх спеціальностей)</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Святослав Семененко, Владислав Яковенко</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-endo24.jpg" alt="Сертифікат ЕНДО-24" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-endo24.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-lviv-2023': {
+    org: 'КНП ЛОР "ЛЬВІВСЬКИЙ ОБЛАСНИЙ ЦЕНТР ЕКСТРЕНОЇ МЕДИЧНОЇ ДОПОМОГИ ТА МЕДИЦИНИ КАТАСТРОФ" (ПРОВАЙДЕР) ТА КНП "1 ТЕРИТОРІАЛЬНЕ МЕДИЧНЕ ОБ\'ЄДНАННЯ"',
+    title: 'СЕРТИФІКАТ (№ 2023-1358-5508112-100176)',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Науково-практична конференція "ENDOSCOPY DAYS LVIV" для лікарів за спеціальностями ендоскопія, хірургія, гастроентерологія...</p>
+        <p><strong>Дата:</strong> 1-2 грудня 2023 року</p>
+        <p><strong>Місце:</strong> м. Львів</p>
+        <p><strong>Учасник:</strong> Тетернік Олег Олександрович</p>
+        <p><strong>Бали БПР:</strong> 10 балів безперервного професійного розвитку</p>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-lviv-2023.jpg" alt="ENDOSCOPY DAYS LVIV" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-lviv-2023.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-odesa-2024': {
+    org: 'Провайдер №1136 ГО "Українська асоціація клінічної фармакології та фармакотерапії"',
+    title: 'Сертифікат учасника №2024-1136-3707808-113117',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Дводенний майстер-клас "Одеса Ендо, 2024"</p>
+        <p><strong>Дата:</strong> 20-21 червня 2024</p>
+        <p><strong>Реєстраційний номер заходу:</strong> 3707808 у переліку захоів БПР 2024 року</p>
+        <p><strong>Учасник:</strong> Олег Тетернік</p>
+        <p><strong>Бали БПР:</strong> 20 балів БПР</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Святослав Семененко, Костянтин Науменко</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-odesa-2024.jpg" alt="Одеса Ендо, 2024" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-odesa-2024.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-uz-interventions': {
+    org: 'ТОВАРИСТВО З ОБМЕЖЕНОЮ ВІДПОВІДАЛЬНІСТЮ «ІННОВАЦІЙНА МЕДИЦИНА» (ШКОЛА ШТУДЕРНОЇ УЛЬТРАЗВУКОВОЇ ДІАГНОСТИКИ)',
+    title: 'СЕРТИФІКАТ реєстраційний номер 2025-2330-1007123-310039',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Майстер-клас «Інтервенції під контролем УЗ для початківців»</p>
+        <p><strong>Дата:</strong> 26-27 березня 2025</p>
+        <p><strong>Учасник:</strong> Тетернік Олег Олександрович</p>
+        <p><strong>Бали БПР:</strong> 20 балів БПР</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Волошин Ігор Іванович</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-uz-interventions.jpg" alt="Інтервенції під контролем УЗ" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-uz-interventions.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-nmu-interventions': {
+    org: 'НМУ (Національний медичний університет імені О.О. Богомольця)',
+    title: 'СЕРТИФІКАТ № 2024-2273-1001306-100030',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Тренінг з оволодіння практичними навичками “Ендоскопічні інтервенції та менеджмент критичних ускладнень в ендоскопії”</p>
+        <p><strong>Дата:</strong> 17-19 жовтня 2024 року</p>
+        <p><strong>Учасник:</strong> Тетернік Олег Олександрович</p>
+        <p><strong>Бали БПР:</strong> 25 балів БПР</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Садовий Валентин Юрійович, Кучин Юрій Леонідович</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-nmu-interventions.jpg" alt="Ендоскопічні інтервенції" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-nmu-interventions.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-ibd-2022': {
+    org: 'ГО "УКРАЇНСЬКА ГАСТРОЕНТЕРОЛОГІЧНА АСОЦІАЦІЯ", ВГО "АСОЦІАЦІЯ ДІЄТОЛОГІВ УКРАЇНИ", ТОВ "ГРУПА КОМПАНІЙ МЕД ЕКСПЕРТ"',
+    title: 'СЕРТИФІКАТ № 1043065700652-2022',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Науково-практичний семінар з міжнародною участю "ЗАПАЛЬНІ ТА ФУНКЦІОНАЛЬНІ ЗАХВОРЮВАННЯ КИШЕЧНИКА"</p>
+        <p><strong>Дата:</strong> 17-18 листопада 2022 р.</p>
+        <p><strong>Місце:</strong> онлайн</p>
+        <p><strong>Учасник:</strong> Тетернік Олег Олександрович</p>
+        <p><strong>Бали БПР:</strong> 20 балів БПР</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> О.В. Швець, Д.О. Бахтіярова</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-ibd-2022.jpg" alt="Запальні та функціональні захворювання кишечника" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-ibd-2022.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-olympus-01-11': {
+    org: 'endo academy | OLYMPUS CONTINUUM',
+    title: 'CERTIFICATE №01/11',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Virtual Medical Expert Training "ENDOSCOPIC ULTRASOUND #1"</p>
+        <p><strong>Дата:</strong> 09 April 2022</p>
+        <p><strong>Місце:</strong> Kyiv, Ukraine</p>
+        <p><strong>Учасник:</strong> TETERNIK OLEG</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Yaroslav Dombrovsky, Lidziya Tarasenka, Orest Kryvoruk</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-olympus-01-11.jpg" alt="CERTIFICATE №01/11" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-olympus-01-11.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-odesa-arkadia': {
+    org: 'Провайдер №1136 ГО "Українська асоціація клінічної фармакології та фармакотерапії"',
+    title: 'Сертифікат учасника №2024-1136-3707807-113117',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> Майстер-клас "Ендо Одеса: Аркадія"</p>
+        <p><strong>Дата:</strong> 22 червня 2024 року</p>
+        <p><strong>Реєстраційний номер заходу:</strong> 3707807</p>
+        <p><strong>Учасник:</strong> Олег Тетернік</p>
+        <p><strong>Бали БПР:</strong> 10 балів БПР</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Святослав Семененко, Костянтин Науменко</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-odesa-arkadia.jpg" alt="Ендо Одеса: Аркадія" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-odesa-arkadia.jpg)</div>'">
+        </div>
+      </div>
+    `
+  },
+  'cert-olympus-06-08': {
+    org: 'endo academy | OLYMPUS CONTINUUM',
+    title: 'CERTIFICATE №06/08',
+    body: `
+      <div class="cert-detail">
+        <p><strong>Захід:</strong> MEDICAL EXPERT TRAINING "UPPER ENDOSCOPY"</p>
+        <p><strong>Дата:</strong> 27 August 2022</p>
+        <p><strong>Місце:</strong> Kyiv, Ukraine</p>
+        <p><strong>Учасник:</strong> TETERNIK OLEG</p>
+        <p><strong>Примітка:</strong> Даний сертифікат підтверджує практичне навчання на біологічній моделі шлунку... та надає можливість лікарю-ендоскопісту отримати 15 балів БПР</p>
+        <div class="cert-detail__signatures">
+          <p><strong>Підписи:</strong> Serhii Polishchuk, David Janelidze, Vitaliy Kutnyak</p>
+        </div>
+        <div class="cert-detail__img-placeholder">
+          <img src="img/certificates/cert-olympus-06-08.jpg" alt="CERTIFICATE №06/08" onerror="this.outerHTML='<div class=&quot;cert-no-img&quot;>Фото сертифіката (cert-olympus-06-08.jpg)</div>'">
+        </div>
+      </div>
+    `
+  }
+};
+
+function initDiplomas() {
+  /* ── Tab switching ── */
+  const tabs = document.querySelectorAll('.diplomas__tab');
+  const panels = document.querySelectorAll('.diplomas__panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      panels.forEach(p => p.classList.remove('active'));
+
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      const panel = document.getElementById(`panel-${target}`);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  /* ── Certificate Modal ── */
+  const modal = document.getElementById('cert-modal');
+  const backdrop = document.getElementById('cert-modal-backdrop');
+  const closeBtn = document.getElementById('cert-modal-close');
+  const modalOrg = document.getElementById('cert-modal-org');
+  const modalTitle = document.getElementById('cert-modal-title');
+  const modalBody = document.getElementById('cert-modal-body');
+
+  if (!modal) return;
+
+  function openCertModal(certId) {
+    const data = CERT_DATA[certId];
+    if (!data) return;
+    if (modalOrg) modalOrg.textContent = data.org || '';
+    if (modalTitle) modalTitle.textContent = data.title || '';
+    if (modalBody) modalBody.innerHTML = data.body || '';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeCertModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Open via cert-card buttons
+  document.querySelectorAll('.cert-card__btn[data-cert-id]').forEach(btn => {
+    btn.addEventListener('click', () => openCertModal(btn.dataset.certId));
+  });
+
+  // Close via backdrop & X button
+  if (backdrop) backdrop.addEventListener('click', closeCertModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeCertModal);
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeCertModal();
   });
 }
 
