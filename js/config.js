@@ -25,20 +25,20 @@ const SITE_CONFIG = {
   //  СТАТИСТИКА
   // ──────────────────────────────────────────────
   stats: {
-    experience:          42,
+    experience:          8,
     
     // БАЗА ДАНИХ: вимикаємо через сміття в таблиці
     patientsFromSupabase: false,
 
     // АЛГОРИТМІЧНИЙ ЛІЧИЛЬНИК (Розумний підрахунок без БД)
     smartCounter: {
-      enabled: true,
+      enabled: false,
       baseDate: '2026-02-01', // Точка відліку
-      baseCount: 3902,        // Точне стартове число
-      patientsPerMonth: 45,   // Середня к-ть пацієнтів на місяць
+      baseCount: 3000,        // Точне стартове число
+      patientsPerMonth: 0,   // Середня к-ть пацієнтів на місяць
     },
 
-    patientsStaticCount:  3902,
+    patientsStaticCount:  3000,
     patientsSince:        'лютого 2026',
     patientsSinceEn:      'February 2026',
   },

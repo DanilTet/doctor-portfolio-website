@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initReviewsSection();
   initReviewModal();
   initDiplomas();
+  initCertsPagination();
 });
 
 
@@ -113,12 +114,12 @@ const translations = {
     'nav.appointment': 'Записатися на прийом',
 
     // Hero
-    'hero.badge': 'Лікар вищої категорії',
+    'hero.badge': 'Ендоскопіст, Хірург, УЗД',
     'hero.name.first': 'Тетернік',
     'hero.name.last': 'Олег Олександрович',
-    'hero.specialization': 'Лікар-ендоскопіст вищої категорії з 42-річним досвідом. Діагностична та лікувальна ендоскопія — індивідуальний підхід до кожного пацієнта.',
-    'hero.experience.number': '42',
-    'hero.experience.label': 'Років профес\u0456йного\nдосв\u0456ду в медицин\u0456',
+    'hero.specialization': 'Лікар-ендоскопіст, хірург, лікар УЗД діагностики з 8-річним досвідом. Спеціалізуюся на ендоскопії, хірургії, УЗД та щороку виконую понад 3000 ендоскопічних досліджень!',
+    'hero.experience.number': '8',
+    'hero.experience.label': 'Років професійного\nдосвіду в медицині',
     'hero.btn.appointment': 'Записатися на прийом',
     'hero.btn.more': 'Дізнатися більше',
     'hero.float.value': '5000+',
@@ -128,9 +129,9 @@ const translations = {
     // Stats
     'stats.exp.label': 'Років досвіду',
     'stats.exp.sub': 'в ендоскопії та медицині',
-    'stats.patients.label': 'Прийомів з Telegram-боту',
-    'stats.patients.sub': 'з лютого 2026 року',
-    'stats.patients.live': 'Live',
+    'stats.patients.label': 'Процедур в рік',
+    'stats.patients.sub': 'понад 3000 досліджень',
+    'stats.patients.live': 'Щорічно',
     'stats.spec.number': 'Ендоскопіст',
     'stats.spec.label': 'Спеціалізація',
     'stats.spec.sub': 'діагностична та лікувальна ендоскопія',
@@ -147,8 +148,8 @@ const translations = {
     'about.subtitle': 'Знайомство з лікарем',
     'about.title': 'Тетернік Олег Олександрович',
     'about.role': 'Лікар Хірург Ендоскопіст',
-    'about.bio.1': 'Професіонал з 42-річним досвідом у проведенні високоточних ендоскопічних та хірургічних втручань. Основний пріоритет — максимальна безпека, безболісність та комфорт пацієнта під час кожної процедури.',
-    'about.bio.2': 'Завдяки сучасному обладнанню та індивідуальному підходу, ми забезпечуємо точну діагностику та ефективне лікування захворювань шлунково-кишкового тракту.',
+    'about.bio.1': 'Я — Тетернік Олег Олександрович, лікар-ендоскопіст, хірург, лікар УЗД діагностики зі стажем роботи 8 років. У своїй практиці я спеціалізуюся на ендоскопії та хірургії, УЗД, і щороку виконую понад 3000 ендоскопічних досліджень!',
+    'about.bio.2': 'Я вірю, що здоров’я наших пацієнтів — це найголовніше. Моя мета — надати кожному пацієнту висококваліфіковану медичну допомогу, використовуючи сучасні техніки та обладнання.',
     'about.spec.1': 'Гастроскопія',
     'about.spec.2': 'Колоноскопія',
     'about.spec.3': 'ЕРХПГ',
@@ -219,6 +220,14 @@ const translations = {
     'reviews.success.title': 'Дякуємо за ваш відгук!',
     'reviews.success.desc': 'Ваш відгук успішно збережено і буде опубліковано після модерації.',
 
+    // Exhibits
+    'exhibits.esge.city': 'м. Мілан, Італія',
+    'exhibits.esge.title': 'ESGE Days 2026',
+    'exhibits.esge.desc': 'Міжнародна ендоскопічна конференція. Обмін досвідом із провідними європейськими фахівцями, обговорення новітніх стандартів та технологій в оперативній ендоскопії.',
+    'exhibits.kiev.city': 'м. Київ, Україна',
+    'exhibits.kiev.title': 'KievEndo 2023',
+    'exhibits.kiev.desc': 'Науково-практична конференція. Презентація клінічних випадків, обговорення сучасних методик малоінвазивної хірургії та діагностичної ендоскопії в Україні.',
+
     // Footer
     'footer.copy': '© 2026 Тетернік О.О. Усі права захищені.',
   },
@@ -232,11 +241,11 @@ const translations = {
     'nav.appointment': 'Book Appointment',
 
     // Hero
-    'hero.badge': 'Highest Category Physician',
+    'hero.badge': 'Endoscopist, Surgeon, Ultrasound',
     'hero.name.first': 'Teternick',
     'hero.name.last': 'Oleg Oleksandrovych',
-    'hero.specialization': 'Senior endoscopist with 42 years of professional experience. Diagnostic and therapeutic endoscopy — individual approach to each patient.',
-    'hero.experience.number': '42',
+    'hero.specialization': 'Endoscopist, surgeon, ultrasound specialist with 8 years of experience. Specializing in endoscopy, surgery, ultrasound, and performing over 3000 endoscopic examinations annually!',
+    'hero.experience.number': '8',
     'hero.experience.label': 'Years of professional\nexperience in medicine',
     'hero.btn.appointment': 'Book Appointment',
     'hero.btn.more': 'Learn More',
@@ -247,9 +256,9 @@ const translations = {
     // Stats
     'stats.exp.label': 'Years of Experience',
     'stats.exp.sub': 'in endoscopy & medicine',
-    'stats.patients.label': 'Appointments via Telegram',
-    'stats.patients.sub': 'since February 2026',
-    'stats.patients.live': 'Live',
+    'stats.patients.label': 'Procedures per year',
+    'stats.patients.sub': 'over 3000 examinations',
+    'stats.patients.live': 'Annually',
     'stats.spec.number': 'Endoscopist',
     'stats.spec.label': 'Specialization',
     'stats.spec.sub': 'diagnostic & therapeutic endoscopy',
@@ -266,8 +275,8 @@ const translations = {
     'about.subtitle': 'Meet the Doctor',
     'about.title': 'Teternick Oleg Oleksandrovych',
     'about.role': 'Surgeon Endoscopist',
-    'about.bio.1': 'A professional with 42 years of experience in performing highly precise endoscopic and surgical interventions. The main priority is maximum safety, painlessness, and patient comfort during every procedure.',
-    'about.bio.2': 'Thanks to modern equipment and an individual approach, we provide accurate diagnostics and effective treatment of gastrointestinal tract diseases.',
+    'about.bio.1': 'I am Oleg Teternick, an endoscopist, surgeon, and ultrasound diagnostics specialist with 8 years of experience. In my practice, I specialize in endoscopy, surgery, and ultrasound, performing over 3000 endoscopic examinations every year!',
+    'about.bio.2': 'I believe that our patients’ health is the most important thing. My goal is to provide each patient with highly qualified medical care using modern techniques and equipment.',
     'about.spec.1': 'Gastroscopy',
     'about.spec.2': 'Colonoscopy',
     'about.spec.3': 'ERCP',
@@ -337,6 +346,14 @@ const translations = {
     'reviews.modal.submit': 'Submit Review',
     'reviews.success.title': 'Thank You for Your Review!',
     'reviews.success.desc': 'Your review has been saved and will be published after moderation.',
+
+    // Exhibits
+    'exhibits.esge.city': 'Milan, Italy',
+    'exhibits.esge.title': 'ESGE Days 2026',
+    'exhibits.esge.desc': 'International Endoscopic Conference. Exchange of experience with leading European specialists, discussion of the latest standards and technologies in operative endoscopy.',
+    'exhibits.kiev.city': 'Kyiv, Ukraine',
+    'exhibits.kiev.title': 'KievEndo 2023',
+    'exhibits.kiev.desc': 'Scientific and Practical Conference. Presentation of clinical cases, discussion of modern techniques of minimally invasive surgery and diagnostic endoscopy in Ukraine.',
 
     // Footer
     'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
@@ -1264,6 +1281,53 @@ function initDiplomas() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && modal.classList.contains('open')) closeCertModal();
   });
+}
+
+/* ============================================================
+   CERTIFICATES PAGINATION (LOAD MORE)
+   ============================================================ */
+function initCertsPagination() {
+  const certCards = document.querySelectorAll('#panel-certificates .cert-card');
+  const loadMoreBtn = document.getElementById('certs-load-more');
+  const loadMoreWrapper = document.getElementById('certs-load-more-wrapper');
+  
+  if (!certCards.length || !loadMoreBtn) return;
+
+  let currentLimit = 0;
+  
+  function getLimitIncrement() {
+    return window.innerWidth >= 992 ? 9 : 3;
+  }
+
+  function applyPagination(isInit = false) {
+    if (isInit) {
+      currentLimit = getLimitIncrement();
+    }
+    
+    let visibleCount = 0;
+    
+    certCards.forEach((card, index) => {
+      if (index < currentLimit) {
+        card.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    if (visibleCount >= certCards.length) {
+      if (loadMoreWrapper) loadMoreWrapper.style.display = 'none';
+    } else {
+      if (loadMoreWrapper) loadMoreWrapper.style.display = 'flex';
+    }
+  }
+
+  loadMoreBtn.addEventListener('click', () => {
+    currentLimit += getLimitIncrement();
+    applyPagination();
+  });
+
+  applyPagination(true);
 }
 
 

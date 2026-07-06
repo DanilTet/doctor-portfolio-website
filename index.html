@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Тетернік Олег Олександрович — лікар вищої категорії з понад 20-річним досвідом. Індивідуальний підхід, сучасні методи лікування. Запишіться на прийом онлайн.">
-  <meta name="keywords" content="лікар, Тетернік, медицина, прийом лікаря, записатися до лікаря">
+  <meta name="description" content="Тетернік Олег Олександрович — лікар-ендоскопіст, хірург, лікар УЗД діагностики зі стажем 8 років. Індивідуальний підхід, сучасні методи лікування. Запишіться на прийом онлайн.">
+  <meta name="keywords" content="лікар, Тетернік, медицина, прийом лікаря, записатися до лікаря, ендоскопія, УЗД, Харків">
   <meta name="author" content="Тетернік О.О.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Д-р Тетернік О.О. — Лікар вищої категорії">
-  <meta property="og:description" content="Професійний лікар з багаторічним досвідом. Запишіться на прийом онлайн.">
+  <meta property="og:title" content="Д-р Тетернік О.О. — Ендоскопіст, Хірург, УЗД">
+  <meta property="og:description" content="Лікар-ендоскопіст, хірург, лікар УЗД діагностики з 8-річним досвідом. Запишіться на прийом онлайн.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="uk_UA">
 
-  <title>Д-р Тетернік О.О. — Лікар вищої категорії</title>
+  <title>Д-р Тетернік О.О. — Ендоскопіст, Хірург, УЗД</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -109,7 +109,7 @@
         <!-- Badge -->
         <div class="hero__badge">
           <span class="hero__badge-dot" aria-hidden="true"></span>
-          <span class="hero__badge-text" data-i18n="hero.badge">Лікар вищої категорії</span>
+          <span class="hero__badge-text" data-i18n="hero.badge">Ендоскопіст, Хірург, УЗД</span>
         </div>
 
         <!-- Name -->
@@ -120,12 +120,12 @@
 
         <!-- Specialization -->
         <p class="hero__specialization" data-i18n="hero.specialization">
-          Лікар-ендоскопіст вищої категорії з 42-річним досвідом. Діагностична та лікувальна ендоскопія — індивідуальний підхід до кожного пацієнта.
+          Лікар-ендоскопіст, хірург, лікар УЗД діагностики з 8-річним досвідом. Спеціалізуюся на ендоскопії, хірургії, УЗД та щороку виконую понад 3000 ендоскопічних досліджень!
         </p>
 
         <!-- Experience Highlight -->
         <div class="hero__experience">
-          <span class="hero__experience-number" data-i18n="hero.experience.number">42</span>
+          <span class="hero__experience-number" data-i18n="hero.experience.number">8</span>
           <span class="hero__experience-label" data-i18n="hero.experience.label">Років професійного<br>досвіду в медицині</span>
         </div>
 
@@ -220,12 +220,12 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <div class="stats__number" id="stat-experience">42</div>
+          <div class="stats__number" id="stat-experience">8</div>
           <div class="stats__label" data-i18n="stats.exp.label">Років досвіду</div>
           <div class="stats__sublabel" data-i18n="stats.exp.sub">в ендоскопії та медицині</div>
         </div>
 
-        <!-- Stat 2: Patients (live from Supabase) -->
+        <!-- Stat 2: Patients (static count of procedures per year) -->
         <div class="stats__item" data-animate data-animate-delay="2">
           <div class="stats__icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -235,14 +235,10 @@
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
           </div>
-          <div class="stats__number" id="stat-patients">...</div>
-          <div class="stats__label" data-i18n="stats.patients.label">Прийомів з Telegram-боту</div>
+          <div class="stats__number">3000+</div>
+          <div class="stats__label" data-i18n="stats.patients.label">Процедур в рік</div>
           <div class="stats__sublabel">
-            <span data-i18n="stats.patients.sub">з лютого 2026 року</span>
-          </div>
-          <div class="stats__live-badge">
-            <span class="stats__live-dot"></span>
-            <span data-i18n="stats.patients.live">Live</span>
+            <span data-i18n="stats.patients.sub">понад 3000 досліджень</span>
           </div>
         </div>
 
@@ -832,6 +828,10 @@
           </div>
 
         </div>
+        
+        <div class="certs__load-more-wrapper" id="certs-load-more-wrapper">
+          <button class="btn btn--primary" id="certs-load-more" aria-label="Показати ще сертифікати">Показати ще</button>
+        </div>
       </div>
 
       <!-- ── TAB: EXHIBITIONS ── -->
@@ -854,16 +854,40 @@
             </div>
           -->
 
-          <!-- Заглушка -->
-          <div class="certs__empty">
-            <div class="certs__empty-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                <path d="M3 9h18M9 21V9"></path>
-              </svg>
+          <!-- Exhibit 1: ESGE Days 2026 -->
+          <div class="exhibit-item" data-animate data-animate-delay="1">
+            <div class="exhibit-item__year">2026</div>
+            <div class="exhibit-item__dot" aria-hidden="true"></div>
+            <div class="exhibit-item__content">
+              <div class="exhibit-item__body">
+                <div class="exhibit-item__info">
+                  <span class="exhibit-item__city" data-i18n="exhibits.esge.city">м. Мілан, Італія</span>
+                  <h3 class="exhibit-item__title" data-i18n="exhibits.esge.title">ESGE Days 2026</h3>
+                  <p class="exhibit-item__desc" data-i18n="exhibits.esge.desc">Міжнародна ендоскопічна конференція. Обмін досвідом із провідними європейськими фахівцями, обговорення новітніх стандартів та технологій в оперативній ендоскопії.</p>
+                </div>
+                <div class="exhibit-item__image-wrapper">
+                  <img src="img/esge-days-2026.png" alt="ESGE Days 2026 Milan" class="exhibit-item__image" loading="lazy">
+                </div>
+              </div>
             </div>
-            <p class="certs__empty-title">Конференції будуть додані незабаром</p>
-            <p class="certs__empty-sub">Розділ знаходиться у розробці</p>
+          </div>
+
+          <!-- Exhibit 2: KievEndo 2023 -->
+          <div class="exhibit-item" data-animate data-animate-delay="2">
+            <div class="exhibit-item__year">2023</div>
+            <div class="exhibit-item__dot" aria-hidden="true"></div>
+            <div class="exhibit-item__content">
+              <div class="exhibit-item__body">
+                <div class="exhibit-item__info">
+                  <span class="exhibit-item__city" data-i18n="exhibits.kiev.city">м. Київ, Україна</span>
+                  <h3 class="exhibit-item__title" data-i18n="exhibits.kiev.title">KievEndo 2023</h3>
+                  <p class="exhibit-item__desc" data-i18n="exhibits.kiev.desc">Науково-практична конференція. Презентація клінічних випадків, обговорення сучасних методик малоінвазивної хірургії та діагностичної ендоскопії в Україні.</p>
+                </div>
+                <div class="exhibit-item__image-wrapper">
+                  <img src="img/kiev-endo-2023.png" alt="KievEndo 2023 Kyiv" class="exhibit-item__image" loading="lazy">
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1117,6 +1141,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/main.js"></script>
   <script src="js/animations.js"></script>
+  <script src="js/tracker.js"></script>
   <script>
     // Init patient counter after DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
