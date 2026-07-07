@@ -10,8 +10,10 @@
 const CFG = (() => {
   const env = window.ADMIN_ENV || {};
   return {
-    url:     env.SUPABASE_URL     || '',
-    anonKey: env.SUPABASE_ANON_KEY || '',
+    url:       env.SUPABASE_URL       || '',
+    anonKey:   env.SUPABASE_ANON_KEY  || '',
+    botUrl:    env.BOT_URL            || '',
+    botSecret: env.BOT_SECRET         || '',
   };
 })();
 
@@ -1246,6 +1248,22 @@ function getWeekDates(offset) {
   return weekDates;
 }
 
+async function triggerBotSync() {
+  if (!CFG.botUrl || !CFG.botSecret) {
+    console.log('ℹ️ Bot URL or Secret not configured, skipping on-demand sync.');
+    return;
+  }
+  
+  console.log('⏳ Triggering Google Sheets sync via Telegram Bot API...');
+  try {
+    const res = await fetch(`${CFG.botUrl}/api/trigger-sync?secret=${CFG.botSecret}`);
+    const data = await res.json();
+    console.log('🤖 Telegram Bot sync triggered successfully:', data);
+  } catch (err) {
+    console.error('❌ Failed to trigger Telegram Bot sync:', err);
+  }
+}
+
 function initPremiumDashboard() {
   if (window.supabase) {
     const token = sessionStorage.getItem('admin_token') || Supabase._token;
@@ -1281,6 +1299,9 @@ function initPremiumDashboard() {
 
   // Setup Realtime
   setupPremiumRealtime();
+
+  // Trigger Google Sheets parsing asynchronously
+  triggerBotSync();
 }
 
 async function loadPremiumAppointments() {

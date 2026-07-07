@@ -13,4 +13,6 @@
 window.ENV = {
   SUPABASE_URL:      'https://YOUR_PROJECT_ID.supabase.co',
   SUPABASE_ANON_KEY: 'YOUR_ANON_KEY_HERE',
+  BOT_URL:           'https://YOUR_BOT_URL.onrender.com', // (or http://localhost:8000 for local test)
+  BOT_SECRET:        'barboss_secret_webhook_barsik_426752',
 };
