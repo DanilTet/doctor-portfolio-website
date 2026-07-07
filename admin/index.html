@@ -80,7 +80,7 @@
   <!-- ── SIDEBAR ─────────────────────────────────────────── -->
   <aside class="sidebar">
 
-    <div class="sidebar-header">
+    <div class="sidebar-header" style="display:flex; align-items:center; justify-content:space-between;">
       <div class="sidebar-logo">
         <div class="sidebar-logo-icon">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -89,11 +89,16 @@
             <path d="M12 10v4"/><path d="M10 12h4"/>
           </svg>
         </div>
-        <div>
+        <div class="sidebar-logo-text-wrap">
           <div class="sidebar-logo-text">Тетернік О.О.</div>
           <div class="sidebar-logo-sub">Адмін-панель</div>
         </div>
       </div>
+      <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" title="Згорнути панель">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -104,7 +109,7 @@
           <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
           <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
         </svg>
-        Дашборд
+        <span>Дашборд</span>
       </button>
 
       <div class="nav-section-label" style="margin-top:8px">Управление</div>
@@ -115,7 +120,7 @@
           <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
           <line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
-        Розклад (Premium)
+        <span>Розклад (Premium)</span>
       </button>
 
       <button class="nav-item" data-page="appointments" id="nav-appointments">
@@ -125,14 +130,14 @@
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
           <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
         </svg>
-        Заявки на прийом
+        <span>Заявки на прийом</span>
       </button>
 
       <button class="nav-item" data-page="reviews" id="nav-reviews">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
-        Модерація відгуків
+        <span>Модерація відгуків</span>
         <span class="nav-badge" id="reviews-badge" style="display:none"></span>
       </button>
 
@@ -140,7 +145,7 @@
 
     <div class="sidebar-footer">
       <div class="admin-user">
-        <div class="admin-avatar" id="admin-avatar">A</div>
+        <div class="admin-avatar" id="admin-avatar" title="Адміністратор">A</div>
         <div class="admin-email" id="admin-email">—</div>
       </div>
       <button class="btn btn--ghost btn--full btn--sm logout-btn" id="logout-btn">
@@ -149,7 +154,7 @@
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        Вийти
+        <span>Вийти</span>
       </button>
     </div>
 
@@ -309,11 +314,7 @@
     <section class="page-section" id="page-premium-dashboard">
       <div class="premium-dashboard-wrapper">
         <!-- Dashboard Header -->
-        <div class="pd-header">
-          <div class="pd-header-title">
-            <h2 class="pd-h2">Розклад Прийомів</h2>
-            <p class="pd-subtitle">Живий моніторинг записів</p>
-          </div>
+        <div class="pd-header" style="justify-content: flex-end;">
           
           <!-- Filters -->
           <div class="pd-filters">
@@ -401,9 +402,11 @@
         <div class="view-toggle" style="display:flex; background:var(--bg-secondary); border-radius:8px; padding:4px;">
           <button id="btn-view-list" class="btn-view active" title="Список">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <span class="btn-view-text">Список</span>
           </button>
           <button id="btn-view-grid" class="btn-view" title="Сетка (Excel)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+            <span class="btn-view-text">Сітка</span>
           </button>
         </div>
       </div>

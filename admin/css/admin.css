@@ -229,12 +229,23 @@ body {
   flex-direction: column;
   height: 100vh;
   overflow-y: auto;
-  transition: transform var(--transition);
+  transition: width var(--transition), transform var(--transition);
+  overflow-x: hidden;
+}
+
+.sidebar.collapsed {
+  width: 76px;
 }
 
 .sidebar-header {
   padding: 20px 20px 16px;
   border-bottom: 1px solid var(--border);
+  position: relative;
+  transition: padding var(--transition);
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 20px 10px 16px;
 }
 
 .sidebar-logo {
@@ -264,6 +275,85 @@ body {
 .sidebar-logo-sub {
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+.sidebar-toggle-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Hide elements when collapsed */
+.sidebar.collapsed .sidebar-logo-text-wrap,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .nav-section-label,
+.sidebar.collapsed .admin-email {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar.collapsed .sidebar-toggle-btn {
+  position: absolute;
+  right: -12px;
+  top: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transform: rotate(180deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.sidebar.collapsed .sidebar-toggle-btn:hover {
+  background: var(--bg-hover);
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+}
+.sidebar.collapsed .nav-item svg {
+  margin: 0;
+}
+.sidebar.collapsed .nav-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  margin: 0;
+  min-width: 16px;
+  padding: 2px 4px;
+  font-size: 9px;
+}
+
+.sidebar.collapsed .admin-user {
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.sidebar.collapsed .logout-btn span {
+  display: none;
+}
+.sidebar.collapsed .logout-btn {
+  padding: 8px 0;
+  display: flex;
+  justify-content: center;
+}
+.sidebar.collapsed .logout-btn svg {
+  margin: 0;
 }
 
 .sidebar-nav {
@@ -296,6 +386,7 @@ body {
   width: 100%;
   text-align: left;
   margin-bottom: 2px;
+  position: relative;
 }
 
 .nav-item:hover {
@@ -1270,9 +1361,13 @@ body {
 }
 
 .pd-excel-grid th, .pd-excel-grid td {
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0;
   vertical-align: top;
+}
+
+.pd-excel-grid tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.015);
 }
 
 /* Sticky Headers */
@@ -1287,7 +1382,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 2;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .pd-excel-grid th .day-name {
@@ -1308,7 +1403,7 @@ body {
   position: sticky;
   left: 0;
   z-index: 1;
-  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.12);
   padding: 12px 4px;
 }
 
@@ -1331,22 +1426,26 @@ body {
 /* Cell Card styling */
 .pd-card {
   position: relative;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
-  padding: 4px 6px;
-  height: 100%;
+  background: rgba(30, 35, 48, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px;
+  height: calc(100% - 4px);
+  margin: 2px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
   transition: all 0.2s ease;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 .pd-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: rgba(38, 43, 58, 0.95);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+  z-index: 5;
 }
 
 /* Left accent line for doctors */
@@ -1354,13 +1453,13 @@ body {
   content: '';
   position: absolute;
   top: 0; bottom: 0; left: 0;
-  width: 3px;
+  width: 4px;
   background: var(--accent);
 }
 .pd-card.doc-teternik::before { background: #4ade80; }
 .pd-card.doc-danilo::before { background: #fcd34d; }
 
-.pd-card-header {
+.pd-card-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -1368,26 +1467,28 @@ body {
 }
 
 .pd-time {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .pd-badges {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
 .pd-badge {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  backdrop-filter: blur(4px);
 }
 
 .pd-badge.stage-заплановано, .pd-badge.stage-запланировано {
@@ -1411,35 +1512,42 @@ body {
 .pd-badge.anesthesia {
   background: rgba(239, 68, 68, 0.15);
   color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
 }
 
-.pd-patient {
+.pd-card-body {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
+  margin-top: 2px;
 }
 
 .pd-service {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .pd-patient-name {
-  font-size: 10px;
-  color: var(--text-secondary);
+  font-size: 11px;
+  color: #e2e8f0;
+}
+
+.pd-card-footer {
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 .pd-doctor-name {
-  font-size: 9px;
-  color: var(--text-muted);
+  font-size: 10px;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 3px;
-  margin-top: auto;
+  gap: 4px;
 }
 
 

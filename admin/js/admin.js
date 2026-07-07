@@ -1059,6 +1059,18 @@ document.addEventListener('DOMContentLoaded', () => {
     showApp(sessionStorage.getItem('admin_email') || '');
   }
 
+  // Restore Sidebar State
+  const sidebar = document.querySelector('.sidebar');
+  if (localStorage.getItem('sidebar_collapsed') === 'true') {
+    sidebar?.classList.add('collapsed');
+  }
+
+  // Sidebar Toggle
+  document.getElementById('sidebar-toggle-btn')?.addEventListener('click', () => {
+    sidebar?.classList.toggle('collapsed');
+    localStorage.setItem('sidebar_collapsed', sidebar?.classList.contains('collapsed'));
+  });
+
   // Login form
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
@@ -1478,13 +1490,15 @@ function renderPremiumGrid(appointments, weekDates) {
           card.className = `pd-card ${docClass}`;
           
           card.innerHTML = `
-            <div class="pd-card-header">
+            <div class="pd-card-top">
               <div class="pd-time">${escText(appt.time || '--:--')}</div>
               <div class="pd-badges">${badgesHtml}</div>
             </div>
-            <div class="pd-patient">
+            <div class="pd-card-body">
               <div class="pd-service">${escText(appt.service || 'Процедура не вказана')}</div>
               <div class="pd-patient-name">${escText(appt.name || 'Анонім')}</div>
+            </div>
+            <div class="pd-card-footer">
               <div class="pd-doctor-name">👨‍⚕️ ${escText(docName)}</div>
             </div>
           `;
