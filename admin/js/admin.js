@@ -1266,6 +1266,15 @@ async function triggerBotSync() {
     return;
   }
   
+  // Rate limiting: 60 seconds
+  const now = Date.now();
+  const lastSync = parseInt(sessionStorage.getItem('lastBotSync') || '0', 10);
+  if (now - lastSync < 60000) {
+    console.log(`⏳ Bot sync was recently triggered. Skipping. Next allowed in ${Math.ceil((60000 - (now - lastSync))/1000)}s`);
+    return;
+  }
+  sessionStorage.setItem('lastBotSync', now.toString());
+  
   console.log('⏳ Triggering Google Sheets sync via Telegram Bot API...');
   try {
     const res = await fetch(`${CFG.botUrl}/api/trigger-sync?secret=${CFG.botSecret}`);
@@ -1473,9 +1482,25 @@ function renderPremiumGrid(appointments, weekDates) {
             skipCells[dayIndex] = true;
           }
 
-          const isDanilo = appt.doctor && appt.doctor.toLowerCase().includes('данило');
-          const docClass = isDanilo ? 'doc-danilo' : 'doc-teternik';
-          const docName = isDanilo ? 'Тетернік Д.О.' : 'Тетернік О.О.';
+          const rawDoc = (appt.doctor || '').trim();
+          const docLower = rawDoc.toLowerCase();
+          
+          let docClass = '';
+          let docName = rawDoc || 'Не вказано';
+
+          if (docLower.includes('данило') || docLower === 'д.о.') {
+            docClass = 'doc-danilo';
+            docName = 'Тетернік Д.О.';
+          } else if (docLower.includes('тетернік') || docLower.includes('тетерник') || docLower === 'о.о.' || (!rawDoc && !docLower)) {
+            // Default to Oleg Olegovich if it's explicitly him or empty (fallback for older DB entries)
+            // If they have "Влада терапевт" it won't match here and will just show "Влада терапевт" with default blue border
+            docClass = 'doc-teternik';
+            docName = rawDoc ? rawDoc : 'Тетернік О.О.';
+            // Wait, if it's explicitly Oleg Olegovich, standardize it:
+            if (!rawDoc || docLower.includes('тетернік') || docLower.includes('тетерник') || docLower === 'о.о.') {
+                docName = 'Тетернік О.О.';
+            }
+          }
           
           let badgesHtml = '';
           if (appt.execution_stage) {
