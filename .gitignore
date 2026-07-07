@@ -18,3 +18,4 @@ Thumbs.db
 
 # Telegram Bot (contains tokens/keys)
 telegram-bot/
+tg-bot/

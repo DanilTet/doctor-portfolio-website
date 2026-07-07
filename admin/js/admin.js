@@ -1,4 +1,4 @@
-﻿/**
+/**
  * admin.js — Admin Panel Logic
  * Supabase Auth + Analytics + Schedule + Appointments + Reviews
  * Security: all user data rendered via textContent (no innerHTML for user content)
@@ -164,7 +164,7 @@ function navigateTo(page) {
 
   const titles = {
     dashboard:    'Дашборд',
-    schedule:     'Расписание',
+    'premium-dashboard': 'Розклад Прийомів (Premium)',
     appointments: 'Заявки на прием',
     reviews:      'Модерация отзывов',
   };
@@ -175,7 +175,7 @@ function navigateTo(page) {
   if (page === 'dashboard')    loadDashboard();
   if (page === 'appointments') loadAppointments();
   if (page === 'reviews')      loadReviews();
-  if (page === 'schedule')     initSchedule();
+  if (page === 'premium-dashboard') initPremiumDashboard();
 }
 
 /* ============================================================
@@ -479,6 +479,164 @@ function renderAppointmentsTable(rows) {
     tr.appendChild(actionTd);
     tbody.appendChild(tr);
   });
+}
+
+/* ============================================================
+   APPOINTMENTS GRID (Excel-like)
+   ============================================================ */
+let currentGridWeekOffset = 0;
+
+function getMonday(d) {
+  d = new Date(d);
+  let day = d.getDay(),
+      diff = d.getDate() - day + (day === 0 ? -6:1);
+  return new Date(d.setDate(diff));
+}
+
+async function loadAppointmentsGrid() {
+  const tbody = document.getElementById('excel-grid-body');
+  const theadRow = document.getElementById('excel-grid-head');
+  if (!tbody || !theadRow) return;
+
+  // Calculate week dates
+  const now = new Date();
+  now.setDate(now.getDate() + (currentGridWeekOffset * 7));
+  const monday = getMonday(now);
+  
+  const weekDates = [];
+  const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт'];
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    weekDates.push(d);
+  }
+
+  const d1 = weekDates[0];
+  const d2 = weekDates[4];
+  document.getElementById('grid-week-label').textContent = 
+    `${d1.toLocaleDateString('ru-RU', {day:'numeric', month:'short'})} - ${d2.toLocaleDateString('ru-RU', {day:'numeric', month:'short', year:'numeric'})}`;
+
+  // Build Header
+  theadRow.innerHTML = '<th class="time-col-header">Час</th>';
+  weekDates.forEach((d, i) => {
+    const th = document.createElement('th');
+    th.innerHTML = `<div>${daysOfWeek[i]}</div><div style="font-size:11px;font-weight:400;color:var(--text-secondary);margin-top:2px;">${d.toLocaleDateString('ru-RU')}</div>`;
+    theadRow.appendChild(th);
+  });
+
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">Завантаження...</td></tr>';
+
+  try {
+    // Format dates as dd.mm.yyyy since that's how the bot stores them in Supabase
+    const dateStrings = weekDates.map(d => {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}.${month}.${year}`;
+    });
+    
+    const dateQuery = dateStrings.map(d => `"${d}"`).join(',');
+    
+    // Fetch all appointments for these 5 days using 'in' operator
+    const { data } = await Supabase.get('appointments', `?date=in.(${encodeURIComponent(dateQuery)})&select=*`);
+    const appts = data || [];
+    
+    // Map them by date + time
+    const map = {};
+    appts.forEach(a => {
+      const key = `${a.date}_${a.time}`;
+      if (!map[key]) map[key] = [];
+      map[key].push(a);
+    });
+
+    // Generate timeslots
+    const slots = [];
+    for (let h = 8; h <= 10; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+      }
+    }
+    for (let h = 11; h <= 17; h++) {
+      slots.push(`${String(h).padStart(2,'0')}:00`);
+    }
+
+    tbody.innerHTML = '';
+    const skipCells = { 0: false, 1: false, 2: false, 3: false, 4: false };
+
+    slots.forEach(timeSlot => {
+      const tr = document.createElement('tr');
+      const tdTime = document.createElement('td');
+      tdTime.className = 'time-col';
+      tdTime.textContent = timeSlot;
+      tr.appendChild(tdTime);
+
+      for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
+        if (skipCells[dayIndex]) {
+          skipCells[dayIndex] = false;
+          continue;
+        }
+
+        const td = document.createElement('td');
+        const d = weekDates[dayIndex];
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const dateStr = `${day}.${month}.${year}`;
+        const key = `${dateStr}_${timeSlot}`;
+        const slotAppts = map[key];
+
+        if (slotAppts && slotAppts.length > 0) {
+          // Render multiple if they overlap, but usually it's just 1
+          slotAppts.forEach(appt => {
+            // Anesthesia rule: if before 11:00 and has 'наркоз' (ignore case), it takes 30 mins (2 slots)
+            if (timeSlot < '11:00' && appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
+              td.rowSpan = 2;
+              skipCells[dayIndex] = true;
+            }
+
+            const isDanilo = appt.doctor && appt.doctor.toLowerCase().includes('данило');
+            const doctorClass = isDanilo ? 'doctor-danilo' : 'doctor-teternik';
+            const statusClass = appt.status === 'cancelled' ? 'status-cancelled' : '';
+            
+            const card = document.createElement('div');
+            card.className = `cell-appt ${doctorClass} ${statusClass}`;
+            
+            let badgesHTML = '';
+            if (appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
+              badgesHTML += `<span class="appt-badge anesthesia">Наркоз</span>`;
+            }
+            if (appt.execution_stage) {
+              badgesHTML += `<span class="appt-badge">${escText(appt.execution_stage)}</span>`;
+            }
+
+            card.innerHTML = `
+              <div class="appt-title" title="${escText(appt.name)}">${escText(appt.name)}</div>
+              <div class="appt-sub" style="font-weight:500; color:var(--text-primary)">${escText(appt.service)}</div>
+              <div class="appt-sub">
+                <span>👨‍⚕️ ${isDanilo ? 'Данило' : 'Тетерник'}</span>
+                ${badgesHTML}
+              </div>
+            `;
+            td.appendChild(card);
+          });
+        }
+        
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--danger)">${escText(err.message)}</td></tr>`;
+  }
+}
+
+// Utility for safe HTML escaping
+function escText(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 /* ============================================================
@@ -945,8 +1103,40 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('refresh-btn')?.addEventListener('click', () => {
     const btn = document.getElementById('refresh-btn');
     btn?.classList.add('spinning');
-    const load = { dashboard: loadDashboard, appointments: loadAppointments, reviews: loadReviews, schedule: initSchedule };
+    
+    let isGrid = document.getElementById('appt-grid-view')?.style.display !== 'none';
+    const load = { 
+      dashboard: loadDashboard, 
+      appointments: isGrid ? loadAppointmentsGrid : loadAppointments, 
+      reviews: loadReviews, 
+      schedule: initSchedule 
+    };
+    
     Promise.resolve((load[currentPage] || loadDashboard)()).finally(() => btn?.classList.remove('spinning'));
+  });
+
+  // View Toggles (List / Grid)
+  document.getElementById('btn-view-list')?.addEventListener('click', () => {
+    document.getElementById('btn-view-list').classList.add('active');
+    document.getElementById('btn-view-grid').classList.remove('active');
+    document.getElementById('appt-list-view').style.display = '';
+    document.getElementById('appt-grid-view').style.display = 'none';
+    loadAppointments();
+  });
+  document.getElementById('btn-view-grid')?.addEventListener('click', () => {
+    document.getElementById('btn-view-grid').classList.add('active');
+    document.getElementById('btn-view-list').classList.remove('active');
+    document.getElementById('appt-list-view').style.display = 'none';
+    document.getElementById('appt-grid-view').style.display = '';
+    loadAppointmentsGrid();
+  });
+  document.getElementById('grid-prev-week')?.addEventListener('click', () => {
+    currentGridWeekOffset--;
+    loadAppointmentsGrid();
+  });
+  document.getElementById('grid-next-week')?.addEventListener('click', () => {
+    currentGridWeekOffset++;
+    loadAppointmentsGrid();
   });
 
   // Appointment filters
@@ -1025,4 +1215,289 @@ function resetSchedulePanel() {
   if (panel) {
     panel.innerHTML = '<p>Выберите день в календаре для настройки расписания</p>';
   }
+}
+
+/* ============================================================
+   PREMIUM DASHBOARD (SCHEDULE)
+   ============================================================ */
+let supabaseClient = null;
+let pdRealtimeChannel = null;
+
+let currentPremiumGridWeekOffset = 0;
+
+function cleanTimeStr(timeStr) {
+  if (!timeStr) return null;
+  const parts = timeStr.split(':');
+  if (parts.length < 2) return null;
+  return `${parts[0].trim().padStart(2, '0')}:${parts[1].trim().padStart(2, '0')}`;
+}
+
+function getWeekDates(offset) {
+  const now = new Date();
+  now.setDate(now.getDate() + (offset * 7));
+  const monday = getMonday(now);
+  
+  const weekDates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    weekDates.push(d);
+  }
+  return weekDates;
+}
+
+function initPremiumDashboard() {
+  if (window.supabase) {
+    const token = sessionStorage.getItem('admin_token') || Supabase._token;
+    const options = {};
+    if (token) {
+      options.global = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+    }
+    if (pdRealtimeChannel && supabaseClient) {
+      supabaseClient.removeChannel(pdRealtimeChannel);
+      pdRealtimeChannel = null;
+    }
+    supabaseClient = window.supabase.createClient(CFG.url, CFG.anonKey, options);
+  }
+
+  // Setup event listeners for filters
+  document.getElementById('pd-doctor-filter')?.addEventListener('change', loadPremiumAppointments);
+  
+  document.getElementById('pd-prev-week')?.addEventListener('click', () => {
+    currentPremiumGridWeekOffset--;
+    loadPremiumAppointments();
+  });
+  
+  document.getElementById('pd-next-week')?.addEventListener('click', () => {
+    currentPremiumGridWeekOffset++;
+    loadPremiumAppointments();
+  });
+
+  loadPremiumAppointments();
+
+  // Setup Realtime
+  setupPremiumRealtime();
+}
+
+async function loadPremiumAppointments() {
+  const wrapper = document.getElementById('pd-grid-wrapper');
+  const emptyState = document.getElementById('pd-empty-state');
+  
+  if (!wrapper) return;
+  
+  // Update week label
+  const weekDates = getWeekDates(currentPremiumGridWeekOffset);
+  const d1 = weekDates[0];
+  const d2 = weekDates[6];
+  const labelEl = document.getElementById('pd-week-label');
+  if (labelEl) {
+    labelEl.textContent = `${d1.toLocaleDateString('ru-RU', {day:'numeric', month:'short'})} — ${d2.toLocaleDateString('ru-RU', {day:'numeric', month:'short'})}`;
+  }
+
+  wrapper.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted)">Завантаження розкладу...</div>';
+  wrapper.style.display = 'block';
+  if(emptyState) emptyState.style.display = 'none';
+
+  const doctorFilter = document.getElementById('pd-doctor-filter')?.value;
+
+  try {
+    // Format dates as DD.MM.YYYY
+    const dateStrings = weekDates.map(d => {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}.${month}.${year}`;
+    });
+    
+    // According to instructions: status in ('confirmed', 'pending')
+    console.log('⏳ Відправка запиту до Supabase для дат:', dateStrings);
+    let query = supabaseClient
+      .from('appointments')
+      .select('*')
+      .in('status', ['confirmed', 'pending'])
+      .in('date', dateStrings);
+
+    if (doctorFilter && doctorFilter !== 'all') {
+      query = query.ilike('doctor', `%${doctorFilter}%`);
+    }
+
+    // Добавляем таймаут для предотвращения бесконечного зависания
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Перевищено час очікування від Supabase (10 секунд)')), 10000));
+    
+    const { data, error } = await Promise.race([query, timeout]);
+    if (error) throw error;
+    
+    console.log('✅ Fetched Appointments for week:', data);
+
+    renderPremiumGrid(data || [], weekDates);
+  } catch (err) {
+    console.error('❌ Error fetching appointments:', err);
+    wrapper.innerHTML = `<div style="padding:40px; text-align:center; color:var(--danger)">Помилка завантаження: ${err.message}</div>`;
+  }
+}
+
+function renderPremiumGrid(appointments, weekDates) {
+  const wrapper = document.getElementById('pd-grid-wrapper');
+  const emptyState = document.getElementById('pd-empty-state');
+  
+  if (!wrapper) return;
+
+  if (!appointments || appointments.length === 0) {
+    wrapper.style.display = 'none';
+    if(emptyState) emptyState.style.display = 'block';
+    return;
+  }
+
+  wrapper.style.display = 'block';
+  if(emptyState) emptyState.style.display = 'none';
+
+  // Map them by date + time (normalization to HH:MM)
+  const map = {};
+  appointments.forEach(a => {
+    const cleanTime = cleanTimeStr(a.time);
+    if (!cleanTime) return;
+    const key = `${a.date}_${cleanTime}`;
+    if (!map[key]) map[key] = [];
+    map[key].push(a);
+    console.log(`📍 Mapped appointment ${a.name} (${a.time}) -> Slot ${cleanTime}`);
+  });
+
+  // Generate timeslots
+  // 08:00 to 10:45 (every 15 min), then 11:00 to 16:00 (every 1 hr)
+  const slots = [];
+  for (let h = 8; h <= 10; h++) {
+    for (let m = 0; m < 60; m += 15) {
+      if (h === 10 && m > 45) continue; // up to 10:45
+      slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    }
+  }
+  for (let h = 11; h <= 16; h++) {
+    slots.push(`${String(h).padStart(2,'0')}:00`);
+  }
+
+  // Create Table Base
+  const table = document.createElement('table');
+  table.className = 'pd-excel-grid';
+
+  // Header Row
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  headRow.innerHTML = '<th class="pd-time-col-header">Час</th>';
+  
+  const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+  weekDates.forEach((d, i) => {
+    const th = document.createElement('th');
+    th.innerHTML = `
+      <div class="day-name">${daysOfWeek[i]}</div>
+      <div style="font-size:11px; font-weight:400; opacity:0.7">${d.toLocaleDateString('ru-RU')}</div>
+    `;
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  // Body
+  const tbody = document.createElement('tbody');
+  
+  // Track skip cells due to rowspan
+  const skipCells = { 0: false, 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
+
+  slots.forEach(timeSlot => {
+    const tr = document.createElement('tr');
+    
+    // Time cell
+    const tdTime = document.createElement('td');
+    tdTime.className = 'pd-time-col';
+    tdTime.textContent = timeSlot;
+    tr.appendChild(tdTime);
+
+    for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+      if (skipCells[dayIndex]) {
+        skipCells[dayIndex] = false;
+        continue;
+      }
+
+      const td = document.createElement('td');
+      td.className = 'pd-cell';
+      
+      const d = weekDates[dayIndex];
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const dateStr = `${day}.${month}.${year}`;
+      const key = `${dateStr}_${timeSlot}`;
+      const slotAppts = map[key];
+
+      if (slotAppts && slotAppts.length > 0) {
+        slotAppts.forEach(appt => {
+          // Anesthesia rule: if before 11:00 and has 'наркоз' (ignore case), it takes 2 slots (rowSpan=2)
+          if (timeSlot < '11:00' && appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
+            td.rowSpan = 2;
+            skipCells[dayIndex] = true;
+          }
+
+          const isDanilo = appt.doctor && appt.doctor.toLowerCase().includes('данило');
+          const docClass = isDanilo ? 'doc-danilo' : 'doc-teternik';
+          const docName = isDanilo ? 'Тетернік Д.О.' : 'Тетернік О.О.';
+          
+          let badgesHtml = '';
+          if (appt.execution_stage) {
+            const stageClass = appt.execution_stage.toLowerCase().replace(/\s+/g, '-');
+            badgesHtml += `<span class="pd-badge stage-${stageClass}">${escText(appt.execution_stage)}</span>`;
+          }
+          if (appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
+            badgesHtml += `<span class="pd-badge anesthesia">Наркоз</span>`;
+          }
+
+          const card = document.createElement('div');
+          card.className = `pd-card ${docClass}`;
+          
+          card.innerHTML = `
+            <div class="pd-card-header">
+              <div class="pd-time">${escText(appt.time || '--:--')}</div>
+              <div class="pd-badges">${badgesHtml}</div>
+            </div>
+            <div class="pd-patient">
+              <div class="pd-service">${escText(appt.service || 'Процедура не вказана')}</div>
+              <div class="pd-patient-name">${escText(appt.name || 'Анонім')}</div>
+              <div class="pd-doctor-name">👨‍⚕️ ${escText(docName)}</div>
+            </div>
+          `;
+          
+          td.appendChild(card);
+        });
+      }
+      
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  wrapper.innerHTML = '';
+  wrapper.appendChild(table);
+}
+
+function setupPremiumRealtime() {
+  if (!supabaseClient) return;
+  if (pdRealtimeChannel) {
+    supabaseClient.removeChannel(pdRealtimeChannel);
+  }
+
+  pdRealtimeChannel = supabaseClient.channel('premium-dashboard-changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'appointments' },
+      (payload) => {
+        if (currentPage === 'premium-dashboard') {
+          console.log('🔄 Realtime update received:', payload);
+          loadPremiumAppointments();
+        }
+      }
+    )
+    .subscribe();
 }

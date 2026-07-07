@@ -981,3 +981,526 @@ body {
 }
 
 .mobile-menu-btn { display: none; }
+
+/* ── EXCEL GRID (APPOINTMENTS) ───────────────────────────── */
+.view-toggle .btn-view {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: all var(--transition);
+}
+.view-toggle .btn-view:hover {
+  color: var(--text-primary);
+}
+.view-toggle .btn-view.active {
+  background: var(--bg-card);
+  color: var(--accent-light);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.excel-grid {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+  background: var(--bg-card);
+  font-size: 11px;
+}
+.excel-grid th, .excel-grid td {
+  border: 1px solid var(--border);
+  padding: 2px 4px;
+  vertical-align: top;
+}
+.excel-grid th {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.excel-grid td.time-col {
+  width: 50px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  vertical-align: middle;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.excel-grid th.time-col-header {
+  width: 50px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+.excel-grid td {
+  height: 35px; /* Compact height for 15 min slot */
+  position: relative;
+}
+
+.cell-appt {
+  background: rgba(99,102,241,0.1);
+  border-left: 3px solid var(--accent);
+  padding: 4px 6px;
+  border-radius: 4px;
+  margin: 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.cell-appt.doctor-danilo {
+  background: rgba(245,158,11,0.1);
+  border-left-color: var(--warning);
+}
+.cell-appt.doctor-teternik {
+  background: rgba(34,197,94,0.1);
+  border-left-color: var(--success);
+}
+.cell-appt.status-cancelled {
+  opacity: 0.5;
+  background: rgba(239,68,68,0.1);
+  border-left-color: var(--danger);
+  text-decoration: line-through;
+}
+
+.appt-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.appt-sub {
+  font-size: 9px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.appt-badge {
+  background: rgba(255,255,255,0.1);
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+.appt-badge.anesthesia {
+  background: rgba(239,68,68,0.2);
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+/* ── PREMIUM DASHBOARD (GLASSMORPHISM) ───────────────────── */
+.premium-dashboard-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: pageIn 0.4s ease;
+}
+
+.pd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pd-h2 {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+
+.pd-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.pd-filters {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.pd-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pd-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pd-select-wrapper, .pd-input-wrapper {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  transition: all var(--transition);
+}
+
+.pd-select-wrapper:hover, .pd-input-wrapper:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.pd-select, .pd-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.pd-select {
+  padding-right: 36px;
+  min-width: 160px;
+}
+
+.pd-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.pd-select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-secondary);
+}
+
+/* Webkit Date Picker Styling */
+.pd-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.pd-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.pd-week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.pd-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+.pd-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.pd-week-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 140px;
+  text-align: center;
+}
+
+/* Grid Wrapper & Table */
+.pd-grid-wrapper {
+  width: 100%;
+  overflow: auto;
+  background: rgba(26, 30, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-height: 70vh;
+}
+
+.pd-excel-grid {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+  font-size: 12px;
+}
+
+.pd-excel-grid th, .pd-excel-grid td {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0;
+  vertical-align: top;
+}
+
+/* Sticky Headers */
+.pd-excel-grid th {
+  background: rgba(26, 30, 42, 0.95);
+  backdrop-filter: blur(8px);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 12px 6px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.pd-excel-grid th .day-name {
+  color: var(--text-primary);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+/* Sticky Time Column */
+.pd-excel-grid td.pd-time-col {
+  width: 60px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(26, 30, 42, 0.95);
+  backdrop-filter: blur(8px);
+  vertical-align: middle;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.05);
+  padding: 12px 4px;
+}
+
+/* Top-left corner needs higher z-index to stay above both row and col scrolling */
+.pd-excel-grid th.pd-time-col-header {
+  width: 60px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+/* Standard Cell minimum height */
+.pd-excel-grid td.pd-cell {
+  height: 52px; /* Base height for a 15-min or 1-hour slot */
+  position: relative;
+  width: calc(100% / 7);
+  padding: 3px;
+}
+
+/* Cell Card styling */
+.pd-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 4px 6px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.pd-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Left accent line for doctors */
+.pd-card::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 3px;
+  background: var(--accent);
+}
+.pd-card.doc-teternik::before { background: #4ade80; }
+.pd-card.doc-danilo::before { background: #fcd34d; }
+
+.pd-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.pd-time {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pd-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.pd-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
+}
+
+.pd-badge.stage-заплановано, .pd-badge.stage-запланировано {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.pd-badge.stage-виконано, .pd-badge.stage-выполнено {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.pd-badge.stage-в-процесі, .pd-badge.stage-выполняется {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pd-badge.anesthesia {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pd-patient {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pd-service {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.pd-patient-name {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.pd-doctor-name {
+  font-size: 9px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: auto;
+}
+
+
+
+/* Empty State */
+.pd-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(26, 30, 42, 0.4);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.pd-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.pd-empty-state h3 {
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.pd-empty-state p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Glowing orbs background for the dashboard */
+#page-premium-dashboard {
+  position: relative;
+}
+#page-premium-dashboard::before, #page-premium-dashboard::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  opacity: 0.4;
+  pointer-events: none;
+}
+#page-premium-dashboard::before {
+  top: 10%;
+  left: 20%;
+  width: 300px;
+  height: 300px;
+  background: rgba(99, 102, 241, 0.15);
+}
+#page-premium-dashboard::after {
+  bottom: 20%;
+  right: 10%;
+  width: 250px;
+  height: 250px;
+  background: rgba(168, 85, 247, 0.1);
+}
