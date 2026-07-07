@@ -1200,7 +1200,7 @@ body {
 
 /* ── PREMIUM DASHBOARD (GLASSMORPHISM) ───────────────────── */
 .premium-dashboard-wrapper {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   animation: pageIn 0.4s ease;
 }
@@ -1350,7 +1350,7 @@ body {
   border-radius: 16px;
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  max-height: 70vh;
+  max-height: calc(100vh - 140px);
 }
 
 .pd-excel-grid {
