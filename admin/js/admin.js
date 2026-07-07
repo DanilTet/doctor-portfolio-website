@@ -1272,24 +1272,26 @@ function getWeekDates(offset) {
   return weekDates;
 }
 
-async function triggerBotSync() {
+async function triggerBotSync(dateStr = '') {
   if (!CFG.botUrl || !CFG.botSecret) {
     console.log('ℹ️ Bot URL or Secret not configured, skipping on-demand sync.');
     return;
   }
   
-  // Rate limiting: 60 seconds
+  // Rate limiting: 60 seconds per specific date
   const now = Date.now();
-  const lastSync = parseInt(sessionStorage.getItem('lastBotSync') || '0', 10);
+  const cacheKey = `lastBotSync_${dateStr || 'current'}`;
+  const lastSync = parseInt(sessionStorage.getItem(cacheKey) || '0', 10);
   if (now - lastSync < 60000) {
-    console.log(`⏳ Bot sync was recently triggered. Skipping. Next allowed in ${Math.ceil((60000 - (now - lastSync))/1000)}s`);
+    console.log(`⏳ Bot sync for ${dateStr || 'current'} was recently triggered. Skipping. Next allowed in ${Math.ceil((60000 - (now - lastSync))/1000)}s`);
     return;
   }
-  sessionStorage.setItem('lastBotSync', now.toString());
+  sessionStorage.setItem(cacheKey, now.toString());
   
-  console.log('⏳ Triggering Google Sheets sync via Telegram Bot API...');
+  console.log(`⏳ Triggering Google Sheets sync for ${dateStr || 'current'} via Telegram Bot API...`);
   try {
-    const res = await fetch(`${CFG.botUrl}/api/trigger-sync?secret=${CFG.botSecret}`);
+    const url = `${CFG.botUrl}/api/trigger-sync?secret=${CFG.botSecret}` + (dateStr ? `&date=${dateStr}` : '');
+    const res = await fetch(url);
     const data = await res.json();
     console.log('🤖 Telegram Bot sync triggered successfully:', data);
   } catch (err) {
@@ -1332,9 +1334,6 @@ function initPremiumDashboard() {
 
   // Setup Realtime
   setupPremiumRealtime();
-
-  // Trigger Google Sheets parsing asynchronously
-  triggerBotSync();
 }
 
 async function loadPremiumAppointments() {
@@ -1345,6 +1344,14 @@ async function loadPremiumAppointments() {
   
   // Update week label
   const weekDates = getWeekDates(currentPremiumGridWeekOffset);
+  
+  // Trigger Google Sheets parsing asynchronously for this week
+  const monday = weekDates[0];
+  const day = String(monday.getDate()).padStart(2, '0');
+  const month = String(monday.getMonth() + 1).padStart(2, '0');
+  const year = monday.getFullYear();
+  const dateStr = `${day}.${month}.${year}`;
+  triggerBotSync(dateStr);
   const d1 = weekDates[0];
   const d2 = weekDates[6];
   const labelEl = document.getElementById('pd-week-label');
