@@ -289,11 +289,29 @@ function updateWeeklyMetrics(appts) {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  const currentWeekStart = new Date(now);
-  currentWeekStart.setDate(now.getDate() - 7);
+  const todayEnd = new Date(now);
+  todayEnd.setHours(23, 59, 59, 999);
 
-  const previousWeekStart = new Date(currentWeekStart);
-  previousWeekStart.setDate(currentWeekStart.getDate() - 7);
+  // Current range: last 7 days (now-6 to now)
+  const currentWeekStart = new Date(now);
+  currentWeekStart.setDate(now.getDate() - 6);
+
+  // Previous range: now-13 to now-7
+  const previousWeekStart = new Date(now);
+  previousWeekStart.setDate(now.getDate() - 13);
+  
+  const previousWeekEnd = new Date(now);
+  previousWeekEnd.setDate(now.getDate() - 7);
+  previousWeekEnd.setHours(23, 59, 59, 999);
+
+  const fmtDate = (d) => {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${day}.${month}`;
+  };
+
+  const curRangeStr = `${fmtDate(currentWeekStart)} - ${fmtDate(now)}`;
+  const prevRangeStr = `${fmtDate(previousWeekStart)} - ${fmtDate(previousWeekEnd)}`;
 
   let curTotal = 0, prevTotal = 0;
   let curTeternik = 0, prevTeternik = 0;
@@ -302,8 +320,8 @@ function updateWeeklyMetrics(appts) {
 
   appts.forEach(appt => {
     const ts = appt.parsedDate.getTime();
-    const isCur = ts >= currentWeekStart.getTime();
-    const isPrev = ts >= previousWeekStart.getTime() && ts < currentWeekStart.getTime();
+    const isCur = ts >= currentWeekStart.getTime() && ts <= todayEnd.getTime();
+    const isPrev = ts >= previousWeekStart.getTime() && ts <= previousWeekEnd.getTime();
 
     if (isCur || isPrev) {
       const doctorStr = (appt.doctor || '').toLowerCase();
@@ -325,32 +343,48 @@ function updateWeeklyMetrics(appts) {
     }
   });
 
-  updateMetricCard('total-appts', curTotal, prevTotal);
-  updateMetricCard('teternik', curTeternik, prevTeternik);
-  updateMetricCard('danilo', curDanilo, prevDanilo);
-  updateMetricCard('kalashnikov', curKalashnikov, prevKalashnikov);
+  updateMetricCard('total-appts', curTotal, prevTotal, curRangeStr, prevRangeStr);
+  updateMetricCard('teternik', curTeternik, prevTeternik, curRangeStr, prevRangeStr);
+  updateMetricCard('danilo', curDanilo, prevDanilo, curRangeStr, prevRangeStr);
+  updateMetricCard('kalashnikov', curKalashnikov, prevKalashnikov, curRangeStr, prevRangeStr);
 }
 
-function updateMetricCard(idSuffix, curVal, prevVal) {
+function updateMetricCard(idSuffix, curVal, prevVal, curRangeStr, prevRangeStr) {
   const elVal = document.getElementById(`stat-${idSuffix}`);
   const elTrend = document.getElementById(`trend-${idSuffix}`);
   if (elVal) elVal.textContent = curVal;
+
+  if (elVal) {
+    const card = elVal.closest('.stat-card');
+    const labelEl = card ? card.querySelector('.stat-label') : null;
+    if (labelEl) {
+      if (idSuffix === 'total-appts') {
+        labelEl.textContent = `Всього прийомів (${curRangeStr})`;
+      } else if (idSuffix === 'teternik') {
+        labelEl.textContent = `Прийоми: Тетернік (${curRangeStr})`;
+      } else if (idSuffix === 'danilo') {
+        labelEl.textContent = `Прийоми: Данило (${curRangeStr})`;
+      } else if (idSuffix === 'kalashnikov') {
+        labelEl.textContent = `Прийоми: Калашніков (${curRangeStr})`;
+      }
+    }
+  }
   
   if (elTrend) {
     if (prevVal === 0) {
-      elTrend.textContent = curVal > 0 ? '⬆ +100% порівняно з минулим тижнем' : 'Немає змін';
+      elTrend.textContent = curVal > 0 ? `⬆ +100% порівняно з ${prevRangeStr}` : 'Немає змін';
       elTrend.className = curVal > 0 ? 'stat-trend trend-up' : 'stat-trend trend-neutral';
     } else {
       const diff = curVal - prevVal;
       const pct = Math.round((diff / prevVal) * 100);
       if (diff > 0) {
-        elTrend.textContent = `⬆ +${pct}% порівняно з минулим тижнем`;
+        elTrend.textContent = `⬆ +${pct}% порівняно з ${prevRangeStr}`;
         elTrend.className = 'stat-trend trend-up';
       } else if (diff < 0) {
-        elTrend.textContent = `⬇ ${Math.abs(pct)}% порівняно з минулим тижнем`;
+        elTrend.textContent = `⬇ ${Math.abs(pct)}% порівняно з ${prevRangeStr}`;
         elTrend.className = 'stat-trend trend-down';
       } else {
-        elTrend.textContent = `Без змін порівняно з минулим тижнем`;
+        elTrend.textContent = `Без змін порівняно з ${prevRangeStr}`;
         elTrend.className = 'stat-trend trend-neutral';
       }
     }
@@ -364,37 +398,73 @@ function renderServicesChart(appts) {
     servicesMap[srv] = (servicesMap[srv] || 0) + 1;
   });
 
-  const ctx = document.getElementById('chart-services');
-  if (!ctx || !window.Chart) return;
+  const canvas = document.getElementById('chart-services');
+  if (!canvas || !window.Chart) return;
+  const ctx = canvas.getContext('2d');
 
   // Sort by count descending
   const sortedEntries = Object.entries(servicesMap).sort((a, b) => b[1] - a[1]);
   const labels = sortedEntries.map(e => e[0]);
   const data = sortedEntries.map(e => e[1]);
+  const totalVal = data.reduce((a, b) => a + b, 0);
 
-  // Neon colors
-  const bgColors = ['#6366f1', '#38bdf8', '#f59e0b', '#22c55e', '#a855f7', '#ec4899', '#14b8a6', '#ef4444', '#8b5cf6', '#10b981'];
+  // Gradient base colors (Indigo, Blue, Amber, Green, Purple, Pink, Teal, Red)
+  const baseColors = [
+    { start: '#818cf8', end: '#4f46e5' },
+    { start: '#7dd3fc', end: '#0ea5e9' },
+    { start: '#fbbf24', end: '#d97706' },
+    { start: '#4ade80', end: '#16a34a' },
+    { start: '#c084fc', end: '#9333ea' },
+    { start: '#f472b6', end: '#db2777' },
+    { start: '#2dd4bf', end: '#0d9488' },
+    { start: '#f87171', end: '#dc2626' },
+  ];
+
+  const bgColors = data.map((_, i) => {
+    const color = baseColors[i % baseColors.length];
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, color.start);
+    gradient.addColorStop(1, color.end);
+    return gradient;
+  });
 
   if (servicesChart) servicesChart.destroy();
-  servicesChart = new Chart(ctx, {
+
+  // Pseudo-3D Drop Shadow Plugin
+  const shadowPlugin = {
+    id: 'shadowPlugin',
+    beforeDraw: (chart) => {
+      const { ctx } = chart;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 8;
+    },
+    afterDraw: (chart) => {
+      chart.ctx.restore();
+    }
+  };
+
+  servicesChart = new Chart(canvas, {
     type: 'doughnut',
     data: {
       labels,
       datasets: [{
         data,
-        backgroundColor: bgColors.slice(0, labels.length),
+        backgroundColor: bgColors,
         borderColor: '#1a1e2a',
-        borderWidth: 3,
-        hoverOffset: 4,
+        borderWidth: 5,
+        hoverOffset: 6,
       }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      cutout: '55%',
       plugins: {
         legend: {
-          position: 'bottom',
-          labels: { color: '#8b93a8', padding: 16, font: { size: 12 } },
+          display: false,
         },
         tooltip: {
           callbacks: {
@@ -402,8 +472,7 @@ function renderServicesChart(appts) {
               let label = context.label || '';
               if (label) label += ': ';
               const val = context.parsed;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const pct = Math.round((val / total) * 100);
+              const pct = Math.round((val / totalVal) * 100);
               label += `${val} (${pct}%)`;
               return label;
             }
@@ -411,13 +480,69 @@ function renderServicesChart(appts) {
         }
       },
     },
+    plugins: [shadowPlugin]
   });
+
+  // Render Custom Legend
+  const legendContainer = document.getElementById('chart-services-legend');
+  if (legendContainer) {
+    legendContainer.innerHTML = '';
+    labels.forEach((label, i) => {
+      const color = baseColors[i % baseColors.length].end;
+      const val = data[i];
+      const pct = Math.round((val / totalVal) * 100);
+      
+      const item = document.createElement('div');
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.justifyContent = 'space-between';
+      item.style.fontSize = '14px';
+
+      const left = document.createElement('div');
+      left.style.display = 'flex';
+      left.style.alignItems = 'center';
+      left.style.gap = '8px';
+
+      const dot = document.createElement('div');
+      dot.style.width = '12px';
+      dot.style.height = '12px';
+      dot.style.borderRadius = '50%';
+      dot.style.background = color;
+      dot.style.boxShadow = `0 0 8px ${color}80`;
+
+      const lbl = document.createElement('span');
+      lbl.style.color = 'var(--text-secondary)';
+      lbl.textContent = label;
+
+      left.appendChild(dot);
+      left.appendChild(lbl);
+
+      const right = document.createElement('div');
+      right.style.fontWeight = '600';
+      right.style.color = 'var(--text)';
+      right.textContent = `${val} `;
+
+      const pctSpan = document.createElement('span');
+      pctSpan.style.color = 'var(--text-muted)';
+      pctSpan.style.fontWeight = '400';
+      pctSpan.style.fontSize = '12px';
+      pctSpan.textContent = `(${pct}%)`;
+      right.appendChild(pctSpan);
+
+      item.appendChild(left);
+      item.appendChild(right);
+      legendContainer.appendChild(item);
+    });
+  }
 }
 
 function updateAttendanceChart(range) {
   const attendanceMap = {}; 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
+
+  const todayEnd = new Date(now);
+  todayEnd.setHours(23, 59, 59, 999);
 
   let startTime = 0;
   let isDaily = false;
@@ -444,7 +569,8 @@ function updateAttendanceChart(range) {
     const d = appt.parsedDate;
     const ts = d.getTime();
 
-    if (startTime > 0 && ts < startTime) return;
+    // Limit daily ranges to [startTime, todayEnd]
+    if (startTime > 0 && (ts < startTime || ts > todayEnd.getTime())) return;
 
     let key;
     if (isDaily) {
