@@ -78,6 +78,12 @@ const Supabase = {
     const res = await fetch(`${CFG.url}/rest/v1/${table}${params}`, {
       headers: this.headers({ 'Prefer': 'count=exact' }),
     });
+    if (res.status === 401) {
+      sessionStorage.removeItem('admin_token');
+      sessionStorage.removeItem('admin_email');
+      location.reload();
+      return { data: [], total: 0 };
+    }
     if (!res.ok) throw new Error(await res.text());
     const total = (() => {
       const cr = res.headers.get('content-range');
@@ -92,6 +98,12 @@ const Supabase = {
       headers: this.headers(),
       body:    JSON.stringify(body),
     });
+    if (res.status === 401) {
+      sessionStorage.removeItem('admin_token');
+      sessionStorage.removeItem('admin_email');
+      location.reload();
+      return;
+    }
     if (!res.ok) throw new Error(await res.text());
     return res.json();
   },
@@ -1371,7 +1383,14 @@ async function loadPremiumAppointments() {
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Перевищено час очікування від Supabase (10 секунд)')), 10000));
     
     const { data, error } = await Promise.race([query, timeout]);
-    if (error) throw error;
+    if (error) {
+      if (error.status === 401 || error.code === '401' || error.message?.includes('JWT')) {
+        sessionStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_email');
+        location.reload();
+      }
+      throw error;
+    }
     
     console.log('✅ Fetched Appointments for week:', data);
 
