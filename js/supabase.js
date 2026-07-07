@@ -142,7 +142,7 @@ async function submitAppointment(data) {
       name: data.name,
       phone: data.phone,
       service: data.service,
-      doctor: 'Тетернік О.О.',
+      doctor: 'Тетерник',
       execution_stage: 'Запланировано',
       status: 'confirmed',
       date: new Date().toLocaleDateString('uk-UA'),

@@ -133,6 +133,16 @@
         <span>Заявки на прийом</span>
       </button>
 
+      <button class="nav-item" data-page="patient-history" id="nav-patient-history">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="11" y1="8" x2="11" y2="11"></line>
+          <line x1="11" y1="11" x2="14" y2="11"></line>
+        </svg>
+        <span>Історія пацієнта</span>
+      </button>
+
       <button class="nav-item" data-page="reviews" id="nav-reviews">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -191,7 +201,7 @@
     <section class="page-section active" id="page-dashboard">
 
       <!-- Stats Row -->
-      <div class="stats-grid">
+      <div class="stats-grid" id="analytics-stats-grid">
 
         <div class="stat-card">
           <div class="stat-icon stat-icon--purple">
@@ -200,108 +210,69 @@
               <circle cx="9" cy="7" r="4"/>
             </svg>
           </div>
-          <div class="stat-value" id="stat-total">—</div>
-          <div class="stat-label">Всього відвідувань</div>
+          <div class="stat-value" id="stat-total-appts">—</div>
+          <div class="stat-label">Всього прийомів (Поточний тиждень)</div>
+          <div class="stat-trend" id="trend-total-appts"></div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon stat-icon--blue">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
             </svg>
           </div>
-          <div class="stat-value" id="stat-today">—</div>
-          <div class="stat-label">Сьогодні</div>
+          <div class="stat-value" id="stat-teternik">—</div>
+          <div class="stat-label">Прийоми: Тетернік</div>
+          <div class="stat-trend" id="trend-teternik"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-icon--amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="stat-value" id="stat-danilo">—</div>
+          <div class="stat-label">Прийоми: Данило</div>
+          <div class="stat-trend" id="trend-danilo"></div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon stat-icon--green">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
             </svg>
           </div>
-          <div class="stat-value" id="stat-week">—</div>
-          <div class="stat-label">За тиждень</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon stat-icon--amber">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <div class="stat-value" id="stat-month">—</div>
-          <div class="stat-label">За місяць</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon stat-icon--purple">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          </div>
-          <div class="stat-value" id="stat-unique">—</div>
-          <div class="stat-label">Унікальних</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon stat-icon--amber">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.4 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.4a16 16 0 0 0 6 6l.38-.38a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-          </div>
-          <div class="stat-value" id="stat-new-appts">—</div>
-          <div class="stat-label">Необроблених заявок</div>
+          <div class="stat-value" id="stat-kalashnikov">—</div>
+          <div class="stat-label">Прийоми: Калашніков</div>
+          <div class="stat-trend" id="trend-kalashnikov"></div>
         </div>
 
       </div>
 
       <!-- Charts Row -->
-      <div class="charts-grid">
+      <div class="charts-grid" style="grid-template-columns: 2fr 1fr;">
         <div class="chart-card">
-          <div class="chart-title">Відвідування за 14 днів</div>
-          <div class="chart-wrap">
-            <canvas id="chart-visits"></canvas>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div class="chart-title" style="margin-bottom:0;">Відвідуваність</div>
+            <select id="analytics-time-range" class="form-select" style="width: auto; padding: 4px 28px 4px 12px; font-size: 12px;">
+              <option value="all_time">За весь час (по місяцях)</option>
+              <option value="last_30_days">Останні 30 днів (по днях)</option>
+              <option value="last_7_days">Останні 7 днів (по днях)</option>
+            </select>
+          </div>
+          <div class="chart-wrap" style="height: 300px;">
+            <canvas id="chart-attendance"></canvas>
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">Платформи</div>
-          <div class="chart-wrap">
-            <canvas id="chart-platform"></canvas>
+          <div class="chart-title">Популярність послуг</div>
+          <div class="chart-wrap" style="height: 300px;">
+            <canvas id="chart-services"></canvas>
           </div>
-        </div>
-      </div>
-
-      <!-- Geo Tables -->
-      <div class="data-grid">
-        <div class="table-card">
-          <div class="table-card-header">
-            <span class="table-card-title">Топ країн</span>
-          </div>
-          <table class="table">
-            <thead>
-              <tr><th>Країна</th><th>Візити</th></tr>
-            </thead>
-            <tbody id="countries-tbody">
-              <tr><td colspan="2" style="text-align:center;color:var(--text-muted);padding:20px">Завантаження...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="table-card">
-          <div class="table-card-header">
-            <span class="table-card-title">Топ міст</span>
-          </div>
-          <table class="table">
-            <thead>
-              <tr><th>Місто</th><th>Візити</th></tr>
-            </thead>
-            <tbody id="cities-tbody">
-              <tr><td colspan="2" style="text-align:center;color:var(--text-muted);padding:20px">Завантаження...</td></tr>
-            </tbody>
-          </table>
         </div>
       </div>
 
@@ -317,14 +288,20 @@
         <div class="pd-header" style="justify-content: flex-end;">
           
           <!-- Filters -->
+          <!-- Filters -->
           <div class="pd-filters">
+            
+            <div id="pd-sync-status" class="sync-status" style="margin-right: 15px; font-size: 13px; font-weight: 500; color: var(--text-muted); align-self: center;">
+              ⏳ Синхронізація: Готово
+            </div>
+
             <!-- Doctor Filter -->
             <div class="pd-filter-group">
               <label class="pd-label">Лікар</label>
               <div class="pd-select-wrapper">
                 <select id="pd-doctor-filter" class="pd-select">
                   <option value="all">Усі лікарі</option>
-                  <option value="Тетернік">Тетернік О.О.</option>
+                  <option value="Тетерник">Тетернік О.О.</option>
                   <option value="Данило">Данило Рома</option>
                 </select>
                 <div class="pd-select-icon">
@@ -460,6 +437,72 @@
 
 
     <!-- ══════════════════════════════════════════════════════
+         PAGE: PATIENT HISTORY
+         ══════════════════════════════════════════════════════ -->
+    <section class="page-section" id="page-patient-history">
+      
+      <div class="search-container">
+        <div class="search-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="patient-search-input" placeholder="Введіть телефон (напр. 0501112233) або ФІО пацієнта..." autocomplete="off">
+          <button id="btn-patient-search" class="btn btn--primary" style="margin-left: 8px;">Знайти</button>
+        </div>
+        <div id="patient-search-help" style="font-size: 13px; color: var(--text-muted); margin-top: 8px; padding-left: 12px;">
+          Пошук ігнорує пробіли, дужки та дефіси. Можна шукати за частковим збігом.
+        </div>
+      </div>
+
+      <div id="patient-history-content" style="display: none; margin-top: 24px;">
+        <div class="patient-history-grid" style="display: grid; grid-template-columns: 300px 1fr; gap: 24px;">
+          
+          <!-- Left sidebar: Search Results List -->
+          <div class="patient-matches-card">
+            <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px;">Знайдені пацієнти</h3>
+            <div id="patient-matches-list" class="matches-list">
+              <!-- JS will inject matches here -->
+            </div>
+          </div>
+
+          <!-- Right area: Timeline -->
+          <div class="patient-timeline-card">
+            <div class="timeline-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+              <div>
+                <h2 id="ph-name" style="margin: 0 0 4px 0; font-size: 20px;">—</h2>
+                <div id="ph-phone" style="color: var(--text-secondary); font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  <span>—</span>
+                </div>
+              </div>
+              <div class="ph-stats" style="text-align: right;">
+                <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="ph-total-visits">0</div>
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">візитів</div>
+              </div>
+            </div>
+
+            <div class="timeline-container" id="patient-timeline">
+              <!-- JS will inject timeline items here -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="patient-history-empty" style="display: none; text-align: center; padding: 64px 0;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); margin-bottom: 16px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </div>
+        <h3 style="margin: 0 0 8px 0; color: var(--text);">Пацієнтів не знайдено</h3>
+        <p style="margin: 0; color: var(--text-secondary); max-width: 300px; margin: 0 auto;">Спробуйте змінити пошуковий запит або перевірте правильність вводу.</p>
+      </div>
+
+    </section>
+
+
+    <!-- ══════════════════════════════════════════════════════
          PAGE: REVIEWS MODERATION
          ══════════════════════════════════════════════════════ -->
     <section class="page-section" id="page-reviews">
@@ -502,7 +545,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
 <!-- Admin logic -->
-<script src="/admin/js/admin.js?v=2"></script>
+<script src="js/admin.js?v=7"></script>
 
 </body>
 </html>

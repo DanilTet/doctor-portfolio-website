@@ -181,196 +181,208 @@ function navigateTo(page) {
     'premium-dashboard': 'Розклад Прийомів (Premium)',
     appointments: 'Заявки на прием',
     reviews:      'Модерация отзывов',
+    'patient-history': 'Історія пацієнта',
   };
   const titleEl = document.getElementById('top-bar-title');
   if (titleEl) titleEl.textContent = titles[page] || page;
 
   // Load data for the active section
-  if (page === 'dashboard')    loadDashboard();
+  if (page === 'dashboard')    loadAnalytics();
   if (page === 'appointments') loadAppointments();
   if (page === 'reviews')      loadReviews();
   if (page === 'premium-dashboard') initPremiumDashboard();
+  if (page === 'patient-history') initPatientHistory();
 }
 
 /* ============================================================
    DASHBOARD — ANALYTICS
    ============================================================ */
-let visitsLineChart = null;
-let platformPieChart = null;
+let attendanceChart = null;
+let servicesChart = null;
+let cachedActiveAppts = [];
 
-async function loadDashboard() {
-  // ── Stats cards ──────────────────────────────────────────
-  try {
-    const stats = await Supabase.rpc('get_visit_stats');
-    setStatCard('stat-total',   stats.total  ?? '—');
-    setStatCard('stat-today',   stats.today  ?? '—');
-    setStatCard('stat-week',    stats.week   ?? '—');
-    setStatCard('stat-month',   stats.month  ?? '—');
-    setStatCard('stat-unique',  stats.unique ?? '—');
-  } catch {
-    ['stat-total','stat-today','stat-week','stat-month','stat-unique']
-      .forEach(id => setStatCard(id, '—'));
+// Parse "DD.MM.YYYY" or "YYYY-MM-DD" to Date object
+function parseApptDate(dateStr) {
+  if (!dateStr) return null;
+  if (dateStr.includes('.')) {
+    const parts = dateStr.split('.');
+    if (parts.length === 3) {
+      return new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+    }
   }
-
-  // ── Visits per day (last 30 days) ────────────────────────
-  try {
-    const { data } = await Supabase.get(
-      'site_visits',
-      `?select=created_at&created_at=gte.${daysAgo(30)}&order=created_at.asc`
-    );
-    renderVisitsChart(data || []);
-  } catch { /* silent */ }
-
-  // ── Platform breakdown ───────────────────────────────────
-  try {
-    const { data } = await Supabase.get('site_visits', '?select=platform');
-    renderPlatformChart(data || []);
-  } catch { /* silent */ }
-
-  // ── Countries table ──────────────────────────────────────
-  try {
-    const { data } = await Supabase.get(
-      'site_visits',
-      '?select=country,country_code&country=not.is.null'
-    );
-    renderGeoTable('countries-tbody', groupCount(data, 'country'));
-  } catch { /* silent */ }
-
-  // ── Cities table ─────────────────────────────────────────
-  try {
-    const { data } = await Supabase.get(
-      'site_visits',
-      '?select=city&city=not.is.null'
-    );
-    renderGeoTable('cities-tbody', groupCount(data, 'city'));
-  } catch { /* silent */ }
-
-  // ── Pending appointments (unprocessed from bot) ───────────
-  try {
-    const { total } = await Supabase.get(
-      'appointments',
-      '?status=eq.pending&select=id'
-    );
-    setStatCard('stat-new-appts', total ?? 0);
-  } catch { /* silent */ }
-}
-
-function setStatCard(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value.toLocaleString ? value.toLocaleString('ru-RU') : value;
-}
-
-function daysAgo(n) {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  return d.toISOString();
-}
-
-function groupCount(arr, key) {
-  const map = {};
-  arr.forEach(item => {
-    const val = item[key];
-    if (val) map[val] = (map[val] || 0) + 1;
-  });
-  return Object.entries(map)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
-}
-
-function renderGeoTable(tbodyId, entries) {
-  const tbody = document.getElementById(tbodyId);
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  if (!entries.length) {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    td.colSpan = 2;
-    td.textContent = 'Нет данных';
-    td.style.cssText = 'text-align:center;color:var(--text-muted);padding:20px';
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-    return;
+  if (dateStr.includes('-')) {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return d;
   }
-  const total = entries.reduce((s, [, c]) => s + c, 0);
-  entries.forEach(([name, count]) => {
-    const tr = document.createElement('tr');
-    const td1 = document.createElement('td');
-    const td2 = document.createElement('td');
-    td1.textContent = name;
-    td2.innerHTML = `<span style="color:var(--text-secondary)">${count}</span>
-      <span style="color:var(--text-muted);font-size:11px;margin-left:6px">(${Math.round(count/total*100)}%)</span>`;
-    tr.appendChild(td1);
-    tr.appendChild(td2);
-    tbody.appendChild(tr);
-  });
+  return null;
 }
 
-function renderVisitsChart(data) {
-  const ctx = document.getElementById('chart-visits');
+function normalizeService(srv) {
+  if (!srv) return 'Інше';
+  let s = srv.toLowerCase().trim();
+  if (s.includes('гастро') && s.includes('колоно')) return 'Гастро + Колоно';
+  if (s.includes('гастро')) return 'Гастроскопія';
+  if (s.includes('колоно')) return 'Колоноскопія';
+  if (s.includes('ректо')) return 'Ректороманоскопія';
+  if (s.includes('бронхо')) return 'Бронхоскопія';
+  if (s.includes('ерхпг') || s.includes('эрхпг')) return 'ЕРХПГ';
+  if (s.includes('узд') || s.includes('узи')) return 'УЗД';
+  if (s.includes('консультац') || s.includes('запланировано')) return 'Консультація';
+  return 'Інше';
+}
+
+async function loadAnalytics() {
+  try {
+    let allAppts = [];
+    let offset = 0;
+    const limit = 1000;
+    let hasMore = true;
+    
+    // Fetch all records using pagination to guarantee we don't miss anything or get random subsets
+    while (hasMore) {
+      const { data } = await Supabase.get('appointments', `?select=*&order=id.desc&limit=${limit}&offset=${offset}`);
+      if (!data || data.length === 0) {
+        hasMore = false;
+      } else {
+        allAppts = allAppts.concat(data);
+        if (data.length < limit) {
+          hasMore = false;
+        } else {
+          offset += limit;
+        }
+      }
+    }
+    
+    // Filter active appointments and pre-parse valid dates
+    cachedActiveAppts = allAppts
+      .filter(a => a.status !== 'cancelled')
+      .map(a => ({ ...a, parsedDate: parseApptDate(a.date) }))
+      .filter(a => a.parsedDate !== null);
+
+    // Calculate weekly stats
+    updateWeeklyMetrics(cachedActiveAppts);
+
+    // Render Doughnut Chart
+    renderServicesChart(cachedActiveAppts);
+
+    // Initial render of Attendance Chart and set up listener
+    const rangeSelect = document.getElementById('analytics-time-range');
+    if (rangeSelect) {
+      rangeSelect.removeEventListener('change', handleTimeRangeChange);
+      rangeSelect.addEventListener('change', handleTimeRangeChange);
+      updateAttendanceChart(rangeSelect.value);
+    } else {
+      updateAttendanceChart('all_time');
+    }
+
+  } catch (err) {
+    console.error(err);
+    toast('Помилка завантаження аналітики', 'error');
+  }
+}
+
+function handleTimeRangeChange(e) {
+  updateAttendanceChart(e.target.value);
+}
+
+function updateWeeklyMetrics(appts) {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const currentWeekStart = new Date(now);
+  currentWeekStart.setDate(now.getDate() - 7);
+
+  const previousWeekStart = new Date(currentWeekStart);
+  previousWeekStart.setDate(currentWeekStart.getDate() - 7);
+
+  let curTotal = 0, prevTotal = 0;
+  let curTeternik = 0, prevTeternik = 0;
+  let curDanilo = 0, prevDanilo = 0;
+  let curKalashnikov = 0, prevKalashnikov = 0;
+
+  appts.forEach(appt => {
+    const ts = appt.parsedDate.getTime();
+    const isCur = ts >= currentWeekStart.getTime();
+    const isPrev = ts >= previousWeekStart.getTime() && ts < currentWeekStart.getTime();
+
+    if (isCur || isPrev) {
+      const doctorStr = (appt.doctor || '').toLowerCase();
+      const isDanilo = doctorStr.includes('данило') || doctorStr.includes('даніло') || doctorStr.includes('данил');
+      const isKalashnikov = doctorStr.includes('калашников') || doctorStr.includes('калашніков');
+      const isTeternik = doctorStr.includes('тетерник') || doctorStr.includes('тетернік');
+
+      if (isCur) {
+        curTotal++;
+        if (isDanilo) curDanilo++;
+        else if (isKalashnikov) curKalashnikov++;
+        else if (isTeternik) curTeternik++;
+      } else {
+        prevTotal++;
+        if (isDanilo) prevDanilo++;
+        else if (isKalashnikov) prevKalashnikov++;
+        else if (isTeternik) prevTeternik++;
+      }
+    }
+  });
+
+  updateMetricCard('total-appts', curTotal, prevTotal);
+  updateMetricCard('teternik', curTeternik, prevTeternik);
+  updateMetricCard('danilo', curDanilo, prevDanilo);
+  updateMetricCard('kalashnikov', curKalashnikov, prevKalashnikov);
+}
+
+function updateMetricCard(idSuffix, curVal, prevVal) {
+  const elVal = document.getElementById(`stat-${idSuffix}`);
+  const elTrend = document.getElementById(`trend-${idSuffix}`);
+  if (elVal) elVal.textContent = curVal;
+  
+  if (elTrend) {
+    if (prevVal === 0) {
+      elTrend.textContent = curVal > 0 ? '⬆ +100% порівняно з минулим тижнем' : 'Немає змін';
+      elTrend.className = curVal > 0 ? 'stat-trend trend-up' : 'stat-trend trend-neutral';
+    } else {
+      const diff = curVal - prevVal;
+      const pct = Math.round((diff / prevVal) * 100);
+      if (diff > 0) {
+        elTrend.textContent = `⬆ +${pct}% порівняно з минулим тижнем`;
+        elTrend.className = 'stat-trend trend-up';
+      } else if (diff < 0) {
+        elTrend.textContent = `⬇ ${Math.abs(pct)}% порівняно з минулим тижнем`;
+        elTrend.className = 'stat-trend trend-down';
+      } else {
+        elTrend.textContent = `Без змін порівняно з минулим тижнем`;
+        elTrend.className = 'stat-trend trend-neutral';
+      }
+    }
+  }
+}
+
+function renderServicesChart(appts) {
+  const servicesMap = {};
+  appts.forEach(appt => {
+    const srv = normalizeService(appt.service);
+    servicesMap[srv] = (servicesMap[srv] || 0) + 1;
+  });
+
+  const ctx = document.getElementById('chart-services');
   if (!ctx || !window.Chart) return;
 
-  // Group by date
-  const map = {};
-  data.forEach(row => {
-    const d = row.created_at?.split('T')[0];
-    if (d) map[d] = (map[d] || 0) + 1;
-  });
-  // Fill last 14 days
-  const labels = [];
-  const values = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const key = d.toISOString().split('T')[0];
-    labels.push(d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }));
-    values.push(map[key] || 0);
-  }
+  // Sort by count descending
+  const sortedEntries = Object.entries(servicesMap).sort((a, b) => b[1] - a[1]);
+  const labels = sortedEntries.map(e => e[0]);
+  const data = sortedEntries.map(e => e[1]);
 
-  if (visitsLineChart) visitsLineChart.destroy();
-  visitsLineChart = new Chart(ctx, {
-    type: 'line',
+  // Neon colors
+  const bgColors = ['#6366f1', '#38bdf8', '#f59e0b', '#22c55e', '#a855f7', '#ec4899', '#14b8a6', '#ef4444', '#8b5cf6', '#10b981'];
+
+  if (servicesChart) servicesChart.destroy();
+  servicesChart = new Chart(ctx, {
+    type: 'doughnut',
     data: {
       labels,
       datasets: [{
-        label: 'Визиты',
-        data: values,
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99,102,241,0.1)',
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#6366f1',
-        pointRadius: 3,
-        pointHoverRadius: 5,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8b93a8', font: { size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8b93a8', font: { size: 11 }, precision: 0 }, beginAtZero: true },
-      },
-    },
-  });
-}
-
-function renderPlatformChart(data) {
-  const ctx = document.getElementById('chart-platform');
-  if (!ctx || !window.Chart) return;
-
-  const map = { Mobile: 0, Desktop: 0, Tablet: 0 };
-  data.forEach(r => { if (r.platform && map[r.platform] !== undefined) map[r.platform]++; });
-
-  if (platformPieChart) platformPieChart.destroy();
-  platformPieChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(map),
-      datasets: [{
-        data: Object.values(map),
-        backgroundColor: ['#6366f1', '#38bdf8', '#f59e0b'],
+        data,
+        backgroundColor: bgColors.slice(0, labels.length),
         borderColor: '#1a1e2a',
         borderWidth: 3,
         hoverOffset: 4,
@@ -384,6 +396,181 @@ function renderPlatformChart(data) {
           position: 'bottom',
           labels: { color: '#8b93a8', padding: 16, font: { size: 12 } },
         },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.label || '';
+              if (label) label += ': ';
+              const val = context.parsed;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = Math.round((val / total) * 100);
+              label += `${val} (${pct}%)`;
+              return label;
+            }
+          }
+        }
+      },
+    },
+  });
+}
+
+function updateAttendanceChart(range) {
+  const attendanceMap = {}; 
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  let startTime = 0;
+  let isDaily = false;
+
+  if (range === 'last_30_days') {
+    startTime = new Date(now).setDate(now.getDate() - 30);
+    isDaily = true;
+  } else if (range === 'last_7_days') {
+    startTime = new Date(now).setDate(now.getDate() - 7);
+    isDaily = true;
+  }
+
+  // Pre-fill map to ensure all dates/months are present even if 0
+  if (isDaily) {
+    let d = new Date(startTime);
+    while (d <= now) {
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      attendanceMap[key] = { total: 0, teternik: 0, danilo: 0, kalashnikov: 0 };
+      d.setDate(d.getDate() + 1);
+    }
+  }
+
+  cachedActiveAppts.forEach(appt => {
+    const d = appt.parsedDate;
+    const ts = d.getTime();
+
+    if (startTime > 0 && ts < startTime) return;
+
+    let key;
+    if (isDaily) {
+      key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    } else {
+      key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    if (!attendanceMap[key]) {
+      attendanceMap[key] = { total: 0, teternik: 0, danilo: 0, kalashnikov: 0 };
+    }
+
+    const doctorStr = (appt.doctor || '').toLowerCase();
+    
+    // Check Danilo first to ensure no overlap
+    const isDanilo = doctorStr.includes('данило') || doctorStr.includes('даніло') || doctorStr.includes('данил');
+    const isKalashnikov = doctorStr.includes('калашников') || doctorStr.includes('калашніков');
+    // If empty or 'не вказано', default to Teternik
+    const isTeternik = doctorStr.includes('тетерник') || doctorStr.includes('тетернік') || doctorStr === '' || doctorStr === 'не вказано';
+
+    attendanceMap[key].total++;
+    
+    if (isDanilo) {
+      attendanceMap[key].danilo++;
+    } else if (isKalashnikov) {
+      attendanceMap[key].kalashnikov++;
+    } else if (isTeternik) {
+      attendanceMap[key].teternik++;
+    } else {
+      console.warn('Unknown doctor for appointment:', appt);
+    }
+  });
+
+  console.log("Analytics Data Loaded:", attendanceMap);
+  renderAttendanceChart(attendanceMap, isDaily);
+}
+
+function renderAttendanceChart(attendanceMap, isDaily) {
+  const ctx = document.getElementById('chart-attendance');
+  if (!ctx || !window.Chart) return;
+
+  // Sort keys chronologically
+  const keys = Object.keys(attendanceMap).sort();
+  
+  // Format labels nicely
+  const labels = keys.map(k => {
+    if (isDaily) {
+      const [yr, mo, da] = k.split('-');
+      const d = new Date(yr, parseInt(mo)-1, da);
+      return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    } else {
+      const [yr, mo] = k.split('-');
+      const d = new Date(yr, parseInt(mo)-1, 1);
+      return d.toLocaleDateString('ru-RU', { month: 'short', year: 'numeric' });
+    }
+  });
+
+  const totals = keys.map(k => attendanceMap[k].total);
+  const teterniks = keys.map(k => attendanceMap[k].teternik);
+  const danilos = keys.map(k => attendanceMap[k].danilo);
+  const kalashnikovs = keys.map(k => attendanceMap[k].kalashnikov);
+
+  if (attendanceChart) attendanceChart.destroy();
+  attendanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Всього',
+          data: totals,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#6366f1',
+        },
+        {
+          label: 'Тетернік',
+          data: teterniks,
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56,189,248,0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#38bdf8',
+        },
+        {
+          label: 'Данило',
+          data: danilos,
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245,158,11,0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#f59e0b',
+        },
+        {
+          label: 'Калашніков',
+          data: kalashnikovs,
+          borderColor: '#22c55e',
+          backgroundColor: 'rgba(34,197,94,0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#22c55e',
+        }
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: { 
+        legend: { 
+          position: 'top',
+          labels: { color: '#8b93a8', font: { size: 12 } }
+        } 
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8b93a8' } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8b93a8', precision: 0 }, beginAtZero: true },
       },
     },
   });
@@ -1132,13 +1319,28 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let isGrid = document.getElementById('appt-grid-view')?.style.display !== 'none';
     const load = { 
-      dashboard: loadDashboard, 
+      dashboard: loadAnalytics, 
       appointments: isGrid ? loadAppointmentsGrid : loadAppointments, 
       reviews: loadReviews, 
-      schedule: initSchedule 
+      schedule: window.initSchedule,
+      'premium-dashboard': loadPremiumAppointments,
+      'patient-history': () => {
+        const input = document.getElementById('patient-search-input');
+        if (input && input.value.trim().length > 0) {
+          return searchPatientHistory();
+        }
+      }
     };
     
-    Promise.resolve((load[currentPage] || loadDashboard)()).finally(() => btn?.classList.remove('spinning'));
+    // Call the corresponding function, fallback to loadAnalytics if not found
+    const loadFn = load[currentPage] || loadAnalytics;
+    
+    // Some functions might be undefined (like old initSchedule), so check first
+    if (typeof loadFn === 'function') {
+      Promise.resolve(loadFn()).finally(() => btn?.classList.remove('spinning'));
+    } else {
+      btn?.classList.remove('spinning');
+    }
   });
 
   // View Toggles (List / Grid)
@@ -1272,23 +1474,65 @@ function getWeekDates(offset) {
   return weekDates;
 }
 
-async function triggerBotSync(dateStr = '') {
+let syncTimerInterval = null;
+
+function updateSyncStatus(text, isError = false) {
+  const el = document.getElementById('pd-sync-status');
+  if (el) {
+    el.innerHTML = text;
+    el.style.color = isError ? 'var(--danger)' : 'var(--text-muted)';
+  }
+}
+
+function startSyncCountdown(seconds) {
+  if (syncTimerInterval) clearInterval(syncTimerInterval);
+  
+  let left = seconds;
+  updateSyncStatus(`⏳ Наступна доступна через: <b>${left}</b> сек`);
+  
+  syncTimerInterval = setInterval(() => {
+    left--;
+    if (left <= 0) {
+      clearInterval(syncTimerInterval);
+      updateSyncStatus(`Готово до синхронізації`);
+    } else {
+      updateSyncStatus(`⏳ Наступна доступна через: <b>${left}</b> сек`);
+    }
+  }, 1000);
+}
+
+async function triggerBotSync(dateStr = '', offset = 0) {
+  if (offset < 0) {
+    console.log(`✅ Пропуск синхронизации для прошедших недель (${dateStr})`);
+    updateSyncStatus(`✅ Минулі тижні не синхронізуються`);
+    if (syncTimerInterval) clearInterval(syncTimerInterval);
+    return;
+  }
+
   if (!CFG.botUrl || !CFG.botSecret) {
     console.log('ℹ️ Bot URL or Secret not configured, skipping on-demand sync.');
+    updateSyncStatus(`⚠️ Синхронізація недоступна`, true);
     return;
   }
   
-  // Rate limiting: 60 seconds per specific date
+  // Rate limiting: 30 seconds global cooldown for any week
   const now = Date.now();
-  const cacheKey = `lastBotSync_${dateStr || 'current'}`;
+  const cacheKey = `lastBotSync_global`;
   const lastSync = parseInt(sessionStorage.getItem(cacheKey) || '0', 10);
-  if (now - lastSync < 60000) {
-    console.log(`⏳ Bot sync for ${dateStr || 'current'} was recently triggered. Skipping. Next allowed in ${Math.ceil((60000 - (now - lastSync))/1000)}s`);
+  const timePassed = now - lastSync;
+  
+  if (timePassed < 30000) {
+    const timeLeft = Math.ceil((30000 - timePassed) / 1000);
+    console.log(`⏳ Bot sync was recently triggered. Skipping.`);
+    startSyncCountdown(timeLeft);
     return;
   }
-  sessionStorage.setItem(cacheKey, now.toString());
   
+  sessionStorage.setItem(cacheKey, now.toString());
   console.log(`⏳ Triggering Google Sheets sync for ${dateStr || 'current'} via Telegram Bot API...`);
+  
+  startSyncCountdown(30);
+  
   try {
     const url = `${CFG.botUrl}/api/trigger-sync?secret=${CFG.botSecret}` + (dateStr ? `&date=${dateStr}` : '');
     const res = await fetch(url);
@@ -1296,6 +1540,7 @@ async function triggerBotSync(dateStr = '') {
     console.log('🤖 Telegram Bot sync triggered successfully:', data);
   } catch (err) {
     console.error('❌ Failed to trigger Telegram Bot sync:', err);
+    updateSyncStatus(`❌ Помилка синхронізації`, true);
   }
 }
 
@@ -1351,7 +1596,7 @@ async function loadPremiumAppointments() {
   const month = String(monday.getMonth() + 1).padStart(2, '0');
   const year = monday.getFullYear();
   const dateStr = `${day}.${month}.${year}`;
-  triggerBotSync(dateStr);
+  triggerBotSync(dateStr, currentPremiumGridWeekOffset);
   const d1 = weekDates[0];
   const d2 = weekDates[6];
   const labelEl = document.getElementById('pd-week-label');
@@ -1521,10 +1766,10 @@ function renderPremiumGrid(appointments, weekDates) {
             // Default to Oleg Olegovich if it's explicitly him or empty (fallback for older DB entries)
             // If they have "Влада терапевт" it won't match here and will just show "Влада терапевт" with default blue border
             docClass = 'doc-teternik';
-            docName = rawDoc ? rawDoc : 'Тетернік О.О.';
+            docName = rawDoc ? rawDoc : 'Тетерник';
             // Wait, if it's explicitly Oleg Olegovich, standardize it:
             if (!rawDoc || docLower.includes('тетернік') || docLower.includes('тетерник') || docLower === 'о.о.') {
-                docName = 'Тетернік О.О.';
+                docName = 'Тетерник';
             }
           }
           
@@ -1566,6 +1811,173 @@ function renderPremiumGrid(appointments, weekDates) {
   table.appendChild(tbody);
   wrapper.innerHTML = '';
   wrapper.appendChild(table);
+}
+
+/* ============================================================
+   PATIENT HISTORY
+   ============================================================ */
+
+let currentPatientHistoryMatches = [];
+
+function initPatientHistory() {
+  const searchBtn = document.getElementById('btn-patient-search');
+  const searchInput = document.getElementById('patient-search-input');
+  
+  if (searchBtn && !searchBtn.dataset.listener) {
+    searchBtn.addEventListener('click', searchPatientHistory);
+    searchBtn.dataset.listener = 'true';
+  }
+  
+  if (searchInput && !searchInput.dataset.listener) {
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchPatientHistory();
+    });
+    searchInput.dataset.listener = 'true';
+  }
+}
+
+async function searchPatientHistory() {
+  const input = document.getElementById('patient-search-input');
+  const query = (input.value || '').trim();
+  
+  if (!query) {
+    toast('Введіть номер телефону або ім\'я', 'error');
+    return;
+  }
+  
+  const searchBtn = document.getElementById('btn-patient-search');
+  const emptyState = document.getElementById('patient-history-empty');
+  const content = document.getElementById('patient-history-content');
+  
+  if (searchBtn) {
+    searchBtn.textContent = 'Пошук...';
+    searchBtn.disabled = true;
+  }
+  
+  try {
+    const digits = query.replace(/\D/g, '');
+    const isPhoneSearch = digits.length >= 7;
+    
+    let dbQuery = '?select=*&order=date.desc,time.desc';
+    
+    if (isPhoneSearch && digits.length >= 9) {
+      const last9 = digits.slice(-9);
+      // Create wildcard query like *66*407*25*54* to match any formatting
+      const wildcard = '*' + last9.substring(0, 2) + '*' + last9.substring(2, 5) + '*' + last9.substring(5, 7) + '*' + last9.substring(7, 9) + '*';
+      dbQuery += `&or=(phone.ilike.${wildcard},name.ilike.${wildcard})`;
+    } else {
+      const cleanQuery = query.replace(/[^\d\w\sа-яА-ЯіІїЇєЄґҐ]/g, '');
+      dbQuery += `&or=(name.ilike.*${cleanQuery}*,phone.ilike.*${cleanQuery}*)`;
+    }
+
+    const { data, total } = await Supabase.get('appointments', dbQuery);
+    
+    const grouped = {};
+    (data || []).forEach(appt => {
+      const ph = appt.phone && appt.phone !== 'Ручний запис' ? appt.phone : null;
+      const key = ph || appt.name.toLowerCase().trim();
+      
+      if (!grouped[key]) {
+        grouped[key] = {
+          phone: ph,
+          name: appt.name,
+          visits: []
+        };
+      }
+      grouped[key].visits.push(appt);
+    });
+    
+    currentPatientHistoryMatches = Object.values(grouped);
+    
+    if (currentPatientHistoryMatches.length === 0) {
+      content.style.display = 'none';
+      emptyState.style.display = 'block';
+    } else {
+      emptyState.style.display = 'none';
+      content.style.display = 'block';
+      renderPatientHistoryMatches();
+    }
+    
+  } catch (err) {
+    console.error('Пошук помилка:', err);
+    toast('Помилка пошуку: ' + err.message, 'error');
+  } finally {
+    if (searchBtn) {
+      searchBtn.textContent = 'Знайти';
+      searchBtn.disabled = false;
+    }
+  }
+}
+
+function renderPatientHistoryMatches() {
+  const listEl = document.getElementById('patient-matches-list');
+  listEl.innerHTML = '';
+  
+  currentPatientHistoryMatches.forEach((match, idx) => {
+    const div = document.createElement('div');
+    div.className = 'match-item' + (idx === 0 ? ' active' : '');
+    div.innerHTML = `
+      <div class="match-name">${escText(match.name)}</div>
+      <div class="match-phone">${match.phone ? escText(match.phone) : 'Телефон не вказано'}</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Візитів: ${match.visits.length}</div>
+    `;
+    
+    div.addEventListener('click', () => {
+      document.querySelectorAll('.match-item').forEach(el => el.classList.remove('active'));
+      div.classList.add('active');
+      renderPatientHistoryTimeline(match);
+    });
+    
+    listEl.appendChild(div);
+  });
+  
+  if (currentPatientHistoryMatches.length > 0) {
+    renderPatientHistoryTimeline(currentPatientHistoryMatches[0]);
+  }
+}
+
+function renderPatientHistoryTimeline(match) {
+  document.getElementById('ph-name').textContent = match.name || 'Анонім';
+  document.getElementById('ph-phone').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <span>${match.phone ? escText(match.phone) : 'Не вказано'}</span>`;
+  document.getElementById('ph-total-visits').textContent = match.visits.length;
+  
+  const container = document.getElementById('patient-timeline');
+  container.innerHTML = '';
+  
+  match.visits.forEach(appt => {
+    const d = parseApptDate(appt.date);
+    const dateDisplay = d ? d.toLocaleDateString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : appt.date;
+    
+    const stageClass = appt.execution_stage ? appt.execution_stage.toLowerCase().replace(/\s+/g, '-') : 'none';
+    
+    const html = `
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">${dateDisplay} о ${appt.time || '--:--'}</div>
+        <div class="timeline-content">
+          <div class="timeline-row">
+            <div class="tl-label">Лікар</div>
+            <div class="tl-value">👨‍⚕️ ${escText(appt.doctor || 'Не вказано')}</div>
+          </div>
+          <div class="timeline-row">
+            <div class="tl-label">Послуга</div>
+            <div class="tl-value">${escText(appt.service || 'Не вказано')}</div>
+          </div>
+          <div class="timeline-row">
+            <div class="tl-label">Наркоз</div>
+            <div class="tl-value">${escText(appt.anesthesia || 'Без наркозу')}</div>
+          </div>
+          <div class="timeline-row" style="margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 8px;">
+            <div class="tl-label">Статус виконання</div>
+            <div class="tl-value">
+               <span class="pd-badge stage-${stageClass}" style="font-size: 11px;">${escText(appt.execution_stage || 'Запланировано')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+  });
 }
 
 function setupPremiumRealtime() {
