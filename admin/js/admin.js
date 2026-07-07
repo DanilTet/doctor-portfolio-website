@@ -1488,9 +1488,9 @@ function renderPremiumGrid(appointments, weekDates) {
           let docClass = '';
           let docName = rawDoc || 'Не вказано';
 
-          if (docLower.includes('данило') || docLower === 'д.о.') {
+          if (docLower.includes('данило') || docLower === 'д.о.' || docLower.includes('рома')) {
             docClass = 'doc-danilo';
-            docName = 'Тетернік Д.О.';
+            docName = 'Данило Рома';
           } else if (docLower.includes('тетернік') || docLower.includes('тетерник') || docLower === 'о.о.' || (!rawDoc && !docLower)) {
             // Default to Oleg Olegovich if it's explicitly him or empty (fallback for older DB entries)
             // If they have "Влада терапевт" it won't match here and will just show "Влада терапевт" with default blue border
