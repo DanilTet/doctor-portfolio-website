@@ -136,16 +136,14 @@ async function submitAppointment(data) {
   }
 
   try {
-    const endpoint = `${url}/rest/v1/${appointmentsTable || 'appointments'}`;
+    const endpoint = `${url}/rest/v1/site_leads`;
 
     const payload = {
       name: data.name,
       phone: data.phone,
       service: data.service,
-      doctor: 'Тетерник',
-      execution_stage: 'Запланировано',
-      status: 'confirmed',
-      date: new Date().toLocaleDateString('uk-UA'),
+      comment: data.comment || '',
+      status: 'pending'
     };
 
     const response = await fetch(endpoint, {

@@ -179,6 +179,7 @@ function navigateTo(page) {
   const titles = {
     dashboard:    'Дашборд',
     'premium-dashboard': 'Розклад Прийомів (Premium)',
+    'site-leads': 'Заявки з сайту (Ліди)',
     appointments: 'Заявки на прием',
     reviews:      'Модерация отзывов',
     'patient-history': 'Історія пацієнта',
@@ -189,6 +190,7 @@ function navigateTo(page) {
   // Load data for the active section
   if (page === 'dashboard')    loadAnalytics();
   if (page === 'appointments') loadAppointments();
+  if (page === 'site-leads')   loadSiteLeads();
   if (page === 'reviews')      loadReviews();
   if (page === 'premium-dashboard') initPremiumDashboard();
   if (page === 'patient-history') initPatientHistory();
@@ -735,6 +737,116 @@ async function loadAppointments() {
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:24px">${escText(err.message)}</td></tr>`;
   }
+}
+
+async function loadSiteLeads() {
+  const tbody = document.getElementById('site-leads-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = skeletonRows(5, 7);
+
+  try {
+    const { data } = await Supabase.get('site_leads', '?order=created_at.desc');
+    renderSiteLeadsTable(data || []);
+    
+    // Update badge
+    const badge = document.getElementById('site-leads-badge');
+    if (badge) {
+      const pendingCount = (data || []).filter(r => r.status === 'pending').length;
+      badge.textContent = pendingCount > 0 ? pendingCount : '';
+      badge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+    }
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:24px">${escText(err.message)}</td></tr>`;
+  }
+}
+
+function renderSiteLeadsTable(rows) {
+  const tbody = document.getElementById('site-leads-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (!rows.length) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="7" style="text-align:center;color:var(--text-muted);padding:32px">Немає заявок</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  const statusOptions = [
+    ['pending', 'Очікує'],
+    ['processed', 'Обробленo']
+  ];
+
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = row.id;
+
+    // Date format
+    const dt = row.created_at ? new Date(row.created_at).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+    
+    [dt, row.name || '—', row.phone || '—', row.service || '—', row.comment || '—'].forEach(text => {
+      const td = document.createElement('td');
+      td.textContent = text;
+      tr.appendChild(td);
+    });
+
+    // Badge td
+    const status = row.status || 'pending';
+    const badgeTd = document.createElement('td');
+    const badge = document.createElement('span');
+    badge.className = 'badge ' + (status === 'pending' ? 'badge--pending' : 'badge--completed');
+    badge.textContent = status === 'pending' ? 'Очікує' : 'Обробленo';
+    badgeTd.appendChild(badge);
+    tr.appendChild(badgeTd);
+
+    // Actions td
+    const actionTd = document.createElement('td');
+    actionTd.style.cssText = 'display:flex;gap:8px;align-items:center';
+
+    const sel = document.createElement('select');
+    sel.className = 'form-select';
+    sel.style.cssText = 'padding:5px 28px 5px 8px;font-size:12px;width:auto;min-width:100px';
+    statusOptions.forEach(([val, label]) => {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = label;
+      if (val === status) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', async () => {
+      sel.disabled = true;
+      try {
+        await Supabase.patch('site_leads', row.id, { status: sel.value });
+        toast('Статус оновлено');
+        loadSiteLeads();
+      } catch (e) {
+        toast(e.message, 'error');
+        sel.disabled = false;
+      }
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn--danger btn--sm';
+    delBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+    delBtn.addEventListener('click', async () => {
+      if (!confirm('Ви впевнені, що хочете видалити цю заявку?')) return;
+      delBtn.disabled = true;
+      try {
+        await Supabase.delete('site_leads', row.id);
+        toast('Заявку видалено');
+        loadSiteLeads();
+      } catch (e) {
+        toast(e.message, 'error');
+        delBtn.disabled = false;
+      }
+    });
+
+    actionTd.appendChild(sel);
+    actionTd.appendChild(delBtn);
+    tr.appendChild(actionTd);
+
+    tbody.appendChild(tr);
+  });
 }
 
 function renderAppointmentsTable(rows) {
@@ -1557,6 +1669,15 @@ function showApp(email) {
   // Fetch pending reviews count for sidebar badge
   Supabase.get('reviews', '?status=eq.pending&select=id').then(({ total }) => {
     const badge = document.getElementById('reviews-badge');
+    if (badge && total > 0) {
+      badge.textContent = total;
+      badge.style.display = '';
+    }
+  }).catch(() => {});
+
+  // Fetch site leads count
+  Supabase.get('site_leads', '?status=eq.pending&select=id').then(({ total }) => {
+    const badge = document.getElementById('site-leads-badge');
     if (badge && total > 0) {
       badge.textContent = total;
       badge.style.display = '';
