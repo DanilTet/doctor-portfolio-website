@@ -95,9 +95,14 @@
         if (res.ok) {
           const data = await res.json();
           sessionStorage.setItem('geo_checked', '1');
-          if (data.cityName) {
+          if (data.cityName && data.cityName !== '-') {
             city = data.cityName;
             sessionStorage.setItem('geo_city', city);
+          } else if (data.countryName && data.countryName !== '-') {
+            city = data.countryName; // Fallback to country
+            sessionStorage.setItem('geo_city', city);
+          } else {
+            city = 'Unknown';
           }
           if (data.countryName) {
             country = data.countryName;
@@ -106,6 +111,7 @@
         }
       } catch (e) {
         sessionStorage.setItem('geo_checked', '1');
+        city = 'Unknown';
         console.debug('[Tracker] Geo lookup failed:', e.message);
       }
     }
@@ -217,7 +223,7 @@
 
     // ── 8. Click Tracking ───────────────────────────────────────────────────
     document.addEventListener('click', (e) => {
-      const trackEl = e.target.closest('[data-track="true"]');
+      const trackEl = e.target.closest('[data-track="true"], .btn, a[href^="tel:"], a[href^="mailto:"], .social-link, .contact-card');
       if (!trackEl) return;
 
       // Debounce: prevent duplicate clicks within 500ms
@@ -226,7 +232,10 @@
       if (now - lastClickTime < 500) return;
       trackEl.dataset.lastClickTime = now.toString();
 
-      const eventName = trackEl.getAttribute('data-event-name') || trackEl.innerText.trim() || 'unnamed-click';
+      let eventName = trackEl.getAttribute('data-event-name');
+      if (!eventName) {
+        eventName = trackEl.innerText ? trackEl.innerText.trim().substring(0, 30) : 'unnamed-click';
+      }
 
       trackEvent({
         eventType: 'click',
