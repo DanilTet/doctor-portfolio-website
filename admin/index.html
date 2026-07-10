@@ -199,6 +199,43 @@
         </button>
         <span class="top-bar-title" id="top-bar-title">Дашборд</span>
       </div>
+
+      <!-- Controls for premium dashboard -->
+      <div id="pd-top-controls" class="pd-top-controls" style="display: none; align-items: center; gap: 20px; flex-grow: 1; justify-content: flex-end; margin-right: 20px;">
+        <div id="pd-sync-status" class="sync-status" style="font-size: 13px; font-weight: 500; color: var(--text-muted); align-self: center;">
+          ⏳ Синхронізація: Готово
+        </div>
+
+        <!-- Doctor Filter -->
+        <div class="pd-filter-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+          <label class="pd-label" style="margin-bottom: 0;">Лікар</label>
+          <div class="pd-select-wrapper">
+            <select id="pd-doctor-filter" class="pd-select" style="padding: 6px 36px 6px 12px; height: 34px;">
+              <option value="all">Усі лікарі</option>
+              <option value="Тетерник">Тетернік О.О.</option>
+              <option value="Данило">Данило Рома</option>
+            </select>
+            <div class="pd-select-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Week Navigation -->
+        <div class="pd-filter-group" style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+          <label class="pd-label" style="margin-bottom: 0;">Тиждень</label>
+          <div class="pd-week-nav" style="padding: 2px; height: 34px;">
+            <button id="pd-prev-week" class="pd-nav-btn" title="Попередній тиждень" style="padding: 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div id="pd-week-label" class="pd-week-label" style="min-width: 140px; font-size: 13px;">Завантаження...</div>
+            <button id="pd-next-week" class="pd-nav-btn" title="Наступний тиждень" style="padding: 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="top-bar-right">
         <button class="refresh-btn" id="refresh-btn" title="Обновить данные">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -309,47 +346,7 @@
          ══════════════════════════════════════════════════════ -->
     <section class="page-section" id="page-premium-dashboard">
       <div class="premium-dashboard-wrapper">
-        <!-- Dashboard Header -->
-        <div class="pd-header" style="justify-content: flex-end;">
-          
-          <!-- Filters -->
-          <!-- Filters -->
-          <div class="pd-filters">
-            
-            <div id="pd-sync-status" class="sync-status" style="margin-right: 15px; font-size: 13px; font-weight: 500; color: var(--text-muted); align-self: center;">
-              ⏳ Синхронізація: Готово
-            </div>
 
-            <!-- Doctor Filter -->
-            <div class="pd-filter-group">
-              <label class="pd-label">Лікар</label>
-              <div class="pd-select-wrapper">
-                <select id="pd-doctor-filter" class="pd-select">
-                  <option value="all">Усі лікарі</option>
-                  <option value="Тетерник">Тетернік О.О.</option>
-                  <option value="Данило">Данило Рома</option>
-                </select>
-                <div class="pd-select-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Week Navigation -->
-            <div class="pd-filter-group">
-              <label class="pd-label">Тиждень</label>
-              <div class="pd-week-nav">
-                <button id="pd-prev-week" class="pd-nav-btn" title="Попередній тиждень">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                </button>
-                <div id="pd-week-label" class="pd-week-label">Завантаження...</div>
-                <button id="pd-next-week" class="pd-nav-btn" title="Наступний тиждень">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- Dashboard Content -->
         <div class="pd-content">

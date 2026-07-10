@@ -176,6 +176,11 @@ function navigateTo(page) {
     el.classList.toggle('active', el.id === `page-${page}`);
   });
 
+  const pdTopControls = document.getElementById('pd-top-controls');
+  if (pdTopControls) {
+    pdTopControls.style.display = (page === 'premium-dashboard') ? 'flex' : 'none';
+  }
+
   const titles = {
     dashboard:    'Дашборд',
     marketing:    'Маркетинг',
