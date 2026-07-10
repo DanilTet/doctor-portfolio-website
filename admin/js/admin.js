@@ -1444,21 +1444,20 @@ function escText(str) {
 /* ============================================================
    REVIEWS MODERATION
    ============================================================ */
+let currentReviewsFilter = 'pending';
+
 async function loadReviews() {
   const list = document.getElementById('reviews-list');
   if (!list) return;
-  list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">Загрузка...</div>';
+  list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">Завантаження...</div>';
 
   try {
     const { data } = await Supabase.get(
       'reviews',
-      '?status=eq.pending&order=created_at.desc&limit=50'
+      `?status=eq.${currentReviewsFilter}&order=created_at.desc&limit=50`
     );
     renderReviews(data || []);
-
-    // Update sidebar badge
-    const badge = document.getElementById('reviews-badge');
-    if (badge) badge.textContent = (data || []).length || '';
+    updateReviewsBadge();
   } catch (err) {
     list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--danger)">${escText(err.message)}</div>`;
   }
@@ -1472,7 +1471,7 @@ function renderReviews(reviews) {
   if (!reviews.length) {
     const div = document.createElement('div');
     div.className = 'empty-state';
-    div.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg><p>Нет отзывов на модерации</p>`;
+    div.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg><p>${currentReviewsFilter === 'pending' ? 'Немає відгуків на модерації' : 'Немає опублікованих відгуків'}</p>`;
     list.appendChild(div);
     return;
   }
@@ -1501,7 +1500,7 @@ function renderReviews(reviews) {
     const info = document.createElement('div');
     const nameEl = document.createElement('div');
     nameEl.className = 'review-name';
-    nameEl.textContent = review.user_name || 'Аноним';
+    nameEl.textContent = review.user_name || 'Анонім';
 
     const dateEl = document.createElement('div');
     dateEl.className = 'review-date';
@@ -1525,26 +1524,53 @@ function renderReviews(reviews) {
 
     const actions = document.createElement('div');
     actions.className = 'review-actions';
+    actions.style.display = 'flex';
+    actions.style.gap = '8px';
 
-    const approveBtn = document.createElement('button');
-    approveBtn.className = 'btn btn--success btn--sm';
-    approveBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`;
-    const approveTxt = document.createElement('span');
-    approveTxt.textContent = 'Одобрить';
-    approveBtn.appendChild(approveTxt);
+    if (currentReviewsFilter === 'pending') {
+      const approveBtn = document.createElement('button');
+      approveBtn.className = 'btn btn--success btn--sm';
+      approveBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>`;
+      const approveTxt = document.createElement('span');
+      approveTxt.textContent = 'Схвалити';
+      approveBtn.appendChild(approveTxt);
 
-    const rejectBtn = document.createElement('button');
-    rejectBtn.className = 'btn btn--danger btn--sm';
-    rejectBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-    const rejectTxt = document.createElement('span');
-    rejectTxt.textContent = 'Отклонить';
-    rejectBtn.appendChild(rejectTxt);
+      const rejectBtn = document.createElement('button');
+      rejectBtn.className = 'btn btn--danger btn--sm';
+      rejectBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+      const rejectTxt = document.createElement('span');
+      rejectTxt.textContent = 'Відхилити';
+      rejectBtn.appendChild(rejectTxt);
 
-    approveBtn.addEventListener('click', () => moderateReview(review.id, 'approved', card));
-    rejectBtn.addEventListener('click',  () => moderateReview(review.id, 'rejected', card));
+      approveBtn.addEventListener('click', () => moderateReview(review.id, 'approved', card));
+      rejectBtn.addEventListener('click',  () => moderateReview(review.id, 'rejected', card));
 
-    actions.appendChild(approveBtn);
-    actions.appendChild(rejectBtn);
+      actions.appendChild(approveBtn);
+      actions.appendChild(rejectBtn);
+    } else {
+      // Approved tab: can Unpublish (move to pending) or Delete (remove record)
+      const unpublishBtn = document.createElement('button');
+      unpublishBtn.className = 'btn btn--outline btn--sm';
+      unpublishBtn.style.borderColor = 'var(--warning)';
+      unpublishBtn.style.color = 'var(--warning)';
+      unpublishBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
+      const unpublishTxt = document.createElement('span');
+      unpublishTxt.textContent = 'Зняти з публікації';
+      unpublishBtn.appendChild(unpublishTxt);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn--danger btn--sm';
+      deleteBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+      const deleteTxt = document.createElement('span');
+      deleteTxt.textContent = 'Видалити';
+      deleteBtn.appendChild(deleteTxt);
+
+      unpublishBtn.addEventListener('click', () => moderateReview(review.id, 'pending', card));
+      deleteBtn.addEventListener('click', () => deleteReview(review.id, card));
+
+      actions.appendChild(unpublishBtn);
+      actions.appendChild(deleteBtn);
+    }
 
     card.appendChild(header);
     card.appendChild(textEl);
@@ -1556,7 +1582,11 @@ function renderReviews(reviews) {
 async function moderateReview(id, status, cardEl) {
   try {
     await Supabase.patch('reviews', id, { status });
-    toast(status === 'approved' ? 'Отзыв опубликован' : 'Отзыв отклонён', status === 'approved' ? 'success' : 'error');
+    let msg = 'Відгук опубліковано';
+    if (status === 'pending') msg = 'Відгук знято з публікації';
+    if (status === 'rejected') msg = 'Відгук відхилено';
+    toast(msg, 'success');
+    
     cardEl.style.transition = 'opacity 0.3s, transform 0.3s';
     cardEl.style.opacity = '0';
     cardEl.style.transform = 'translateX(20px)';
@@ -1566,11 +1596,45 @@ async function moderateReview(id, status, cardEl) {
   }
 }
 
-function updateReviewsBadge() {
-  const badge = document.getElementById('reviews-badge');
-  const cards = document.querySelectorAll('.review-card');
-  if (badge) badge.textContent = cards.length > 0 ? cards.length : '';
+async function deleteReview(id, cardEl) {
+  if (!confirm('Ви впевнені, що хочете видалити цей відгук остаточно?')) return;
+  try {
+    await Supabase.delete('reviews', id);
+    toast('Відгук видалено', 'success');
+    cardEl.style.transition = 'opacity 0.3s, transform 0.3s';
+    cardEl.style.opacity = '0';
+    cardEl.style.transform = 'translateX(20px)';
+    setTimeout(() => { cardEl.remove(); updateReviewsBadge(); }, 300);
+  } catch (e) {
+    toast(e.message, 'error');
+  }
 }
+
+async function updateReviewsBadge() {
+  try {
+    const { total } = await Supabase.get('reviews', '?status=eq.pending&select=id');
+    const badge = document.getElementById('reviews-badge');
+    if (badge) badge.textContent = total || '';
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+window.switchReviewsTab = function(filter) {
+  currentReviewsFilter = filter;
+  const btnPending = document.getElementById('reviews-tab-pending');
+  const btnApproved = document.getElementById('reviews-tab-approved');
+  if (!btnPending || !btnApproved) return;
+  
+  if (filter === 'pending') {
+    btnPending.className = 'btn btn--primary btn--sm';
+    btnApproved.className = 'btn btn--outline btn--sm';
+  } else {
+    btnPending.className = 'btn btn--outline btn--sm';
+    btnApproved.className = 'btn btn--primary btn--sm';
+  }
+  loadReviews();
+};
 
 /* ============================================================
    SCHEDULE

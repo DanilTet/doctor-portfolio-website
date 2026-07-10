@@ -559,9 +559,14 @@
          ══════════════════════════════════════════════════════ -->
     <section class="page-section" id="page-reviews">
 
-      <div style="margin-bottom:16px;color:var(--text-secondary);font-size:13px">
-        Нижче відображаються відгуки зі статусом <strong style="color:var(--warning)">pending</strong>.
-        Одобрені відгуки публікуються на сайті автоматично.
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+        <div style="color:var(--text-secondary);font-size:14px">
+          Керування та модерація відгуків пацієнтів.
+        </div>
+        <div class="reviews-filter-tabs" style="display: flex; gap: 10px;">
+          <button id="reviews-tab-pending" class="btn btn--primary btn--sm" onclick="window.switchReviewsTab('pending')">На модерації</button>
+          <button id="reviews-tab-approved" class="btn btn--outline btn--sm" onclick="window.switchReviewsTab('approved')">Опубліковані</button>
+        </div>
       </div>
 
       <div class="reviews-list" id="reviews-list">
