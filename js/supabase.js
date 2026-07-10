@@ -26,7 +26,6 @@ async function fetchAppointmentCount() {
       method: 'POST',
       headers: {
         'apikey': anonKey,
-        'Authorization': `Bearer ${anonKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({}),
@@ -150,7 +149,6 @@ async function submitAppointment(data) {
       method: 'POST',
       headers: {
         'apikey': anonKey,
-        'Authorization': `Bearer ${anonKey}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal',
       },
@@ -193,7 +191,6 @@ async function fetchReviews(page = 1, pageSize = 6) {
       method: 'GET',
       headers: {
         'apikey': anonKey,
-        'Authorization': `Bearer ${anonKey}`,
         'Prefer': 'count=exact',
       },
     });
@@ -252,7 +249,6 @@ async function submitReview(data) {
       method: 'POST',
       headers: {
         'apikey':        anonKey,
-        'Authorization': `Bearer ${anonKey}`,
         'Content-Type':  'application/json',
         'Prefer':        'return=minimal',
       },

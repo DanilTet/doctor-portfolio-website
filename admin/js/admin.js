@@ -178,6 +178,7 @@ function navigateTo(page) {
 
   const titles = {
     dashboard:    'Дашборд',
+    marketing:    'Маркетинг',
     'premium-dashboard': 'Розклад Прийомів (Premium)',
     'site-leads': 'Заявки з сайту (Ліди)',
     appointments: 'Заявки на прием',
@@ -189,6 +190,7 @@ function navigateTo(page) {
 
   // Load data for the active section
   if (page === 'dashboard')    loadAnalytics();
+  if (page === 'marketing')    loadMarketingAnalytics();
   if (page === 'appointments') loadAppointments();
   if (page === 'site-leads')   loadSiteLeads();
   if (page === 'reviews')      loadReviews();
@@ -280,6 +282,349 @@ async function loadAnalytics() {
   } catch (err) {
     console.error(err);
     toast('Помилка завантаження аналітики', 'error');
+  }
+}
+
+let marketingSourcesChart = null;
+
+function handleMarketingRangeChange(e) {
+  loadMarketingAnalytics(parseInt(e.target.value, 10));
+}
+
+async function loadMarketingAnalytics(rangeDays) {
+  try {
+    const rangeSelect = document.getElementById('marketing-time-range');
+    if (rangeSelect) {
+      rangeSelect.removeEventListener('change', handleMarketingRangeChange);
+      rangeSelect.addEventListener('change', handleMarketingRangeChange);
+    }
+
+    const daysCount = rangeDays || (rangeSelect ? parseInt(rangeSelect.value, 10) : 30);
+    const fetchLimit = daysCount * 2;
+
+    const { data } = await Supabase.get('daily_analytics', `?limit=${fetchLimit}&order=date.desc`);
+    const days = data || [];
+
+    // Split into current and previous periods
+    const currentPeriodDays = days.slice(0, daysCount);
+    const previousPeriodDays = days.slice(daysCount, daysCount * 2);
+
+    const aggregatePeriodData = (daysList) => {
+      let totalVisits = 0;
+      let uniqueVisitors = 0;
+      let returningVisitors = 0;
+      let totalScrollDepth = 0;
+      let scrollEvents = 0;
+      let totalTimeOnSite = 0;
+      let timeEvents = 0;
+
+      const sourceCounts = {};
+      const clickCounts = {};
+      const cityCounts = {};
+      const deviceCounts = {};
+      const osCounts = {};
+      const browserCounts = {};
+      const referrerCounts = {};
+
+      const mergeJson = (target, source) => {
+        if (!source) return;
+        Object.entries(source).forEach(([k, v]) => {
+          target[k] = (target[k] || 0) + (parseInt(v, 10) || 0);
+        });
+      };
+
+      daysList.forEach(day => {
+        totalVisits += day.pageviews || 0;
+        uniqueVisitors += day.unique_visitors || 0;
+        returningVisitors += day.returning_visitors || 0;
+        
+        totalScrollDepth += day.total_scroll_depth || 0;
+        scrollEvents += day.scroll_events || 0;
+        
+        totalTimeOnSite += day.total_time_on_site || 0;
+        timeEvents += day.time_events || 0;
+
+        mergeJson(sourceCounts, day.utm_sources);
+        mergeJson(clickCounts, day.clicks);
+        mergeJson(cityCounts, day.cities);
+        mergeJson(deviceCounts, day.devices);
+        mergeJson(osCounts, day.os);
+        mergeJson(browserCounts, day.browsers);
+        mergeJson(referrerCounts, day.referrers);
+      });
+
+      const avgScroll = scrollEvents > 0 ? Math.round(totalScrollDepth / scrollEvents) : 0;
+      const avgSeconds = timeEvents > 0 ? Math.round(totalTimeOnSite / timeEvents) : 0;
+      const returningRate = uniqueVisitors > 0 ? Math.round((returningVisitors / uniqueVisitors) * 100) : 0;
+
+      return {
+        totalVisits,
+        uniqueVisitors,
+        returningVisitors,
+        returningRate,
+        avgScroll,
+        avgSeconds,
+        sourceCounts,
+        clickCounts,
+        cityCounts,
+        deviceCounts,
+        osCounts,
+        browserCounts,
+        referrerCounts
+      };
+    };
+
+    const current = aggregatePeriodData(currentPeriodDays);
+    const previous = aggregatePeriodData(previousPeriodDays);
+
+    // Helper for formatting time
+    const formatTime = (avgSeconds) => {
+      let timeDisplay = '0с';
+      if (avgSeconds < 60) {
+        timeDisplay = `${avgSeconds}с`;
+      } else {
+        const mins = Math.floor(avgSeconds / 60);
+        const secs = avgSeconds % 60;
+        timeDisplay = secs > 0 ? `${mins}хв ${secs}с` : `${mins}хв`;
+      }
+      return timeDisplay;
+    };
+
+    // Render primary stats
+    document.getElementById('m-stat-visitors').textContent = current.uniqueVisitors.toLocaleString();
+    document.getElementById('m-stat-sessions').textContent = current.totalVisits.toLocaleString();
+    document.getElementById('m-stat-returning').textContent = `${current.returningRate}%`;
+    document.getElementById('m-stat-scroll').textContent = `${current.avgScroll}%`;
+    document.getElementById('m-stat-time').textContent = formatTime(current.avgSeconds);
+
+    // Format trends
+    const formatTrend = (curVal, prevVal, isPercent = false, suffix = '') => {
+      const elTrend = document.createElement('span');
+      if (prevVal === 0) {
+        elTrend.className = curVal > 0 ? 'trend-up' : 'trend-neutral';
+        elTrend.textContent = curVal > 0 ? '⬆ +100%' : 'Без змін';
+        return elTrend.outerHTML;
+      }
+      const diff = curVal - prevVal;
+      const pct = Math.round((diff / prevVal) * 100);
+      if (diff > 0) {
+        elTrend.className = 'trend-up';
+        elTrend.textContent = `⬆ +${isPercent ? pct : diff.toLocaleString()}${suffix}`;
+      } else if (diff < 0) {
+        elTrend.className = 'trend-down';
+        elTrend.textContent = `⬇ ${isPercent ? pct : Math.abs(diff).toLocaleString()}${suffix}`;
+      } else {
+        elTrend.className = 'trend-neutral';
+        elTrend.textContent = 'Без змін';
+      }
+      return elTrend.outerHTML;
+    };
+
+    document.getElementById('m-trend-visitors').innerHTML = formatTrend(current.uniqueVisitors, previous.uniqueVisitors, true) + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
+    document.getElementById('m-trend-sessions').innerHTML = formatTrend(current.totalVisits, previous.totalVisits, true) + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
+    document.getElementById('m-trend-returning').innerHTML = formatTrend(current.returningRate, previous.returningRate, false, '%') + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
+    document.getElementById('m-trend-scroll').innerHTML = formatTrend(current.avgScroll, previous.avgScroll, false, '%') + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
+    document.getElementById('m-trend-time').innerHTML = formatTrend(current.avgSeconds, previous.avgSeconds, true) + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
+
+    // 2. Traffic Sources Chart
+    const labels = Object.keys(current.sourceCounts);
+    const chartValues = Object.values(current.sourceCounts);
+
+    const premiumColors = [
+      '#6366f1', '#a855f7', '#38bdf8', '#22c55e', '#f59e0b', '#ec4899', '#14b8a6'
+    ];
+
+    let finalColors = premiumColors.slice(0, labels.length);
+
+    if (labels.length === 0) {
+      labels.push('Немає даних');
+      chartValues.push(1);
+      finalColors = ['rgba(255, 255, 255, 0.05)'];
+    }
+
+    if (marketingSourcesChart) {
+      marketingSourcesChart.destroy();
+    }
+
+    const canvas = document.getElementById('chart-marketing-sources');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      marketingSourcesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: chartValues,
+            backgroundColor: finalColors,
+            borderColor: '#13161e',
+            borderWidth: 2,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#f1f3f9', font: { family: "'Inter', sans-serif", size: 12 }, padding: 15 }
+            },
+            tooltip: {
+              backgroundColor: '#1a1e2a', titleColor: '#f1f3f9', bodyColor: '#8b93a8', borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1
+            }
+          }
+        }
+      });
+    }
+
+    // Render detailed list of sources with comparisons
+    const sourcesListContainer = document.getElementById('marketing-sources-list');
+    if (sourcesListContainer) {
+      const sortedSources = Object.entries(current.sourceCounts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      if (sortedSources.length === 0) {
+        sourcesListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про джерела...</div>`;
+      } else {
+        const totalVisitsCount = current.totalVisits || 1;
+        sourcesListContainer.innerHTML = sortedSources.map(item => {
+          const prevCount = previous.sourceCounts[item.name] || 0;
+          const diff = item.count - prevCount;
+          const pct = Math.round((item.count / totalVisitsCount) * 100);
+          
+          let diffBadge = '';
+          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
+          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
+
+          const tempNode = document.createElement('div');
+          tempNode.textContent = item.name;
+          return `
+            <div class="action-item">
+              <span class="action-name">📥 ${tempNode.innerHTML}</span>
+              <span class="action-count-badge">${item.count} відв. (${pct}%)${diffBadge}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 3. Render click actions with comparisons
+    const clicksListContainer = document.getElementById('marketing-clicks-list');
+    if (clicksListContainer) {
+      const sortedClicks = Object.entries(current.clickCounts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10); // Show top 10
+
+      if (sortedClicks.length === 0) {
+        clicksListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про кліки...</div>`;
+      } else {
+        clicksListContainer.innerHTML = sortedClicks.map(item => {
+          const prevCount = previous.clickCounts[item.name] || 0;
+          const diff = item.count - prevCount;
+          
+          let diffBadge = '';
+          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
+          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
+
+          const tempNode = document.createElement('div');
+          tempNode.textContent = item.name;
+          return `
+            <div class="action-item">
+              <span class="action-name">🎯 ${tempNode.innerHTML}</span>
+              <span class="action-count-badge">${item.count} кліків ${diffBadge}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 4. Render Top Cities with comparisons
+    const citiesListContainer = document.getElementById('marketing-cities-list');
+    if (citiesListContainer) {
+      const sortedCities = Object.entries(current.cityCounts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+
+      if (sortedCities.length === 0) {
+        citiesListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про міста...</div>`;
+      } else {
+        const totalGeoSessions = Object.values(current.cityCounts).reduce((sum, v) => sum + v, 0) || 1;
+        citiesListContainer.innerHTML = sortedCities.map(item => {
+          const prevCount = previous.cityCounts[item.name] || 0;
+          const diff = item.count - prevCount;
+          const pct = Math.round((item.count / totalGeoSessions) * 100);
+          
+          let diffBadge = '';
+          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
+          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
+
+          const tempNode = document.createElement('div');
+          tempNode.textContent = item.name;
+          return `
+            <div class="action-item">
+              <span class="action-name">📍 ${tempNode.innerHTML}</span>
+              <span class="action-count-badge">${item.count} відв. (${pct}%)${diffBadge}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 5. Render Tech Breakdown (devices, OS, browsers, referrers) with comparisons
+    const techListContainer = document.getElementById('marketing-tech-list');
+    if (techListContainer) {
+      const totalTechSessions = Object.values(current.deviceCounts).reduce((sum, v) => sum + v, 0) || 1;
+      const totalRefs = Object.values(current.referrerCounts).reduce((sum, v) => sum + v, 0) || 1;
+
+      const topDevice = Object.entries(current.deviceCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalTechSessions) * 100) })).sort((a, b) => b.count - a.count)[0];
+      const topOS = Object.entries(current.osCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalTechSessions) * 100) })).sort((a, b) => b.count - a.count)[0];
+      const topBrowser = Object.entries(current.browserCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalTechSessions) * 100) })).sort((a, b) => b.count - a.count)[0];
+      const topReferrer = Object.entries(current.referrerCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalRefs) * 100) })).sort((a, b) => b.count - a.count)[0];
+
+      let html = '';
+      if (!topDevice && !topOS && !topBrowser && !topReferrer) {
+        techListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про пристрої...</div>`;
+      } else {
+        const renderTechItem = (icon, label, item, prevCounts) => {
+          if (!item) return '';
+          const prevCount = prevCounts[item.name] || 0;
+          const diff = item.count - prevCount;
+          
+          let diffBadge = '';
+          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
+          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
+
+          let displayName = item.name;
+          if (displayName.startsWith('http')) {
+            try { displayName = new URL(displayName).hostname; } catch(e) {}
+          }
+
+          const tempNode = document.createElement('div');
+          tempNode.textContent = displayName;
+
+          return `
+            <div class="action-item">
+              <span class="action-name">${icon} ${label}: <strong>${tempNode.innerHTML}</strong></span>
+              <span class="action-count-badge">${item.pct}%${diffBadge}</span>
+            </div>
+          `;
+        };
+
+        html += renderTechItem('📱', 'Пристрій', topDevice, previous.deviceCounts);
+        html += renderTechItem('💻', 'ОС', topOS, previous.osCounts);
+        html += renderTechItem('🌐', 'Браузер', topBrowser, previous.browserCounts);
+        html += renderTechItem('🔗', 'Реферер', topReferrer, previous.referrerCounts);
+        techListContainer.innerHTML = html;
+      }
+    }
+
+  } catch (err) {
+    console.error('loadMarketingAnalytics error:', err);
+    toast('Помилка завантаження маркетингової аналітики', 'error');
   }
 }
 
@@ -1558,6 +1903,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isGrid = document.getElementById('appt-grid-view')?.style.display !== 'none';
     const load = { 
       dashboard: loadAnalytics, 
+      marketing: loadMarketingAnalytics,
       appointments: isGrid ? loadAppointmentsGrid : loadAppointments, 
       reviews: loadReviews, 
       schedule: window.initSchedule,

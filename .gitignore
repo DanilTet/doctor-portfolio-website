@@ -19,3 +19,7 @@ Thumbs.db
 # Telegram Bot (contains tokens/keys)
 telegram-bot/
 tg-bot/
+
+# Graphify & Code Review Graph
+graphify-out/
+.code-review-graph/

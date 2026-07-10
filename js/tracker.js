@@ -1,110 +1,260 @@
 /**
  * tracker.js — Visitor Analytics Tracker
- * Collects visit data (platform, geo, browser) and sends to Supabase site_visits table.
- * - Runs once per session (sessionStorage flag)
- * - IP is hashed with SHA-256 — raw IP never stored (GDPR-friendly)
- * - Geo lookup via ipapi.co (1000 req/day free)
- * - Graceful fallback if geo API is unavailable
+ * Tracks user behavior (pageviews, clicks, scroll depth), UTM tags, geo locations, browser & device types.
+ * Sends data to Supabase analytics_events table.
  */
 
 (async function initTracker() {
-  // Run only once per browser session
-  if (sessionStorage.getItem('_tracked')) return;
-  sessionStorage.setItem('_tracked', '1');
-
-  const { url, anonKey } = (window.SITE_CONFIG && window.SITE_CONFIG.supabase) || {};
-  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID')) return;
-
-  // ── 1. Session ID (unique per tab session) ──────────────────────────────
-  const sessionId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
-
-  // ── 2. Platform / Browser / OS from User-Agent ──────────────────────────
-  function detectPlatform() {
-    const ua = navigator.userAgent;
-    if (/tablet|ipad|playbook|silk/i.test(ua)) return 'Tablet';
-    if (/mobi|android|iphone|ipod|blackberry|opera mini|iemobile/i.test(ua)) return 'Mobile';
-    return 'Desktop';
-  }
-
-  function detectBrowser() {
-    const ua = navigator.userAgent;
-    if (/edg\//i.test(ua))             return 'Edge';
-    if (/opr\//i.test(ua))             return 'Opera';
-    if (/chrome\/[\d.]+/i.test(ua) && !/chromium/i.test(ua)) return 'Chrome';
-    if (/firefox\/[\d.]+/i.test(ua))   return 'Firefox';
-    if (/safari\/[\d.]+/i.test(ua))    return 'Safari';
-    return 'Other';
-  }
-
-  function detectOS() {
-    const ua = navigator.userAgent;
-    if (/windows/i.test(ua))           return 'Windows';
-    if (/iphone|ipad|ipod/i.test(ua))  return 'iOS';
-    if (/mac os x/i.test(ua))          return 'macOS';
-    if (/android/i.test(ua))           return 'Android';
-    if (/linux/i.test(ua))             return 'Linux';
-    return 'Other';
-  }
-
-  // ── 3. SHA-256 hash of IP (privacy-preserving unique visitor count) ─────
-  async function hashText(text) {
-    try {
-      const data = new TextEncoder().encode(text);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hashBuffer))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
-    } catch {
-      return null;
-    }
-  }
-
-  // ── 4. Geo lookup via ipapi.co ──────────────────────────────────────────
-  async function getGeoData() {
-    try {
-      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(5000) });
-      if (!res.ok) return {};
-      const data = await res.json();
-      return {
-        country:      data.country_name  || null,
-        city:         data.city          || null,
-        country_code: data.country_code  || null,
-        ip_raw:       data.ip            || null,
-      };
-    } catch {
-      return {};
-    }
-  }
-
-  // ── 5. Collect & send ───────────────────────────────────────────────────
   try {
-    const geo = await getGeoData();
-    const ipHash = geo.ip_raw ? await hashText(geo.ip_raw) : null;
+    // ── 1. UTM Parameters Setup ─────────────────────────────────────────────
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+    const utmMedium = urlParams.get('utm_medium');
+    const utmCampaign = urlParams.get('utm_campaign');
 
-    const payload = {
-      country:      geo.country      || null,
-      city:         geo.city         || null,
-      country_code: geo.country_code || null,
-      platform:     detectPlatform(),
-      browser:      detectBrowser(),
-      os:           detectOS(),
-      referrer:     document.referrer ? document.referrer.slice(0, 200) : null,
-      session_id:   sessionId,
-      ip_hash:      ipHash,
+    if (utmSource) sessionStorage.setItem('utm_source', utmSource);
+    if (utmMedium) sessionStorage.setItem('utm_medium', utmMedium);
+    if (utmCampaign) sessionStorage.setItem('utm_campaign', utmCampaign);
+
+    const currentUtm = {
+      utm_source: sessionStorage.getItem('utm_source') || null,
+      utm_medium: sessionStorage.getItem('utm_medium') || null,
+      utm_campaign: sessionStorage.getItem('utm_campaign') || null
     };
 
-    await fetch(`${url}/rest/v1/site_visits`, {
-      method:  'POST',
-      headers: {
-        'apikey':        anonKey,
-        'Authorization': `Bearer ${anonKey}`,
-        'Content-Type':  'application/json',
-        'Prefer':        'return=minimal',
-      },
-      body: JSON.stringify(payload),
+    // ── 2. Identification (daily aggregation) ──────────────
+    const today = new Date().toISOString().split('T')[0];
+    let isNewVisitor = false;
+    let isReturning = false;
+    
+    const lastVisit = localStorage.getItem('last_visit_date');
+    const firstVisit = localStorage.getItem('first_visit_date');
+    
+    if (!firstVisit) {
+      localStorage.setItem('first_visit_date', today);
+      isNewVisitor = true;
+    } else if (lastVisit && lastVisit !== today) {
+      isReturning = true;
+    }
+    
+    if (lastVisit !== today) {
+      localStorage.setItem('last_visit_date', today);
+    }
+
+    // ── 3. Device / Browser / OS & Referrer Detection ───────────────────────
+    function detectPlatform() {
+      const ua = navigator.userAgent;
+      if (/tablet|ipad|playbook|silk/i.test(ua)) return 'Tablet';
+      if (/mobi|android|iphone|ipod|blackberry|opera mini|iemobile/i.test(ua)) return 'Mobile';
+      return 'Desktop';
+    }
+
+    function detectBrowser() {
+      const ua = navigator.userAgent;
+      if (/edg\//i.test(ua))             return 'Edge';
+      if (/opr\//i.test(ua))             return 'Opera';
+      if (/chrome\/[\d.]+/i.test(ua) && !/chromium/i.test(ua)) return 'Chrome';
+      if (/firefox\/[\d.]+/i.test(ua))   return 'Firefox';
+      if (/safari\/[\d.]+/i.test(ua))    return 'Safari';
+      return 'Other';
+    }
+
+    function detectOS() {
+      const ua = navigator.userAgent;
+      if (/windows/i.test(ua))           return 'Windows';
+      if (/iphone|ipad|ipod/i.test(ua))  return 'iOS';
+      if (/mac os x/i.test(ua))          return 'macOS';
+      if (/android/i.test(ua))           return 'Android';
+      if (/linux/i.test(ua))             return 'Linux';
+      return 'Other';
+    }
+
+    const deviceType = detectPlatform();
+    const browser = detectBrowser();
+    const os = detectOS();
+
+    let referrer = sessionStorage.getItem('entry_referrer');
+    if (referrer === null) {
+      const ref = document.referrer;
+      if (ref && !ref.includes(window.location.hostname)) {
+        referrer = ref.slice(0, 250);
+      } else {
+        referrer = 'Direct';
+      }
+      sessionStorage.setItem('entry_referrer', referrer);
+    }
+
+    // ── 4. Geolocation (Lookup once per session) ───────────────────────────
+    let city = sessionStorage.getItem('geo_city') || null;
+    let country = sessionStorage.getItem('geo_country') || null;
+
+    async function fetchGeoData() {
+      if (city || sessionStorage.getItem('geo_checked')) return;
+      try {
+        const res = await fetch('https://freeipapi.com/api/json', { signal: AbortSignal.timeout ? AbortSignal.timeout(3000) : undefined });
+        if (res.ok) {
+          const data = await res.json();
+          sessionStorage.setItem('geo_checked', '1');
+          if (data.cityName) {
+            city = data.cityName;
+            sessionStorage.setItem('geo_city', city);
+          }
+          if (data.countryName) {
+            country = data.countryName;
+            sessionStorage.setItem('geo_country', country);
+          }
+        }
+      } catch (e) {
+        sessionStorage.setItem('geo_checked', '1');
+        console.debug('[Tracker] Geo lookup failed:', e.message);
+      }
+    }
+
+    // ── 5. Supabase REST API Mock Wrapper ────────────────────────────────────
+    const supabase = {
+      rpc: async (fn, data) => {
+        const config = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG : (window.SITE_CONFIG || {});
+        const { url, anonKey } = config.supabase || {};
+        if (!url || !anonKey || url.includes('YOUR_PROJECT_ID')) {
+          return;
+        }
+        const endpoint = `${url}/rest/v1/rpc/${fn}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'apikey': anonKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+          const errMsg = await response.text();
+          throw new Error(errMsg);
+        }
+      }
+    };
+
+    // ── 6. Main trackEvent Function ──────────────────────────────────────────
+    async function trackEvent(eventData) {
+      try {
+        const payload = {
+          p_event_type: eventData.eventType,
+          p_event_target: eventData.eventTarget || null,
+          p_scroll_depth: eventData.scroll_depth !== undefined ? eventData.scroll_depth : null,
+          p_time_on_site: eventData.time_on_site !== undefined ? eventData.time_on_site : null,
+          p_is_new_visitor: isNewVisitor,
+          p_is_returning: isReturning,
+          p_utm_source: currentUtm.utm_source,
+          p_city: city,
+          p_os: os,
+          p_browser: browser,
+          p_device: deviceType,
+          p_referrer: referrer
+        };
+
+        await supabase.rpc('track_analytics_event', payload);
+        
+        // Reset boolean flags after the first event so they aren't double-counted
+        isNewVisitor = false;
+        isReturning = false;
+      } catch (err) {
+        console.debug('[Tracker] Error logging event:', err.message);
+      }
+    }
+
+    // Initialize and run
+    await fetchGeoData();
+    trackEvent({ eventType: 'pageview' });
+
+    // ── 7. Scroll Depth Tracking ─────────────────────────────────────────────
+    const getSentScrollDepths = () => {
+      try {
+        const data = sessionStorage.getItem('sent_scroll_depths');
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    };
+
+    const markScrollDepthSent = (depth) => {
+      const depths = getSentScrollDepths();
+      if (!depths.includes(depth)) {
+        depths.push(depth);
+        sessionStorage.setItem('sent_scroll_depths', JSON.stringify(depths));
+      }
+    };
+
+    const isScrollDepthSent = (depth) => {
+      return getSentScrollDepths().includes(depth);
+    };
+
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        scrollTimeout = null;
+
+        const scrollTop = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const totalScrollable = scrollHeight - clientHeight;
+        if (totalScrollable <= 0) return;
+
+        const percentage = Math.round((scrollTop / totalScrollable) * 100);
+        const milestones = [25, 50, 75, 100];
+
+        for (const milestone of milestones) {
+          if (percentage >= milestone && !isScrollDepthSent(milestone)) {
+            markScrollDepthSent(milestone);
+            trackEvent({
+              eventType: 'scroll',
+              scroll_depth: milestone
+            });
+          }
+        }
+      }, 100);
     });
+
+    // ── 8. Click Tracking ───────────────────────────────────────────────────
+    document.addEventListener('click', (e) => {
+      const trackEl = e.target.closest('[data-track="true"]');
+      if (!trackEl) return;
+
+      // Debounce: prevent duplicate clicks within 500ms
+      const now = Date.now();
+      const lastClickTime = parseInt(trackEl.dataset.lastClickTime || '0', 10);
+      if (now - lastClickTime < 500) return;
+      trackEl.dataset.lastClickTime = now.toString();
+
+      const eventName = trackEl.getAttribute('data-event-name') || trackEl.innerText.trim() || 'unnamed-click';
+
+      trackEvent({
+        eventType: 'click',
+        eventTarget: eventName
+      });
+    });
+
+    // ── 9. Time on Site Milestones ──────────────────────────────────────────
+    const timeMilestones = [
+      { time: 10, label: '10s' },
+      { time: 30, label: '30s' },
+      { time: 60, label: '1m' },
+      { time: 120, label: '2m' },
+      { time: 300, label: '5m' },
+      { time: 600, label: '10m' }
+    ];
+
+    timeMilestones.forEach(milestone => {
+      setTimeout(() => {
+        trackEvent({
+          eventType: 'time_on_site',
+          eventTarget: milestone.label,
+          time_on_site: milestone.time
+        });
+      }, milestone.time * 1000);
+    });
+
   } catch (err) {
-    // Silent fail — tracking should never break the site
-    console.debug('[Tracker] Visit not recorded:', err.message);
+    console.debug('[Tracker] Initialization failed:', err.message);
   }
 })();

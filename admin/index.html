@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Админ-панель — Д-р Тетернік О.О.</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236366f1%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M22 12h-4l-3 9L9 3l-3 9H2%22/></svg>">
   <meta name="robots" content="noindex, nofollow">
 
   <!-- Styles -->
@@ -110,6 +111,13 @@
           <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
         </svg>
         <span>Дашборд</span>
+      </button>
+
+      <button class="nav-item" data-page="marketing" id="nav-marketing">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span>Маркетинг</span>
       </button>
 
       <div class="nav-section-label" style="margin-top:8px">Управление</div>
@@ -565,6 +573,146 @@
 
     </section>
 
+
+    <!-- ══════════════════════════════════════════════════════
+         PAGE: MARKETING ANALYTICS
+         ══════════════════════════════════════════════════════ -->
+    <section class="page-section" id="page-marketing">
+
+      <!-- Header with Time Range Select -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="margin:0; font-size:18px; font-weight:600; color:var(--text-primary);">Маркетингова аналітика</h2>
+          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text-secondary);">Аналіз джерел трафіку, конверсій та технічних метрик відвідувачів</p>
+        </div>
+        <select id="marketing-time-range" class="form-select" style="width: auto; padding: 6px 28px 6px 12px; font-size: 13px; font-weight: 500;">
+          <option value="7">Останні 7 днів</option>
+          <option value="14">Останні 14 днів</option>
+          <option value="30" selected>Останні 30 днів</option>
+        </select>
+      </div>
+
+      <!-- Metrics Row (General Stats) -->
+      <div class="marketing-grid">
+        <div class="marketing-card marketing-card--purple">
+          <div class="marketing-value" id="m-stat-visitors">—</div>
+          <div class="marketing-label">Унікальні відвідувачі</div>
+          <div class="stat-trend" id="m-trend-visitors">—</div>
+        </div>
+        <div class="marketing-card marketing-card--blue">
+          <div class="marketing-value" id="m-stat-sessions">—</div>
+          <div class="marketing-label">Перегляди сторінок</div>
+          <div class="stat-trend" id="m-trend-sessions">—</div>
+        </div>
+        <div class="marketing-card marketing-card--amber">
+          <div class="marketing-value" id="m-stat-returning">—</div>
+          <div class="marketing-label">Повторні візити</div>
+          <div class="stat-trend" id="m-trend-returning">—</div>
+        </div>
+        <div class="marketing-card marketing-card--green">
+          <div class="marketing-value" id="m-stat-scroll">—</div>
+          <div class="marketing-label">Середній скролл</div>
+          <div class="stat-trend" id="m-trend-scroll">—</div>
+        </div>
+        <div class="marketing-card marketing-card--pink">
+          <div class="marketing-value" id="m-stat-time">—</div>
+          <div class="marketing-label">Час на сайті (сер.)</div>
+          <div class="stat-trend" id="m-trend-time">—</div>
+        </div>
+      </div>
+
+      <!-- Section: Traffic Sources -->
+      <div class="marketing-section-header" style="margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em;">Джерела трафіку</h3>
+      </div>
+      
+      <div class="marketing-row">
+        <!-- Traffic Sources Doughnut Chart -->
+        <div class="marketing-chart-card">
+          <div class="marketing-list-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            </svg>
+            <span>Розподіл джерел (utm_source)</span>
+          </div>
+          <div class="chart-wrap" style="height: 280px; display: flex; justify-content: center; align-items: center; position: relative;">
+            <canvas id="chart-marketing-sources"></canvas>
+          </div>
+        </div>
+
+        <!-- Detailed Sources List with Comparisons -->
+        <div class="marketing-list-card">
+          <div class="marketing-list-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            <span>Джерела та динаміка</span>
+          </div>
+          <div class="top-actions-list" id="marketing-sources-list">
+            <div style="text-align:center;color:var(--text-muted);padding:32px">Завантаження...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: User Actions & Conversions -->
+      <div class="marketing-section-header" style="margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em;">Конверсії та кліки</h3>
+      </div>
+      
+      <div class="marketing-row" style="grid-template-columns: 1fr;">
+        <!-- Click actions list with trends -->
+        <div class="marketing-list-card">
+          <div class="marketing-list-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+              <polyline points="16 7 22 7 22 13"></polyline>
+            </svg>
+            <span>Топ дій та кліків на сайті</span>
+          </div>
+          <div class="top-actions-list" id="marketing-clicks-list">
+            <div style="text-align:center;color:var(--text-muted);padding:32px">Завантаження...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Geography & Tech -->
+      <div class="marketing-section-header" style="margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em;">Географія та технології відвідувачів</h3>
+      </div>
+      
+      <div class="marketing-row">
+        <!-- Top Cities List -->
+        <div class="marketing-list-card">
+          <div class="marketing-list-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Географія (Топ міст)</span>
+          </div>
+          <div class="top-actions-list" id="marketing-cities-list">
+            <div style="text-align:center;color:var(--text-muted);padding:32px">Завантаження...</div>
+          </div>
+        </div>
+
+        <!-- Devices, OS, Browsers and Referrers -->
+        <div class="marketing-list-card">
+          <div class="marketing-list-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+              <rect x="9" y="18" width="6" height="2"></rect>
+            </svg>
+            <span>Технічні параметри та Реферери</span>
+          </div>
+          <div class="top-actions-list" id="marketing-tech-list">
+            <div style="text-align:center;color:var(--text-muted);padding:32px">Завантаження...</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
   </div><!-- /main-content -->
 
 </div><!-- /app -->
@@ -592,7 +740,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
 <!-- Admin logic -->
-<script src="js/admin.js?v=12"></script>
+<script src="js/admin.js?v=13"></script>
 
 </body>
 </html>
