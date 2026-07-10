@@ -2354,7 +2354,9 @@ function renderPremiumGrid(appointments, weekDates) {
       if (slotAppts && slotAppts.length > 0) {
         slotAppts.forEach(appt => {
           // Anesthesia rule: if before 11:00 and has 'наркоз' (ignore case), it takes 2 slots (rowSpan=2)
-          if (timeSlot < '11:00' && appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
+          // Make sure it doesn't match 'Без наркоза'
+          const hasAnesthesia = appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз') && !appt.anesthesia.toLowerCase().includes('без');
+          if (timeSlot < '11:00' && hasAnesthesia) {
             td.rowSpan = 2;
             skipCells[dayIndex] = true;
           }
@@ -2384,7 +2386,7 @@ function renderPremiumGrid(appointments, weekDates) {
             const stageClass = appt.execution_stage.toLowerCase().replace(/\s+/g, '-');
             badgesHtml += `<span class="pd-badge stage-${stageClass}">${escText(window.getFriendlyExecutionStage(appt.execution_stage))}</span>`;
           }
-          if (appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
+          if (hasAnesthesia) {
             badgesHtml += `<span class="pd-badge anesthesia">Наркоз</span>`;
           }
 
