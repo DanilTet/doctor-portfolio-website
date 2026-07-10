@@ -1129,11 +1129,24 @@ function renderSiteLeadsTable(rows) {
     // Date format
     const dt = row.created_at ? new Date(row.created_at).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
     
-    [dt, row.name || '—', row.phone || '—', row.service || '—', row.comment || '—'].forEach(text => {
+    const renderCell = (content, isHTML = false) => {
       const td = document.createElement('td');
-      td.textContent = text;
+      if (isHTML) td.innerHTML = content;
+      else td.textContent = content;
       tr.appendChild(td);
-    });
+    };
+
+    renderCell(dt);
+    renderCell(row.name || '—');
+    
+    if (row.phone && row.phone !== 'Ручний запис') {
+      renderCell(`${escText(row.phone)} <button onclick="window.openPatientHistory('${escText(row.phone)}')" style="background:none; border:1px solid var(--border-color); padding:2px 6px; border-radius:4px; font-size:11px; margin-left:8px; cursor:pointer; color:var(--text-color);">📜 Історія</button>`, true);
+    } else {
+      renderCell(row.phone || '—');
+    }
+    
+    renderCell(row.service || '—');
+    renderCell(row.comment || '—');
 
     // Badge td
     const status = row.status || 'pending';
@@ -2369,7 +2382,7 @@ function renderPremiumGrid(appointments, weekDates) {
           let badgesHtml = '';
           if (appt.execution_stage) {
             const stageClass = appt.execution_stage.toLowerCase().replace(/\s+/g, '-');
-            badgesHtml += `<span class="pd-badge stage-${stageClass}">${escText(appt.execution_stage)}</span>`;
+            badgesHtml += `<span class="pd-badge stage-${stageClass}">${escText(window.getFriendlyExecutionStage(appt.execution_stage))}</span>`;
           }
           if (appt.anesthesia && appt.anesthesia.toLowerCase().includes('наркоз')) {
             badgesHtml += `<span class="pd-badge anesthesia">Наркоз</span>`;
@@ -2386,6 +2399,7 @@ function renderPremiumGrid(appointments, weekDates) {
             <div class="pd-card-body">
               <div class="pd-service">${escText(appt.service || 'Процедура не вказана')}</div>
               <div class="pd-patient-name">${escText(appt.name || 'Анонім')}</div>
+              ${appt.phone && appt.phone !== 'Ручний запис' ? `<div style="margin-top:4px;"><a href="#" onclick="window.openPatientHistory('${escText(appt.phone)}'); return false;" style="color:var(--text-muted); font-size:12px; text-decoration:none; display:flex; align-items:center; gap:4px;">📜 Історія: ${escText(appt.phone)}</a></div>` : ''}
             </div>
             <div class="pd-card-footer">
               <div class="pd-doctor-name">👨‍⚕️ ${escText(docName)}</div>
@@ -2409,6 +2423,22 @@ function renderPremiumGrid(appointments, weekDates) {
 /* ============================================================
    PATIENT HISTORY
    ============================================================ */
+
+window.openPatientHistory = function(query) {
+  if (!query || query === 'Ручний запис') return;
+  
+  // Navigate to history tab
+  navigateTo('patient-history');
+  
+  // Wait for the view to render, then populate input and trigger search
+  setTimeout(() => {
+    const input = document.getElementById('patient-search-input');
+    if (input) {
+      input.value = query;
+      searchPatientHistory();
+    }
+  }, 50);
+};
 
 let currentPatientHistoryMatches = [];
 
@@ -2529,6 +2559,27 @@ function renderPatientHistoryMatches() {
   }
 }
 
+window.getFriendlyExecutionStage = function(stage) {
+  if (!stage) return 'Заплановано';
+  const clean = stage.trim().toLowerCase().replace(/_/g, ' ');
+  const map = {
+    'scheduled': 'Заплановано',
+    'confirmed': 'Підтверджено',
+    'in process': 'В процесі',
+    'in_process': 'В процесі',
+    'executed': 'Виконано',
+    'no show': 'Не з\'явився',
+    'no_show': 'Не з\'явився',
+    'cancelled': 'Скасовано',
+    'cancelled notified': 'Скасовано (сповіщено)',
+    'cancelled_notified': 'Скасовано (сповіщено)',
+    'rescheduled': 'Перенесено',
+    'waiting list': 'Лист очікування',
+    'waiting_list': 'Лист очікування'
+  };
+  return map[stage.trim()] || map[clean] || stage;
+};
+
 function renderPatientHistoryTimeline(match) {
   document.getElementById('ph-name').textContent = match.name || 'Анонім';
   document.getElementById('ph-phone').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <span>${match.phone ? escText(match.phone) : 'Не вказано'}</span>`;
@@ -2563,7 +2614,7 @@ function renderPatientHistoryTimeline(match) {
           <div class="timeline-row" style="margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 8px;">
             <div class="tl-label">Статус виконання</div>
             <div class="tl-value">
-               <span class="pd-badge stage-${stageClass}" style="font-size: 11px;">${escText(appt.execution_stage || 'Запланировано')}</span>
+               <span class="pd-badge stage-${stageClass}" style="font-size: 11px;">${escText(window.getFriendlyExecutionStage(appt.execution_stage))}</span>
             </div>
           </div>
         </div>
