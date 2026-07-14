@@ -150,9 +150,9 @@ app.delete('/api/blog/posts/:id', authGuard, (req, res) => {
 app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
   const BEHOLD_URL = process.env.INSTAGRAM_BEHOLD_URL;
 
-  if (!BEHOLD_URL) {
+  if (!BEHOLD_URL || BEHOLD_URL.includes('YOUR_FEED_ID')) {
     return res.status(400).json({
-      error: 'Для синхронизации с Instagram необходимо создать бесплатный фид на https://behold.so и добавить INSTAGRAM_BEHOLD_URL в файл server/.env. Это защитит от блокировок Cloudflare/403.'
+      error: 'Вы еще не заменили YOUR_FEED_ID на ваш собственный ID в файле server/.env. Пожалуйста, зарегистрируйтесь на https://behold.so (это бесплатно), создайте фид для Instagram аккаунта и укажите реальную ссылку.'
     });
   }
 
