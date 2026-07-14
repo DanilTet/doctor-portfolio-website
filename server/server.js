@@ -144,66 +144,63 @@ app.delete('/api/blog/posts/:id', authGuard, (req, res) => {
 /**
  * POST /api/blog/sync-instagram
  * Fetches posts from public Instagram profile and saves new ones locally.
- * Uses a scraper-friendly approach via picuki.com JSON API (no official API key required).
+ * Uses a stable, official-based Behold.so JSON Feed API (free plan, bypasses Cloudflare).
  * Requires header: X-Blog-Secret
  */
 app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
-  if (!INSTAGRAM_USERNAME) {
-    return res.status(400).json({ error: 'INSTAGRAM_USERNAME не задан в .env' });
+  const BEHOLD_URL = process.env.INSTAGRAM_BEHOLD_URL;
+
+  if (!BEHOLD_URL) {
+    return res.status(400).json({
+      error: 'Для синхронизации с Instagram необходимо создать бесплатный фид на https://behold.so и добавить INSTAGRAM_BEHOLD_URL в файл server/.env. Это защитит от блокировок Cloudflare/403.'
+    });
   }
 
   try {
-    // We use Picuki's public media endpoint as a free scraper-friendly source.
-    // It returns the latest public posts from a profile without needing API keys.
-    const profileUrl = `https://www.picuki.com/profile/${INSTAGRAM_USERNAME}`;
-    const response   = await fetch(profileUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; DoctorBlogBot/1.0)',
-      },
-      timeout: 15000,
-    });
+    const response = await fetch(BEHOLD_URL, { timeout: 15000 });
+    if (!response.ok) throw new Error(`Behold API вернул статус: ${response.status}`);
 
-    if (!response.ok) throw new Error(`Ошибка при получении профиля: ${response.status}`);
+    // Behold can return either a direct array of posts or an object containing an array.
+    const result = await response.json();
+    const rawPosts = Array.isArray(result) ? result : (result.posts || []);
 
-    const html = await response.text();
-
-    // Extract post data from Picuki's HTML using regex
-    const posts      = readPosts();
+    const posts = readPosts();
     const existingIg = new Set(posts.filter(p => p.instagram_id).map(p => p.instagram_id));
-    const newPosts   = [];
+    const newPosts = [];
 
-    // Parse media boxes from picuki HTML
-    const boxRegex = /<div class="photo-description">([\s\S]*?)<\/div>[\s\S]*?<img[^>]+src="([^"]+)"[\s\S]*?href="https:\/\/www\.instagram\.com\/p\/([^/]+)\//g;
-    let match;
-    while ((match = boxRegex.exec(html)) !== null) {
-      const caption   = match[1].replace(/<[^>]+>/g, '').trim();
-      const imgUrl    = match[2];
-      const igPostId  = match[3];
+    for (const raw of rawPosts) {
+      const igPostId = raw.id;
+      if (existingIg.has(igPostId)) continue; // Уже синхронизирован
 
-      if (existingIg.has(igPostId)) continue; // Already saved
+      const caption = raw.caption || '';
+      const imgUrl  = raw.mediaUrl;
 
-      // Download image locally
+      // Скачиваем изображение локально на сервер
       let localImagePath = null;
-      try {
-        const imgRes  = await fetch(imgUrl, { timeout: 10000 });
-        const buffer  = await imgRes.buffer();
-        const ext     = '.jpg';
-        const fname   = `ig_${igPostId}${ext}`;
-        const fpath   = path.join(UPLOADS_DIR, fname);
-        fs.writeFileSync(fpath, buffer);
-        localImagePath = `/uploads/blog/${fname}`;
-      } catch (imgErr) {
-        console.warn(`[Instagram] Не удалось скачать изображение: ${imgErr.message}`);
+      if (imgUrl) {
+        try {
+          const imgRes = await fetch(imgUrl, { timeout: 10000 });
+          if (imgRes.ok) {
+            const buffer = await imgRes.buffer();
+            const ext    = '.jpg';
+            const fname  = `ig_${igPostId}${ext}`;
+            const fpath  = path.join(UPLOADS_DIR, fname);
+            fs.writeFileSync(fpath, buffer);
+            localImagePath = `/uploads/blog/${fname}`;
+          }
+        } catch (imgErr) {
+          console.warn(`[Instagram] Не удалось скачать изображение: ${imgErr.message}`);
+        }
       }
 
       const post = {
-        id:           uuidv4(),
-        instagram_id: igPostId,
-        title:        caption.split('\n')[0].slice(0, 100) || 'Пост из Instagram',
-        content:      caption || '',
-        image_path:   localImagePath,
-        instagram_url:`https://www.instagram.com/p/${igPostId}/`,
-        date:          new Date().toISOString(),
+        id:            uuidv4(),
+        instagram_id:  igPostId,
+        title:         caption.split('\n')[0].slice(0, 100) || 'Пост из Instagram',
+        content:       caption,
+        image_path:    localImagePath,
+        instagram_url: raw.permalink || `https://www.instagram.com/p/${igPostId}/`,
+        date:          raw.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString(),
         source:        'instagram',
       };
 
