@@ -36,6 +36,50 @@
     // Instagram sync
     const syncBtn = getEl('blog-sync-instagram-btn');
     if (syncBtn) syncBtn.addEventListener('click', handleInstagramSync);
+
+    // Custom tag addition
+    const addTagBtn = getEl('blog-add-tag-btn');
+    const tagInput  = getEl('blog-new-tag-input');
+    if (addTagBtn && tagInput) {
+      const addCustomTag = () => {
+        let tag = tagInput.value.trim();
+        if (!tag) return;
+        
+        // Normalize: Capitalize first letter
+        tag = tag.charAt(0).toUpperCase() + tag.slice(1);
+        
+        const container = getEl('blog-tags-container');
+        if (!container) return;
+
+        // Check if exists
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        const exists = Array.from(checkboxes).some(cb => cb.value.toLowerCase() === tag.toLowerCase());
+        
+        if (!exists) {
+          const label = document.createElement('label');
+          label.className = 'admin-tag-checkbox';
+          label.innerHTML = `
+            <input type="checkbox" value="${tag}" checked>
+            <span>${tag}</span>
+          `;
+          container.appendChild(label);
+        } else {
+          // If it exists, just make sure it's checked
+          const match = Array.from(checkboxes).find(cb => cb.value.toLowerCase() === tag.toLowerCase());
+          if (match) match.checked = true;
+        }
+
+        tagInput.value = '';
+      };
+
+      addTagBtn.addEventListener('click', addCustomTag);
+      tagInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addCustomTag();
+        }
+      });
+    }
   }
 
   /* ── Image Preview ───────────────────────────────────────── */
@@ -101,9 +145,16 @@
       ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg> Instagram · '
       : '';
 
+    const tagsHtml = (post.tags && post.tags.length > 0)
+      ? `<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">` + 
+        post.tags.map(t => `<span style="background:var(--bg-secondary);color:var(--text);font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--border)">${escHtml(t)}</span>`).join('') +
+        `</div>`
+      : '';
+
     info.innerHTML = `
       <div style="font-weight:600;font-size:14px;margin-bottom:2px">${escHtml(post.title)}</div>
       <div style="font-size:12px;color:var(--text-muted)">${sourceIcon}${date}</div>
+      ${tagsHtml}
     `;
     div.appendChild(info);
 
@@ -164,6 +215,11 @@
     formData.append('content', content);
     if (imgFile) formData.append('image', imgFile);
 
+    // Collect tags
+    const tagInputs = document.querySelectorAll('#blog-tags-container input[type="checkbox"]:checked');
+    const tags = Array.from(tagInputs).map(input => input.value);
+    formData.append('tags', JSON.stringify(tags));
+
     try {
       const res  = await fetch(`${API}/posts`, {
         method:  'POST',
@@ -178,6 +234,7 @@
       getEl('blog-image-preview').style.display = 'none';
       hideFieldError('blog-title-error');
       hideFieldError('blog-content-error');
+      document.querySelectorAll('#blog-tags-container input[type="checkbox"]').forEach(cb => cb.checked = false);
 
       fb.textContent = '✅ Пост опубликован!';
       fb.style.color = 'var(--success, #22c55e)';

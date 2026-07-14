@@ -36,16 +36,7 @@
 
       <!-- Logo -->
       <a href="#" class="header__logo" aria-label="На головну">
-        <div class="header__logo-icon">
-          <!-- Medical Cross Icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 2v4"></path><path d="M16 2v4"></path><path d="M8 18v4"></path><path d="M16 18v4"></path>
-            <path d="M2 8h4"></path><path d="M2 16h4"></path><path d="M18 8h4"></path><path d="M18 16h4"></path>
-            <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-            <path d="M12 10v4"></path><path d="M10 12h4"></path>
-          </svg>
-        </div>
-        <span class="header__logo-text">Д-р <span>Тетернік</span> О.О.</span>
+        <span class="header__logo-text">Ендоскопія <span>простими словами</span></span>
       </a>
 
       <!-- Navigation -->
@@ -53,9 +44,9 @@
         <ul class="nav__list">
           <li><a href="#about" class="nav__link" data-i18n="nav.about">Про лікаря</a></li>
           <li><a href="#blog" class="nav__link">Блог</a></li>
-          <li><a href="#services" class="nav__link" data-i18n="nav.services">Послуги</a></li>
+          <li><a href="#topics" class="nav__link">Теми</a></li>
           <li><a href="#diplomas" class="nav__link" data-i18n="nav.diplomas">Дипломи</a></li>
-          <li><a href="#reviews" class="nav__link" data-i18n="nav.reviews">Відгуки</a></li>
+          <!-- <li><a href="#reviews" class="nav__link" data-i18n="nav.reviews">Відгуки</a></li> -->
           <li><a href="#contacts" class="nav__link" data-i18n="nav.contacts">Контакти</a></li>
         </ul>
 
@@ -67,15 +58,12 @@
             <button class="lang-switch__btn" data-lang="en" aria-label="English">EN</button>
           </div>
 
-          <a href="#appointment" class="btn btn--primary btn--sm" data-i18n="nav.appointment">
-            <!-- Calendar Icon -->
+          <a href="#appointment" class="btn btn--primary btn--sm">
+            <!-- Question Icon -->
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            Записатися на прийом
+            Залишити запитання
           </a>
         </div>
       </nav>
@@ -112,18 +100,18 @@
         <!-- Badge -->
         <div class="hero__badge">
           <span class="hero__badge-dot" aria-hidden="true"></span>
-          <span class="hero__badge-text">Блог про ендоскопію &amp; хірургію</span>
+          <span class="hero__badge-text">Освітній блог лікаря Олега Тетерніка</span>
         </div>
 
         <!-- Name -->
         <h1 class="hero__title">
-          <span data-i18n="hero.name.first">Тетернік</span>
-          <span class="hero__title-accent" data-i18n="hero.name.last">Олег Олександрович</span>
+          <span>Ендоскопія</span>
+          <span class="hero__title-accent">простими словами</span>
         </h1>
 
         <!-- Specialization -->
-        <p class="hero__specialization" data-i18n="hero.specialization">
-          Лікар-ендоскопіст, хірург, лікар УЗД діагностики з 8-річним досвідом. Спеціалізуюся на ендоскопії, хірургії, УЗД та щороку виконую понад 3000 ендоскопічних досліджень!
+        <p class="hero__specialization">
+          Розповідаю про гастроскопію, колоноскопію, підготовку та лікування без міфів та зайвого страху. Поради лікаря-ендоскопіста, хірурга, лікаря УЗД з 8-річним досвідом.
         </p>
 
         <!-- Experience Highlight -->
@@ -142,8 +130,8 @@
             </svg>
             Читати блог
           </a>
-          <a href="#appointment" class="btn btn--ghost" data-i18n="hero.btn.appointment">
-            Записатися на прийом
+          <a href="#appointment" class="btn btn--ghost">
+            Залишити запитання
           </a>
         </div>
       </div>
@@ -207,51 +195,94 @@
   <!-- ============================================================
        STATS SECTION — «Цифри довіри»
        ============================================================ -->
-  <section class="stats" id="stats" aria-label="Статистика">
+  <!-- ============================================================
+       TOPICS STRIP — теми блогу з акордеоном
+       ============================================================ -->
+  <section class="stats" id="topics" aria-label="Теми блогу">
     <div class="stats__bg" aria-hidden="true"></div>
     <div class="container">
       <div class="stats__inner">
 
-        <!-- Stat 1: Experience -->
-        <div class="stats__item" data-animate data-animate-delay="1">
-          <div class="stats__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
+        <!-- Topic 1 -->
+        <div class="stats__item stats__accordion" data-animate data-animate-delay="1" tabindex="0" role="button" aria-expanded="false" aria-controls="topic-gastroscopy-content">
+          <div class="stats__label">Гастроскопія</div>
+          <div class="stats__sublabel">Підготовка, перебіг, результати</div>
+          <div class="stats__arrow-wrap">
+            <span class="stats__more-btn">Дізнатися більше</span>
+            <svg class="stats__arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
-          <div class="stats__number" id="stat-experience">8</div>
-          <div class="stats__label" data-i18n="stats.exp.label">Років досвіду</div>
-          <div class="stats__sublabel" data-i18n="stats.exp.sub">в ендоскопії та медицині</div>
+          
+          <!-- Hidden detail block -->
+          <div class="stats__accordion-content" id="topic-gastroscopy-content" aria-hidden="true">
+            <div class="stats__accordion-inner">
+              <h4>Що це таке?</h4>
+              <p>Це огляд слизової оболонки стравоходу, шлунка та дванадцятипалої кишки за допомогою гнучкого тонкого зонда з відеокамерою.</p>
+              <h4>Коли варто пройти?</h4>
+              <ul>
+                <li>Часта печія, відрижка, гіркота в роті</li>
+                <li>Біль у верхній частині живота (натщесерце або після їжі)</li>
+                <li>Тривала нудота чи проблеми з ковтанням</li>
+              </ul>
+              <h4>Як підготуватися?</h4>
+              <p>Процедура проводиться виключно <strong>натщесерце</strong>. Останній прийом їжі — мінімум за 8-10 годин до дослідження. Воду не можна пити за 3-4 години до процедури.</p>
+              <button class="btn btn--outline" style="margin-top:16px" data-filter-tag="Гастроскопія">Читати статті про Гастроскопію</button>
+            </div>
+          </div>
         </div>
 
-        <!-- Stat 2: Patients (static count of procedures per year) -->
-        <div class="stats__item" data-animate data-animate-delay="2">
-          <div class="stats__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        <!-- Topic 2 -->
+        <div class="stats__item stats__accordion" data-animate data-animate-delay="2" tabindex="0" role="button" aria-expanded="false" aria-controls="topic-colonoscopy-content">
+          <div class="stats__label">Колоноскопія</div>
+          <div class="stats__sublabel">Як не боятися й підготуватися</div>
+          <div class="stats__arrow-wrap">
+            <span class="stats__more-btn">Дізнатися більше</span>
+            <svg class="stats__arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
-          <div class="stats__number">3000+</div>
-          <div class="stats__label" data-i18n="stats.patients.label">Процедур в рік</div>
-          <div class="stats__sublabel">
-            <span data-i18n="stats.patients.sub">понад 3000 досліджень</span>
+
+          <!-- Hidden detail block -->
+          <div class="stats__accordion-content" id="topic-colonoscopy-content" aria-hidden="true">
+            <div class="stats__accordion-inner">
+              <h4>Чому це життєво важливо?</h4>
+              <p>Це золотий стандарт профілактики раку товстої кишки. Дозволяє виявити та одразу видалити поліпи (доброякісні новоутворення) до того, як вони стануть небезпечними.</p>
+              <h4>Чи це боляче?</h4>
+              <p>Сучасна колоноскопія у 95% випадків проводиться <strong>в стані медикаментозного сну (седації)</strong>. Ви просто спите 15-20 хвилин і не відчуваєте жодного дискомфорту.</p>
+              <h4>Головне у підготовці:</h4>
+              <p>Якість огляду на 90% залежить від чистоти кишечника. Необхідно за 3 дні дотримуватися безшлакової дієти та напередодні випити спеціальний очищувальний розчин за схемою.</p>
+              <button class="btn btn--outline" style="margin-top:16px" data-filter-tag="Колоноскопія">Читати статті про Колоноскопію</button>
+            </div>
           </div>
         </div>
 
-        <!-- Stat 3: Specialization highlight -->
-        <div class="stats__item" data-animate data-animate-delay="3">
-          <div class="stats__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        <!-- Topic 3 -->
+        <div class="stats__item stats__accordion" data-animate data-animate-delay="3" tabindex="0" role="button" aria-expanded="false" aria-controls="topic-ultrasound-content">
+          <div class="stats__label">УЗД та хірургія</div>
+          <div class="stats__sublabel">Коли і навіщо потрібні</div>
+          <div class="stats__arrow-wrap">
+            <span class="stats__more-btn">Дізнатися більше</span>
+            <svg class="stats__arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </div>
-          <div class="stats__number" style="font-size: clamp(1.5rem, 2.5vw, 2rem); -webkit-text-fill-color: unset; background: none; color: var(--color-primary-light);" data-i18n="stats.spec.number">Ендоскопіст</div>
-          <div class="stats__label" data-i18n="stats.spec.label">Спеціалізація</div>
-          <div class="stats__sublabel" data-i18n="stats.spec.sub">діагностична та лікувальна ендоскопія</div>
+
+          <!-- Hidden detail block -->
+          <div class="stats__accordion-content" id="topic-ultrasound-content" aria-hidden="true">
+            <div class="stats__accordion-inner">
+              <h4>УЗД діагностика</h4>
+              <p>Швидкий і безпечний метод перевірити стан внутрішніх органів (печінки, жовчного міхура, підшлункової залози, нирок) без опромінення.</p>
+              <h4>Оперативна ендоскопія</h4>
+              <p>Це хірургія без розрізів. Завдяки ендоскопу лікар може видалити сторонні тіла, зупинити внутрішню кровотечу або виконати поліпектомію (видалення поліпів шлунка чи кишечника) безпосередньо під час огляду.</p>
+              <h4>Переваги:</h4>
+              <p>Пацієнт відновлюється вже за кілька годин після втручання та може повертатися до звичайного життя.</p>
+              <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+                <button class="btn btn--outline" data-filter-tag="УЗД">Статті про УЗД</button>
+                <button class="btn btn--outline" data-filter-tag="Хірургія">Статті про Хірургію</button>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -270,6 +301,9 @@
         <div class="section__line"></div>
         <p class="section__desc">Лікар-ендоскопіст Тетернік О.О. розповідає про процедури, розвінчує міфи і ділиться корисними порадами з підготовки до ендоскопії.</p>
       </div>
+
+      <!-- Filters -->
+      <div id="blog-filters" class="blog-filters" style="display:none"></div>
 
       <!-- Loading state -->
       <div id="blog-loading" class="blog-grid-loading">
@@ -965,7 +999,7 @@
   <!-- ============================================================
        REVIEWS SECTION — «Відгуки»
        ============================================================ -->
-  <section class="reviews section--dark" id="reviews" aria-label="Відгуки пацієнтів">
+  <section class="reviews section--dark" id="reviews" aria-label="Відгуки пацієнтів" style="display: none;">
     <div class="container">
       <div class="section__header" data-animate data-animate-delay="1">
         <div class="reviews__header-top">

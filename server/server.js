@@ -69,7 +69,9 @@ function writePosts(posts) {
 
 function authGuard(req, res, next) {
   const secret = req.headers['x-blog-secret'];
+  console.log(`[Blog Auth] Received secret: "${secret}", Expected: "${BLOG_SECRET}"`);
   if (secret !== BLOG_SECRET) {
+    console.warn(`[Blog Auth] Denied access. Secret mismatch.`);
     return res.status(403).json({ error: 'Forbidden' });
   }
   next();
@@ -102,6 +104,15 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
 
   const posts = readPosts();
 
+  let parsedTags = [];
+  try {
+    if (req.body.tags) {
+      parsedTags = JSON.parse(req.body.tags);
+    }
+  } catch (e) {
+    console.warn('[Blog] Failed to parse tags:', req.body.tags);
+  }
+
   const newPost = {
     id:         uuidv4(),
     title:      title.trim(),
@@ -109,6 +120,7 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
     image_path: req.file ? `/uploads/blog/${req.file.filename}` : null,
     date:       new Date().toISOString(),
     source:     'manual',
+    tags:       Array.isArray(parsedTags) ? parsedTags : [],
   };
 
   posts.push(newPost);
@@ -123,11 +135,16 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
  * Requires header: X-Blog-Secret
  */
 app.delete('/api/blog/posts/:id', authGuard, (req, res) => {
+  const { id } = req.params;
+  console.log(`[Blog API] DELETE requested for post ID: "${id}"`);
+  
   const posts = readPosts();
-  const idx   = posts.findIndex(p => p.id === req.params.id);
+  const idx   = posts.findIndex(p => p.id === id);
 
-  if (idx === -1)
+  if (idx === -1) {
+    console.warn(`[Blog API] Post with ID "${id}" not found.`);
     return res.status(404).json({ error: 'Пост не найден' });
+  }
 
   const [deleted] = posts.splice(idx, 1);
 
@@ -135,9 +152,11 @@ app.delete('/api/blog/posts/:id', authGuard, (req, res) => {
   if (deleted.image_path && deleted.image_path.startsWith('/uploads/blog/')) {
     const filePath = path.join(__dirname, deleted.image_path);
     fs.rm(filePath, { force: true }, () => {});
+    console.log(`[Blog API] Deleted local image: "${filePath}"`);
   }
 
   writePosts(posts);
+  console.log(`[Blog API] Post "${id}" deleted successfully.`);
   res.json({ ok: true, deleted });
 });
 

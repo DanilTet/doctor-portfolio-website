@@ -321,6 +321,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: var(--space-sm);
   z-index: 10;
+  flex-shrink: 0; /* Prevent the logo container from shrinking */
 }
 
 .header__logo-icon {
@@ -342,14 +343,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .header__logo-text {
   font-family: var(--font-heading);
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: var(--fw-bold);
   color: var(--color-text-light);
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
+  white-space: nowrap; /* Prevent logo text from wrapping */
 }
 
 .header__logo-text span {
   color: var(--color-primary-light);
+  font-weight: var(--fw-semibold);
 }
 
 /* Navigation */
@@ -375,6 +378,7 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
   transition: color var(--transition-base);
   border-radius: var(--radius-sm);
+  white-space: nowrap;
 }
 
 .nav__link::after {
@@ -1214,16 +1218,88 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* changed to start to support vertical growth */
   padding: var(--space-2xl) var(--space-xl);
   text-align: center;
   position: relative;
-  transition: background var(--transition-base);
+  transition: background var(--transition-base), padding var(--transition-base);
+  cursor: pointer;
 }
 
 .stats__item:hover {
   background: rgba(78, 205, 196, 0.04);
 }
+
+/* Accordion Controls */
+.stats__arrow-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+  color: var(--color-primary-light);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  transition: opacity 0.2s ease;
+}
+
+.stats__more-btn {
+  letter-spacing: 0.02em;
+}
+
+.stats__arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.stats__item.active .stats__arrow-icon {
+  transform: rotate(180deg);
+}
+
+.stats__item.active .stats__more-btn {
+  content: "Згорнути";
+}
+
+/* Accordion Content Wrapper */
+.stats__accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  width: 100%;
+  transition: max-height 0.3s ease-out;
+}
+
+.stats__accordion-inner {
+  padding-top: var(--space-lg);
+  text-align: left;
+  border-top: 1px dashed rgba(78, 205, 196, 0.15);
+  margin-top: var(--space-md);
+  color: var(--color-text-light-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.stats__accordion-inner h4 {
+  color: var(--color-text-light);
+  font-size: var(--fs-body);
+  margin-bottom: var(--space-xs);
+  margin-top: var(--space-md);
+}
+.stats__accordion-inner h4:first-of-type {
+  margin-top: 0;
+}
+
+.stats__accordion-inner p {
+  margin-bottom: var(--space-sm);
+}
+
+.stats__accordion-inner ul {
+  padding-left: var(--space-md);
+  margin-bottom: var(--space-sm);
+  list-style-type: disc;
+}
+
+.stats__accordion-inner li {
+  margin-bottom: 4px;
+}
+
 
 /* Icon */
 .stats__icon {
@@ -1272,18 +1348,20 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Label */
 .stats__label {
-  font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
-  color: var(--color-text-light);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  font-weight: var(--fw-bold);
+  color: var(--color-primary-light);
   margin-bottom: var(--space-xs);
+  font-family: var(--font-heading);
 }
 
 /* Sub-label */
 .stats__sublabel {
-  font-size: var(--fs-xs);
-  color: var(--color-text-light-muted);
-  letter-spacing: 0.03em;
+  font-size: var(--fs-body-sm);
+  color: var(--color-text-light);
+  letter-spacing: 0.01em;
   line-height: var(--lh-normal);
+  margin-bottom: var(--space-xs);
 }
 
 /* Live badge for patient counter */

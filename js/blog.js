@@ -1,6 +1,6 @@
 /**
  * blog.js — Public blog posts loader for index.html
- * Fetches posts from local API, renders grid + modal.
+ * Fetches posts from local API, renders grid + modal, handles tag filtering.
  */
 
 (function () {
@@ -8,13 +8,17 @@
 
   const API_URL = '/api/blog/posts';
 
+  let allPosts = [];
+  let activeFilter = 'Всі';
+
   /* ── DOM Refs ─────────────────────────────────────────────── */
-  const grid      = document.getElementById('blog-posts-grid');
-  const loading   = document.getElementById('blog-loading');
-  const empty     = document.getElementById('blog-empty');
-  const modal     = document.getElementById('blog-modal');
-  const modalOver = document.getElementById('blog-modal-overlay');
-  const modalClose= document.getElementById('blog-modal-close');
+  const grid         = document.getElementById('blog-posts-grid');
+  const loading      = document.getElementById('blog-loading');
+  const empty        = document.getElementById('blog-empty');
+  const filtersWrap  = document.getElementById('blog-filters');
+  const modal        = document.getElementById('blog-modal');
+  const modalOver    = document.getElementById('blog-modal-overlay');
+  const modalClose   = document.getElementById('blog-modal-close');
 
   /* ── Fetch & Render ──────────────────────────────────────── */
   async function loadPosts() {
@@ -29,15 +33,85 @@
         return;
       }
 
-      if (grid) {
-        grid.style.display = '';
-        posts.forEach(post => grid.appendChild(createCard(post)));
-      }
-    } catch {
-      // Server might be offline — show empty state silently
+      allPosts = posts;
+      renderFilters();
+      renderGrid();
+
+    } catch (e) {
+      console.warn('[Blog] Error loading posts:', e);
       if (loading) loading.style.display = 'none';
       if (empty)   empty.style.display = 'flex';
     }
+  }
+
+  /* ── Filters ─────────────────────────────────────────────── */
+  function renderFilters() {
+    if (!filtersWrap) return;
+
+    // Get all unique tags
+    const tagSet = new Set();
+    allPosts.forEach(p => {
+      if (Array.isArray(p.tags)) {
+        p.tags.forEach(t => tagSet.add(t));
+      }
+    });
+
+    if (tagSet.size === 0) {
+      filtersWrap.style.display = 'none';
+      return;
+    }
+
+    const tags = ['Всі', ...Array.from(tagSet).sort()];
+    
+    filtersWrap.innerHTML = '';
+    tags.forEach(tag => {
+      const btn = document.createElement('button');
+      btn.className = 'blog-filter-btn';
+      if (tag === activeFilter) btn.classList.add('active');
+      btn.textContent = tag === 'Всі' ? 'Всі статті' : `#${tag}`;
+      btn.addEventListener('click', () => {
+        activeFilter = tag;
+        updateFilterUI();
+        renderGrid();
+      });
+      filtersWrap.appendChild(btn);
+    });
+
+    filtersWrap.style.display = 'flex';
+  }
+
+  function updateFilterUI() {
+    if (!filtersWrap) return;
+    const btns = filtersWrap.querySelectorAll('.blog-filter-btn');
+    btns.forEach(btn => {
+      const tagText = btn.textContent.replace(/^#/, '');
+      if (tagText === activeFilter || (activeFilter === 'Всі' && tagText === 'Всі статті')) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  /* ── Grid Renderer ───────────────────────────────────────── */
+  function renderGrid() {
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const filtered = activeFilter === 'Всі' 
+      ? allPosts 
+      : allPosts.filter(p => Array.isArray(p.tags) && p.tags.includes(activeFilter));
+
+    if (!filtered.length) {
+      grid.style.display = 'none';
+      if (empty) empty.style.display = 'flex';
+      return;
+    }
+
+    if (empty) empty.style.display = 'none';
+    grid.style.display = '';
+
+    filtered.forEach(post => grid.appendChild(createCard(post)));
   }
 
   /* ── Card Builder ────────────────────────────────────────── */
@@ -63,6 +137,10 @@
          </span>`
       : '';
 
+    const tagsHtml = (Array.isArray(post.tags) && post.tags.length > 0)
+      ? `<div class="blog-card__tags">` + post.tags.map(t => `<span class="blog-tag">${escHtml(t)}</span>`).join('') + `</div>`
+      : '';
+
     const excerpt = post.content.length > 140
       ? post.content.slice(0, 140).trimEnd() + '…'
       : post.content;
@@ -74,6 +152,7 @@
       }
       <div class="blog-card__body">
         <div class="blog-card__meta">${igBadge}<span class="blog-card__date">${dateStr}</span></div>
+        ${tagsHtml}
         <h3 class="blog-card__title">${escHtml(post.title)}</h3>
         <p class="blog-card__excerpt">${escHtml(excerpt)}</p>
         <span class="blog-card__read-more">Читати далі →</span>
@@ -117,7 +196,6 @@
       source.textContent = post.source === 'instagram' ? '📸 Instagram' : '✍️ Блог';
     }
 
-    // Render content: preserve newlines
     if (body) {
       body.innerHTML = escHtml(post.content)
         .replace(/\n\n+/g, '</p><p>')
@@ -138,7 +216,6 @@
     modal.classList.add('blog-modal--open');
     document.body.style.overflow = 'hidden';
 
-    // Focus close button for accessibility
     setTimeout(() => { if (modalClose) modalClose.focus(); }, 50);
   }
 
@@ -154,17 +231,45 @@
   if (modalOver)   modalOver.addEventListener('click', closeModal);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+  /* ── External Hooks (Accordion to Blog Filter) ─────────────── */
+  function initExternalFilters() {
+    const filterBtns = document.querySelectorAll('[data-filter-tag]');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tag = e.target.getAttribute('data-filter-tag');
+        if (!tag) return;
+        
+        // 1. Smooth scroll to blog section
+        const blogSection = document.getElementById('blog');
+        if (blogSection) {
+          blogSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 2. Set filter
+        activeFilter = tag;
+        updateFilterUI();
+        renderGrid();
+      });
+    });
+  }
+
   /* ── Utils ───────────────────────────────────────────────── */
   function escHtml(str) {
+    if (!str) return '';
     return String(str)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   /* ── Boot ────────────────────────────────────────────────── */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadPosts);
-  } else {
+  function boot() {
     loadPosts();
+    initExternalFilters();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 })();

@@ -337,7 +337,7 @@
       <div class="charts-grid doughnut-row" style="grid-template-columns: 1fr; max-width: 800px; margin: 0 auto;">
         <div class="chart-card">
           <div class="chart-title" style="text-align: center;">Популярність послуг</div>
-          <div class="chart-wrap" style="height: 300px; display: flex; justify-content: center; align-items: center; gap: 40px;">
+          <div class="chart-wrap chart-wrap--doughnut" style="height: 300px;">
             <div style="flex: 1; max-width: 300px; position: relative;">
                <canvas id="chart-services"></canvas>
             </div>
@@ -747,6 +747,43 @@
             <label class="form-label" for="blog-content">Текст поста <span style="color:var(--danger)">*</span></label>
             <textarea id="blog-content" class="form-input" rows="7" placeholder="Напишите текст статьи..." style="resize:vertical" required></textarea>
             <div id="blog-content-error" style="color:var(--danger);font-size:12px;margin-top:4px;display:none"></div>
+          </div>
+          
+          <!-- Tags Section -->
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Теги (оберіть відповідні теми)</label>
+            <div class="admin-tags-container" id="blog-tags-container">
+              <label class="admin-tag-checkbox">
+                <input type="checkbox" value="Гастроскопія">
+                <span>Гастроскопія</span>
+              </label>
+              <label class="admin-tag-checkbox">
+                <input type="checkbox" value="Колоноскопія">
+                <span>Колоноскопія</span>
+              </label>
+              <label class="admin-tag-checkbox">
+                <input type="checkbox" value="УЗД">
+                <span>УЗД</span>
+              </label>
+              <label class="admin-tag-checkbox">
+                <input type="checkbox" value="ЕРХПГ">
+                <span>ЕРХПГ</span>
+              </label>
+              <label class="admin-tag-checkbox">
+                <input type="checkbox" value="Підготовка">
+                <span>Підготовка</span>
+              </label>
+              <label class="admin-tag-checkbox">
+                <input type="checkbox" value="Хірургія">
+                <span>Хірургія</span>
+              </label>
+            </div>
+            
+            <!-- Custom Tag Creation -->
+            <div style="margin-top: 10px; display: flex; gap: 8px; max-width: 320px;">
+              <input id="blog-new-tag-input" type="text" class="form-input" style="padding: 6px 12px; font-size: 13px;" placeholder="Власний тег (напр. Поради)...">
+              <button id="blog-add-tag-btn" type="button" class="btn btn--outline btn--sm" style="padding: 6px 12px; height: auto; white-space: nowrap;">Додати тег</button>
+            </div>
           </div>
           <div class="form-group" style="margin-bottom:20px">
             <label class="form-label" for="blog-image">Изображение (необязательно)</label>

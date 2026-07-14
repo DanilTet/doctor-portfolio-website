@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initReviewModal();
   initDiplomas();
   initCertsPagination();
+  initTopicsAccordion();
 });
 
 
@@ -1316,5 +1317,70 @@ function initCertsPagination() {
 
   applyPagination(true);
 }
+
+
+/* ============================================================
+   TOPICS ACCORDION — Expandable details for blog topics
+   ============================================================ */
+function initTopicsAccordion() {
+  const accordions = document.querySelectorAll('.stats__accordion');
+
+  accordions.forEach(item => {
+    const trigger = item;
+    const content = item.querySelector('.stats__accordion-content');
+    const moreBtnText = item.querySelector('.stats__more-btn');
+
+    if (!content) return;
+
+    // Toggle on click
+    trigger.addEventListener('click', (e) => {
+      // If user clicked inside the open content, don't close it automatically unless clicking close-trigger items
+      if (e.target.closest('.stats__accordion-inner') && !e.target.closest('h4')) {
+        return;
+      }
+
+      const isActive = item.classList.contains('active');
+
+      // Close all other accordions for clean accordion-style behavior
+      accordions.forEach(otherItem => {
+        if (otherItem !== item && otherItem.classList.contains('active')) {
+          otherItem.classList.remove('active');
+          otherItem.setAttribute('aria-expanded', 'false');
+          const otherContent = otherItem.querySelector('.stats__accordion-content');
+          if (otherContent) {
+            otherContent.style.maxHeight = null;
+            otherContent.setAttribute('aria-hidden', 'true');
+          }
+          const otherBtn = otherItem.querySelector('.stats__more-btn');
+          if (otherBtn) otherBtn.textContent = 'Дізнатися більше';
+        }
+      });
+
+      // Toggle current item
+      if (isActive) {
+        item.classList.remove('active');
+        item.setAttribute('aria-expanded', 'false');
+        content.style.maxHeight = null;
+        content.setAttribute('aria-hidden', 'true');
+        if (moreBtnText) moreBtnText.textContent = 'Дізнатися більше';
+      } else {
+        item.classList.add('active');
+        item.setAttribute('aria-expanded', 'true');
+        content.style.maxHeight = content.scrollHeight + 'px';
+        content.setAttribute('aria-hidden', 'false');
+        if (moreBtnText) moreBtnText.textContent = 'Згорнути';
+      }
+    });
+
+    // Support keyboard activation (Enter or Space)
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        trigger.click();
+      }
+    });
+  });
+}
+
 
 

@@ -1044,14 +1044,17 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
+.mobile-menu-btn { display: none; }
+
 /* ── RESPONSIVE SIDEBAR ──────────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar {
     position: fixed;
     left: 0; top: 0;
     z-index: 100;
     transform: translateX(-100%);
     box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    -webkit-overflow-scrolling: touch;
   }
   .sidebar.open { transform: translateX(0); }
 
@@ -1076,9 +1079,58 @@ body {
     color: var(--text-secondary);
     cursor: pointer;
   }
+
+  /* Main scroll fixes */
+  .main-content {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Shrink header padding & height to fit top bar controls */
+  .top-bar {
+    padding: 0 16px;
+    height: auto;
+    min-height: var(--header-h);
+    flex-wrap: wrap;
+    align-content: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .pd-top-controls {
+    width: 100%;
+    margin-right: 0 !important;
+    margin-top: 10px;
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+    gap: 12px !important;
+  }
+
+  .page-section {
+    padding: 16px;
+  }
+
+  /* Compact stats cards on mobile */
+  .stat-card {
+    padding: 18px;
+  }
+  .stat-value {
+    font-size: 28px;
+  }
+
+  /* Scrollable filter buttons strip */
+  .filter-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    display: inline-flex;
+  }
+  .filter-tab {
+    flex-shrink: 0;
+  }
 }
 
-.mobile-menu-btn { display: none; }
+
 
 /* ── EXCEL GRID (APPOINTMENTS) ───────────────────────────── */
 .view-toggle .btn-view {
@@ -1895,4 +1947,66 @@ body {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 20px;
+}
+
+/* ── Blog Tags ── */
+.admin-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-tag-checkbox {
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin-tag-checkbox input {
+  display: none;
+}
+
+.admin-tag-checkbox span {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.admin-tag-checkbox input:checked + span {
+  color: #fff;
+  background: var(--accent-light);
+  border-color: var(--accent-light);
+}
+
+/* ── Doughnut Chart Mobile Overflow Fix ── */
+.chart-wrap--doughnut {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+@media (max-width: 768px) {
+  .chart-wrap--doughnut {
+    flex-direction: column;
+    gap: 20px;
+    height: auto !important;
+    padding: 10px 0;
+  }
+  
+  .chart-wrap--doughnut > div {
+    width: 100%;
+    max-width: 250px !important;
+  }
+
+  .chart-wrap--doughnut .custom-legend {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
 }
