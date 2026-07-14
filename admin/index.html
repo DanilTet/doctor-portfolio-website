@@ -167,6 +167,16 @@
         <span class="nav-badge" id="reviews-badge" style="display:none"></span>
       </button>
 
+      <div class="nav-section-label" style="margin-top:8px">Блог</div>
+
+      <button class="nav-item" data-page="blog" id="nav-blog">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        <span>Управление блогом</span>
+      </button>
+
     </nav>
 
     <div class="sidebar-footer">
@@ -715,6 +725,73 @@
 
     </section>
 
+
+    <!-- ══════════════════════════════════════════════════════
+         PAGE: BLOG MANAGEMENT
+         ══════════════════════════════════════════════════════ -->
+    <section class="page-section" id="page-blog">
+
+      <!-- Create Post -->
+      <div class="card" style="margin-bottom:24px">
+        <h2 style="margin-bottom:20px;font-weight:600;display:flex;align-items:center;gap:10px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Новый пост
+        </h2>
+        <form id="blog-post-form" novalidate>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label" for="blog-title">Заголовок <span style="color:var(--danger)">*</span></label>
+            <input id="blog-title" type="text" class="form-input" placeholder="Гастроскопия: мифы и реальность..." required>
+            <div id="blog-title-error" style="color:var(--danger);font-size:12px;margin-top:4px;display:none"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label" for="blog-content">Текст поста <span style="color:var(--danger)">*</span></label>
+            <textarea id="blog-content" class="form-input" rows="7" placeholder="Напишите текст статьи..." style="resize:vertical" required></textarea>
+            <div id="blog-content-error" style="color:var(--danger);font-size:12px;margin-top:4px;display:none"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label" for="blog-image">Изображение (необязательно)</label>
+            <input id="blog-image" type="file" accept="image/*" class="form-input" style="padding:8px">
+            <div id="blog-image-preview" style="margin-top:10px;display:none">
+              <img id="blog-image-thumb" src="" alt="Preview" style="max-width:200px;max-height:150px;border-radius:8px;object-fit:cover;border:1px solid var(--border)">
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <button id="blog-submit-btn" type="submit" class="btn btn--primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Опубликовать пост
+            </button>
+            <div id="blog-form-feedback" style="font-size:13px;font-weight:500"></div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Instagram Sync -->
+      <div class="card" style="margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            Синхронизация с Instagram
+          </div>
+          <div style="font-size:13px;color:var(--text-muted)">Импортировать новые публикации из профиля врача. Картинки сохранятся на сервер локально.</div>
+        </div>
+        <button id="blog-sync-instagram-btn" class="btn btn--outline" style="white-space:nowrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Синхронизировать
+        </button>
+        <div id="blog-sync-feedback" style="font-size:13px;font-weight:500;width:100%"></div>
+      </div>
+
+      <!-- Published Posts -->
+      <div class="card">
+        <h3 style="margin-bottom:16px;font-weight:600">Опубликованные посты</h3>
+        <div id="blog-posts-list">
+          <div style="text-align:center;color:var(--text-muted);padding:32px">Загрузка...</div>
+        </div>
+      </div>
+
+    </section>
+
+
   </div><!-- /main-content -->
 
 </div><!-- /app -->
@@ -743,6 +820,9 @@
 
 <!-- Admin logic -->
 <script src="js/admin.js?v=13"></script>
+
+<!-- Blog management module -->
+<script src="js/blog-admin.js"></script>
 
 </body>
 </html>
