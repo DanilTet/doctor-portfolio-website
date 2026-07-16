@@ -198,7 +198,7 @@
 
     if (body) {
       if (window.marked && window.DOMPurify) {
-        body.innerHTML = DOMPurify.sanitize(marked.parse(post.content));
+        body.innerHTML = DOMPurify.sanitize(marked.parse(post.content, { breaks: true }));
       } else {
         body.innerHTML = escHtml(post.content)
           .replace(/\n\n+/g, '</p><p>')
