@@ -23,3 +23,8 @@ tg-bot/
 # Graphify & Code Review Graph
 graphify-out/
 .code-review-graph/
+
+# Dependencies
+node_modules/
+package-lock.json
+
