@@ -418,139 +418,144 @@ function applyTranslations(lang) {
    ============================================================ */
 const SERVICES_DATA = {
   gastroscopy: {
-    title: { ua: 'Гастроскопія', en: 'Gastroscopy' },
-    subtitle: { ua: 'Ендоскопічне дослідження стравоходу, шлунка та 12-палої кишки', en: 'Endoscopic examination of esophagus, stomach and duodenum' },
+    title: { ua: 'Гастроскопія', en: 'Gastroscopy', ru: 'Гастроскопия' },
+    subtitle: { ua: 'Ендоскопічне дослідження стравоходу, шлунка та 12-палої кишки', en: 'Endoscopic examination of esophagus, stomach and duodenum', ru: 'Эндоскопическое исследование пищевода, желудка и 12-перстной кишки' },
     desc: {
       ua: 'Високоточний метод діагностики, що дозволяє детально оглянути слизову оболонку верхніх відділів шлунково-кишкового тракту, виявити запалення, виразки, поліпи або інші зміни на ранніх стадіях.',
-      en: 'A high-precision diagnostic method for inspecting the upper GI mucosa, detecting inflammation, ulcers, polyps, or early-stage changes.'
+      en: 'A high-precision diagnostic method for inspecting the upper GI mucosa, detecting inflammation, ulcers, polyps, or early-stage changes.',
+      ru: 'Высокоточный метод диагностики, позволяющий детально осмотреть слизистую оболочку верхних отделов желудочно-кишечного тракта, выявить воспаления, язвы, полипы или другие изменения на ранних стадиях.'
     },
     steps: [
       {
-        title: { ua: '1. Підготовка', en: '1. Preparation' },
-        text: { ua: 'Дослідження проводиться суворо натщесерце (не їсти за 6-8 годин до прийому, не пити за 2-3 години). Напередодні рекомендується легка вечеря.', en: 'Performed strictly on an empty stomach (no food for 6-8 hours, no liquids for 2-3 hours before). Light dinner the evening before.' }
+        title: { ua: '1. Підготовка', en: '1. Preparation', ru: '1. Подготовка' },
+        text: { ua: 'Дослідження проводиться суворо натщесерце (не їсти за 6-8 годин до прийому, не пити за 2-3 години). Напередодні рекомендується легка вечеря.', en: 'Performed strictly on an empty stomach (no food for 6-8 hours, no liquids for 2-3 hours before). Light dinner the evening before.', ru: 'Исследование проводится строго натощак (не есть за 6-8 часов до приема, не пить за 2-3 часа). Накануне рекомендуется легкий ужин.' }
       },
       {
-        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
-        text: { ua: 'Пацієнт лягає на лівий бік. Тонкий гнучкий ендоскоп з відеокамерою високої роздільної здатності обережно вводиться через ротову порожнину. Обстеження триває всього 5–10 хвилин.', en: 'Patient lies on the left side. A thin flexible video endoscope is gently inserted through the mouth. The exam takes only 5–10 minutes.' }
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps', ru: '2. Как проходит процедура' },
+        text: { ua: 'Пацієнт лягає на лівий бік. Тонкий гнучкий ендоскоп з відеокамерою високої роздільної здатності обережно вводиться через ротову порожнину. Обстеження триває всього 5–10 хвилин.', en: 'Patient lies on the left side. A thin flexible video endoscope is gently inserted through the mouth. The exam takes only 5–10 minutes.', ru: 'Пациент ложится на левый бок. Тонкий гибкий эндоскоп с видеокамерой высокого разрешения осторожно вводится через ротовую полость. Обследование длится всего 5–10 минут.' }
       },
       {
-        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
-        text: { ua: 'Використовується місцева спрей-анестезія горла (лідокаїн). За бажанням пацієнта або за медичними показаннями процедуру можна провести «уві сні» (медикаментозний сон / седація) під наглядом анестезіолога.', en: 'Local throat spray (lidocaine) is used. At the patient\'s request, sedation ("sleep endoscopy") can be administered under an anesthesiologist\'s care.' }
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation', ru: '3. Безболезненность и анестезия' },
+        text: { ua: 'Використовується місцева спрей-анестезія горла (лідокаїн). За бажанням пацієнта або за медичними показаннями процедуру можна провести «уві сні» (медикаментозний сон / седація) під наглядом анестезіолога.', en: 'Local throat spray (lidocaine) is used. At the patient\'s request, sedation (\'sleep endoscopy\') can be administered under an anesthesiologist\'s care.', ru: 'Используется местная спрей-анестезия горла (лидокаин). По желанию пациента или по медицинским показаниям процедуру можно провести «во сне» (медикаментозный сон / седация) под наблюдением анестезиолога.' }
       }
     ]
   },
   colonoscopy: {
-    title: { ua: 'Колоноскопія', en: 'Colonoscopy' },
-    subtitle: { ua: 'Повна ендоскопічна діагностика товстого кишечника', en: 'Full endoscopic diagnostic of the colon' },
+    title: { ua: 'Колоноскопія', en: 'Colonoscopy', ru: 'Колоноскопия' },
+    subtitle: { ua: 'Повна ендоскопічна діагностика товстого кишечника', en: 'Full endoscopic diagnostic of the colon', ru: 'Полная эндоскопическая диагностика толстого кишечника' },
     desc: {
       ua: 'Найбільш інформативний метод діагностики захворювань товстої кишки, що дозволяє не лише виявити патології на ранніх стадіях, а й одночасно провести видалення поліпів або взяти біопсію.',
-      en: 'The gold standard for diagnosing colon conditions, enabling early detection and immediate polyp removal or biopsy.'
+      en: 'The gold standard for diagnosing colon conditions, enabling early detection and immediate polyp removal or biopsy.',
+      ru: 'Наиболее информативный метод диагностики заболеваний толстой кишки, позволяющий не только выявить патологии на ранних стадиях, но и одновременно провести удаление полипов или взять биопсию.'
     },
     steps: [
       {
-        title: { ua: '1. Підготовка', en: '1. Preparation' },
-        text: { ua: 'Потребує безшлакової дієти протягом 2-3 днів та прийому спеціального препарату для очищення кишечника напередодні за призначенням лікаря.', en: 'Requires a low-fiber diet for 2-3 days and a specific bowel preparation solution taken the day before as prescribed.' }
+        title: { ua: '1. Підготовка', en: '1. Preparation', ru: '1. Подготовка' },
+        text: { ua: 'Потребує безшлакової дієти протягом 2-3 днів та прийому спеціального препарату для очищення кишечника напередодні за призначенням лікаря.', en: 'Requires a low-fiber diet for 2-3 days and a specific bowel preparation solution taken the day before as prescribed.', ru: 'Требует бесшлаковой диеты в течение 2-3 дней и приема специального препарата для очищения кишечника накануне по назначению врача.' }
       },
       {
-        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
-        text: { ua: 'Дослідження виконується гнучким колоноскопом з оглядом слизової по всій довжині товстого кишечника. Тривалість процедури — близько 15–25 хвилин.', en: 'Examined using a flexible colonoscope assessing mucosa across the entire colon. Duration is approx. 15–25 minutes.' }
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps', ru: '2. Как проходит процедура' },
+        text: { ua: 'Дослідження виконується гнучким колоноскопом з оглядом слизової по всій довжині товстого кишечника. Тривалість процедури — близько 15–25 хвилин.', en: 'Examined using a flexible colonoscope assessing mucosa across the entire colon. Duration is approx. 15–25 minutes.', ru: 'Исследование выполняется гибким колоноскопом с осмотром слизистой по всей длине толстого кишечника. Продолжительность процедуры — около 15–25 минут.' }
       },
       {
-        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
-        text: { ua: 'Для максимального комфорту рекомендується медикаментозний сон (седація), під час якого пацієнт не відчуває ніякого дискомфорту та болю.', en: 'For optimal comfort, intravenous sedation is recommended so the patient feels no pain or anxiety during the study.' }
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation', ru: '3. Безболезненность и анестезия' },
+        text: { ua: 'Для максимального комфорту рекомендується медикаментозний сон (седація), під час якого пацієнт не відчуває ніякого дискомфорту та болю.', en: 'For optimal comfort, intravenous sedation is recommended so the patient feels no pain or anxiety during the study.', ru: 'Для максимального комфорта рекомендуется медикаментозный сон (седация), во время которого пациент не испытывает никакого дискомфорта и боли.' }
       }
     ]
   },
   ercp: {
-    title: { ua: 'ЕРХПГ', en: 'ERCP Procedure' },
-    subtitle: { ua: 'Діагностика та малоінвазивне лікування жовчних протоків', en: 'Diagnostics & minimally invasive treatment of bile ducts' },
+    title: { ua: 'ЕРХПГ', en: 'ERCP Procedure', ru: 'ЭРХПГ' },
+    subtitle: { ua: 'Діагностика та малоінвазивне лікування жовчних протоків', en: 'Diagnostics & minimally invasive treatment of bile ducts', ru: 'Диагностика и малоинвазивное лечение желчных протоков' },
     desc: {
       ua: 'Спеціалізоване високотехнологічне втручання, що поєднує ендоскопію та рентгеноскопію для діагностики та видалення каменів із жовчних протоків або відновлення їх прохідності.',
-      en: 'Advanced intervention combining endoscopy and fluoroscopy to diagnose and clear bile duct stones or restore patency.'
+      en: 'Advanced intervention combining endoscopy and fluoroscopy to diagnose and clear bile duct stones or restore patency.',
+      ru: 'Специализированное высокотехнологичное вмешательство, объединяющее эндоскопию и рентгеноскопию для диагностики и удаления камней из желчных протоков или восстановления их проходимости.'
     },
     steps: [
       {
-        title: { ua: '1. Підготовка', en: '1. Preparation' },
-        text: { ua: 'Обов\'язкова попередня консультація, аналізи крові та інструментальне обстеження (УЗД/КТ). Строго натщесерце.', en: 'Requires pre-procedure blood work, ultrasound/CT review, and strict fasting.' }
+        title: { ua: '1. Підготовка', en: '1. Preparation', ru: '1. Подготовка' },
+        text: { ua: 'Обов\'язкова попередня консультація, аналізи крові та інструментальне обстеження (УЗД/КТ). Строго натщесерце.', en: 'Requires pre-procedure blood work, ultrasound/CT review, and strict fasting.', ru: 'Обязательна предварительная консультация, анализы крови и инструментальное обследование (УЗИ/КТ). Строго натощак.' }
       },
       {
-        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
-        text: { ua: 'Спеціальний дуоденоскоп вводиться у 12-палу кишку до великого дуоденального сосочка, через який вводиться контраст та виконуються необхідні маніпуляції.', en: 'A specialized duodenoscope is passed to the papilla of Vater, contrast is injected, and therapeutic steps are performed.' }
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps', ru: '2. Как проходит процедура' },
+        text: { ua: 'Спеціальний дуоденоскоп вводиться у 12-палу кишку до великого дуоденального сосочка, через який вводиться контраст та виконуються необхідні маніпуляції.', en: 'A specialized duodenoscope is passed to the papilla of Vater, contrast is injected, and therapeutic steps are performed.', ru: 'Специальный дуоденоскоп вводится в 12-перстную кишку до большого дуоденального сосочка, через который вводится контраст и выполняются необходимые манипуляции.' }
       },
       {
-        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
-        text: { ua: 'Проводиться виключно під загальним знеболенням або глибокою седацією у стаціонарних умовах.', en: 'Performed exclusively under general anesthesia or deep sedation in a hospital room.' }
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation', ru: '3. Безболезненность и анестезия' },
+        text: { ua: 'Проводиться виключно під загальним знеболенням або глибокою седацією у стаціонарних умовах.', en: 'Performed exclusively under general anesthesia or deep sedation in a hospital room.', ru: 'Проводится исключительно под общим обезболиванием или глубокой седацией в стационарных условиях.' }
       }
     ]
   },
   bronchoscopy: {
-    title: { ua: 'Бронхоскопія', en: 'Bronchoscopy' },
-    subtitle: { ua: 'Огляд та діагностика дихальних шляхів і бронхіального дерева', en: 'Inspection & diagnostics of airways and bronchial tree' },
+    title: { ua: 'Бронхоскопія', en: 'Bronchoscopy', ru: 'Бронхоскопия' },
+    subtitle: { ua: 'Огляд та діагностика дихальних шляхів і бронхіального дерева', en: 'Inspection & diagnostics of airways and bronchial tree', ru: 'Осмотр и диагностика дыхательных путей и бронхиального дерева' },
     desc: {
       ua: 'Метод прямого візуального обстеження трахеї та бронхів за допомогою ультратонкого гнучкого бронхоскопа для оцінки стану дихальної системи та забору матеріалу.',
-      en: 'Direct visualization of the trachea and bronchi using an ultra-thin flexible scope for respiratory assessment and sampling.'
+      en: 'Direct visualization of the trachea and bronchi using an ultra-thin flexible scope for respiratory assessment and sampling.',
+      ru: 'Метод прямого визуального обследования трахеи и бронхов с помощью ультратонкого гибкого бронхоскопа для оценки состояния дыхательной системы и забора материала.'
     },
     steps: [
       {
-        title: { ua: '1. Підготовка', en: '1. Preparation' },
-        text: { ua: 'Виконується натщесерце (не їсти та не пити зранку). Необхідно попередити лікаря про наявність алергій або астми.', en: 'Done fasting (no food or drinks in the morning). Inform the doctor of any allergies or asthma history.' }
+        title: { ua: '1. Підготовка', en: '1. Preparation', ru: '1. Подготовка' },
+        text: { ua: 'Виконується натщесерце (не їсти та не пити зранку). Необхідно попередити лікаря про наявність алергій або астми.', en: 'Done fasting (no food or drinks in the morning). Inform the doctor of any allergies or asthma history.', ru: 'Выполняется натощак (не есть и не пить утром). Необходимо предупредить врача о наличии аллергий или астмы.' }
       },
       {
-        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
-        text: { ua: 'Бронхоскоп через ніс або рот м\'яко проводиться у дихальні шляхи. Процедура займає 5–15 хвилин.', en: 'The bronchoscope is gently passed via nose or mouth into the airways. Lasts 5–15 minutes.' }
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps', ru: '2. Как проходит процедура' },
+        text: { ua: 'Бронхоскоп через ніс або рот м\'яко проводиться у дихальні шляхи. Процедура займає 5–15 хвилин.', en: 'The bronchoscope is gently passed via nose or mouth into the airways. Lasts 5–15 minutes.', ru: 'Бронхоскоп через нос или рот мягко проводится в дыхательные пути. Процедура занимает 5–15 минут.' }
       },
       {
-        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
-        text: { ua: 'Застосовується якісна місцева анестезія слизових носоглотки та трахеї, що усуває кашльовий рефлекс.', en: 'Local anesthetic spray is applied to the airway mucosa to block the cough reflex effectively.' }
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation', ru: '3. Безболезненность и анестезия' },
+        text: { ua: 'Застосовується якісна місцева анестезія слизових носоглотки та трахеї, що усуває кашльовий рефлекс.', en: 'Local anesthetic spray is applied to the airway mucosa to block the cough reflex effectively.', ru: 'Применяется качественная местная анестезия слизистых носоглотки и трахеи, устраняющая кашлевой рефлекс.' }
       }
     ]
   },
   ultrasound: {
-    title: { ua: 'УЗД діагностика', en: 'Ultrasound Diagnostics' },
-    subtitle: { ua: 'Ультразвукове дослідження органів черевної порожнини', en: 'Ultrasound study of abdominal organs' },
+    title: { ua: 'УЗД діагностика', en: 'Ultrasound Diagnostics', ru: 'УЗИ диагностика' },
+    subtitle: { ua: 'Ультразвукове дослідження органів черевної порожнини', en: 'Ultrasound study of abdominal organs', ru: 'Ультразвуковое исследование органов брюшной полости' },
     desc: {
       ua: 'Безпечний, безболісний та швидкий метод обстеження печінки, жовчного міхура, підшлункової залози, селезінки та нирок у реальному часі.',
-      en: 'Safe, non-invasive real-time imaging of liver, gallbladder, pancreas, spleen, and kidneys.'
+      en: 'Safe, non-invasive real-time imaging of liver, gallbladder, pancreas, spleen, and kidneys.',
+      ru: 'Безопасный, безболезненный и быстрый метод обследования печени, желчного пузыря, поджелудочной железы, селезенки и почек в реальном времени.'
     },
     steps: [
       {
-        title: { ua: '1. Підготовка', en: '1. Preparation' },
-        text: { ua: 'Бажано проводити натщесерце або через 6 годин після прийому їжі. За день утриматися від продуктів, що викликають газоутворення.', en: 'Best performed on an empty stomach (or 6 hours after meals). Avoid gas-inducing foods the day before.' }
+        title: { ua: '1. Підготовка', en: '1. Preparation', ru: '1. Подготовка' },
+        text: { ua: 'Бажано проводити натщесерце або через 6 годин після прийому їжі. За день утриматися від продуктів, що викликають газоутворення.', en: 'Best performed on an empty stomach (or 6 hours after meals). Avoid gas-inducing foods the day before.', ru: 'Желательно проводить натощак или через 6 часов после приема пищи. За день воздержаться от продуктов, вызывающих газообразование.' }
       },
       {
-        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
-        text: { ua: 'Пацієнт розташовується на кушетці, лікар наносить гіпоалергенний гель на шкіру та сканує органи датчиком. Займає 15–20 хвилин.', en: 'Patient lies on a couch, hypoallergenic gel is applied, and organs are scanned. Takes 15–20 minutes.' }
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps', ru: '2. Как проходит процедура' },
+        text: { ua: 'Пацієнт розташовується на кушетці, лікар наносить гіпоалергенний гель на шкіру та сканує органи датчиком. Займає 15–20 хвилин.', en: 'Patient lies on a couch, hypoallergenic gel is applied, and organs are scanned. Takes 15–20 minutes.', ru: 'Пациент располагается на кушетке, врач наносит гипоаллергенный гель на кожу и сканирует органы датчиком. Занимает 15–20 минут.' }
       },
       {
-        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
-        text: { ua: 'Процедура абсолютно безболісна, не має протипоказань та не потребує анестезії.', en: 'Completely painless, safe for all ages, requires no anesthesia.' }
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation', ru: '3. Безболезненность и анестезия' },
+        text: { ua: 'Процедура абсолютно безболісна, не має протипоказань та не потребує анестезії.', en: 'Completely painless, safe for all ages, requires no anesthesia.', ru: 'Процедура абсолютно безболезненна, не имеет противопоказаний и не требует анестезии.' }
       }
     ]
   },
   surgery: {
-    title: { ua: 'Оперативна ендоскопія та хірургія', en: 'Operative Endoscopy & Surgery' },
-    subtitle: { ua: 'Малоінвазивні втручання та ендоскопічна хірургія', en: 'Minimally invasive interventions and endoscopic surgery' },
+    title: { ua: 'Оперативна ендоскопія та хірургія', en: 'Operative Endoscopy & Surgery', ru: 'Оперативная эндоскопия и хирургия' },
+    subtitle: { ua: 'Малоінвазивні втручання та ендоскопічна хірургія', en: 'Minimally invasive interventions and endoscopic surgery', ru: 'Малоинвазивные вмешательства и эндоскопическая хирургия' },
     desc: {
       ua: 'Видалення поліпів шлунка та кишечника (поліпектомія), зупинка кровотеч, забір біопсії, видалення чужорідних тіл без розрізів та тривалої реабілітації.',
-      en: 'Polyp removal (polypectomy), hemostasis, biopsies, foreign body retrieval without surgical cuts.'
+      en: 'Polyp removal (polypectomy), hemostasis, biopsies, foreign body retrieval without surgical cuts.',
+      ru: 'Удаление полипов желудка и кишечника (полипэктомия), остановка кровотечений, забор биопсии, удаление инородных тел без разрезов и длительной реабилитации.'
     },
     steps: [
       {
-        title: { ua: '1. Підготовка', en: '1. Preparation' },
-        text: { ua: 'Визначається індивідуально залежно від обсягу втручання після попереднього діагностичного обстеження.', en: 'Determined individually based on procedure scope following initial diagnostic assessment.' }
+        title: { ua: '1. Підготовка', en: '1. Preparation', ru: '1. Подготовка' },
+        text: { ua: 'Визначається індивідуально залежно від обсягу втручання після попереднього діагностичного обстеження.', en: 'Determined individually based on procedure scope following initial diagnostic assessment.', ru: 'Определяется индивидуально в зависимости от объема вмешательства после предварительного диагностического обследования.' }
       },
       {
-        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps' },
-        text: { ua: 'Виконується за допомогою спеціальних інструментів, що проводяться через канал ендоскопа безпосередньо до осередку ураження.', en: 'Executed using surgical accessories guided through the endoscope channel directly to the target area.' }
+        title: { ua: '2. Як проходить процедура', en: '2. Procedure Steps', ru: '2. Как проходит процедура' },
+        text: { ua: 'Виконується за допомогою спеціальних інструментів, що проводяться через канал ендоскопа безпосередньо до осередку ураження.', en: 'Executed using surgical accessories guided through the endoscope channel directly to the target area.', ru: 'Выполняется с помощью специальных инструментов, проводимых через канал эндоскопа непосредственно к очагу поражения.' }
       },
       {
-        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation' },
-        text: { ua: 'Забезпечується повний анальгетичний захист або комбінована анестезія для максимальної безпеки.', en: 'Full pain management or general sedation is provided for complete safety and tranquility.' }
+        title: { ua: '3. Безболісність та анестезія', en: '3. Comfort & Sedation', ru: '3. Безболезненность и анестезия' },
+        text: { ua: 'Забезпечується повний анальгетичний захист або комбінована анестезія для максимальної безпеки.', en: 'Full pain management or general sedation is provided for complete safety and tranquility.', ru: 'Обеспечивается полная анальгетическая защита или комбинированная анестезия для максимальной безопасности.' }
       }
     ]
   }
 };
-
 let activeModalServiceKey = null;
 
 function initServiceModal() {
