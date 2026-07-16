@@ -130,7 +130,7 @@ const translations = {
     'nav.blog': 'Blog',
     'nav.topics': 'Topics',
     'nav.ask': 'Ask a Question',
-    'hero.badge.blog': 'Educational blog of Dr. Oleg Teternick',
+    'hero.badge.blog': 'Educational blog of Dr. Oleg Teternik',
     'hero.title.main': 'Endoscopy',
     'hero.title.accent': 'in simple terms',
     'hero.specialization': 'Explaining gastroscopy, colonoscopy, preparation, and treatment without myths and unnecessary fear. Advice from an endoscopist, surgeon, and ultrasound specialist with 8 years of experience.',
@@ -156,7 +156,7 @@ const translations = {
     'section.reviews': 'Patient Reviews',
     'section.contacts': 'Contacts',
     'about.subtitle': 'Meet the Doctor',
-    'about.title': 'Teternick Oleg Oleksandrovych',
+    'about.title': 'Teternik Oleg Oleksandrovych',
     'about.role': 'Surgeon Endoscopist',
     'about.bio.1': 'A professional with 8 years of experience in performing high-precision endoscopic and surgical interventions. The main priority is maximum safety, painlessness, and patient comfort during every procedure.',
     'about.bio.2': 'Thanks to modern equipment and an individual approach, we provide accurate diagnosis and effective treatment of gastrointestinal diseases.',
@@ -227,7 +227,7 @@ const translations = {
     'exhibits.kiev.city': 'Kyiv, Ukraine',
     'exhibits.kiev.title': 'KievEndo 2023',
     'exhibits.kiev.desc': 'Scientific and Practical Conference. Presentation of clinical cases, discussion of modern techniques of minimally invasive surgery and diagnostic endoscopy in Ukraine.',
-    'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
+    'footer.copy': '© 2026 Teternik O.O. All rights reserved.',
     'diplomas.subtitle': 'Education & Achievements',
     'diplomas.title': 'Diplomas & Certificates',
     'diplomas.tab.education': 'Education',
@@ -273,9 +273,9 @@ function generateLang(langCode) {
         $('meta[name="description"]').attr('content', 'Тетерник Олег Александрович — врач-эндоскопист, хирург, УЗИ. Отзывы пациентов. Эндоскопия в Харькове.');
     } else if (langCode === 'en') {
         $('a.lang-switch__btn:contains("EN")').addClass('active');
-        $('title').text('Dr. Teternick O. O. — Endoscopist, Surgeon, Ultrasound | Reviews');
-        $('meta[property="og:title"]').attr('content', 'Dr. Teternick O. O. — Endoscopist, Surgeon, Ultrasound | Reviews');
-        $('meta[name="description"]').attr('content', 'Teternick Oleg Oleksandrovych — Endoscopist, Surgeon, Ultrasound. Patient reviews. Endoscopy in Kharkiv.');
+        $('title').text('Dr. Teternik O. O. — Endoscopist, Surgeon, Ultrasound | Reviews');
+        $('meta[property="og:title"]').attr('content', 'Dr. Teternik O. O. — Endoscopist, Surgeon, Ultrasound | Reviews');
+        $('meta[name="description"]').attr('content', 'Teternik Oleg Oleksandrovych — Endoscopist, Surgeon, Ultrasound. Patient reviews. Endoscopy in Kharkiv.');
     }
 
     fs.writeFileSync(`${langCode}.html`, $.html());

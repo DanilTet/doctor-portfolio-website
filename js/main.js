@@ -243,7 +243,7 @@ const translations = {
 
     // Hero
     'hero.badge': 'Endoscopist, Surgeon, Ultrasound',
-    'hero.name.first': 'Teternick',
+    'hero.name.first': 'Teternik',
     'hero.name.last': 'Oleg Oleksandrovych',
     'hero.specialization': 'Endoscopist, surgeon, ultrasound specialist with 8 years of experience. Specializing in endoscopy, surgery, ultrasound, and performing over 3000 endoscopic examinations annually!',
     'hero.experience.number': '8',
@@ -274,7 +274,7 @@ const translations = {
 
     // About
     'about.subtitle': 'Meet the Doctor',
-    'about.title': 'Teternick Oleg Oleksandrovych',
+    'about.title': 'Teternik Oleg Oleksandrovych',
     'about.role': 'Surgeon Endoscopist',
     'about.bio.1': 'A professional with 8 years of experience in performing high-precision endoscopic and surgical interventions. The main priority is maximum safety, painlessness, and patient comfort during every procedure.',
     'about.bio.2': 'Thanks to modern equipment and an individual approach, we provide accurate diagnosis and effective treatment of gastrointestinal diseases.',
@@ -357,7 +357,7 @@ const translations = {
     'exhibits.kiev.desc': 'Scientific and Practical Conference. Presentation of clinical cases, discussion of modern techniques of minimally invasive surgery and diagnostic endoscopy in Ukraine.',
 
     // Footer
-    'footer.copy': '© 2026 Teternick O.O. All rights reserved.',
+    'footer.copy': '© 2026 Teternik O.O. All rights reserved.',
   }
 };
 
