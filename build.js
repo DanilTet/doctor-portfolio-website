@@ -161,6 +161,7 @@ const translations = {
 
     // Нові ключі для сторінок послуг
     'service.back': 'Назад на главную',
+    'appointment.form.btn_redirect': 'Заполнить форму на сайте',
     'service.gastro.meta.title': 'Гастроскопия | Врач Тетерник О.А.',
     'service.gastro.title': 'Гастроскопия',
     'service.gastro.subtitle': 'Современное эндоскопическое исследование желудка без мифов, боли и страха.',
@@ -375,6 +376,7 @@ const translations = {
 
     // New keys for English service pages
     'service.back': 'Back to homepage',
+    'appointment.form.btn_redirect': 'Fill out form on website',
     'service.gastro.meta.title': 'Gastroscopy | Dr. Teternik O.O.',
     'service.gastro.title': 'Gastroscopy',
     'service.gastro.subtitle': 'Modern endoscopic examination of the stomach without fear, pain, and discomfort.',
