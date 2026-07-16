@@ -2010,3 +2010,23 @@ body {
     text-align: center;
   }
 }
+
+/* ── Blog Mobile Responsiveness ── */
+@media (max-width: 600px) {
+  .blog-post-row {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  .blog-post-row > div:first-child {
+    min-width: 100% !important;
+  }
+  .blog-post-row > div:last-child {
+    min-width: 100% !important;
+    justify-content: flex-start !important;
+    margin-top: 8px;
+  }
+  #blog-schedule-modal > div {
+    width: 95% !important;
+    padding: 20px !important;
+  }
+}

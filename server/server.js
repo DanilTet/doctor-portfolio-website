@@ -83,9 +83,20 @@ function authGuard(req, res, next) {
 /**
  * GET /api/blog/posts
  * Returns all posts (sorted newest first). Public — no auth required.
+ * If ?all=true and valid X-Blog-Secret is provided, returns all posts including scheduled.
  */
-app.get('/api/blog/posts', (_req, res) => {
-  const posts = readPosts().sort((a, b) => new Date(b.date) - new Date(a.date));
+app.get('/api/blog/posts', (req, res) => {
+  let posts = readPosts().sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  const wantAll = req.query.all === 'true';
+  const secret = req.headers['x-blog-secret'];
+  const isAdmin = wantAll && secret === BLOG_SECRET;
+
+  if (!isAdmin) {
+    const now = new Date();
+    posts = posts.filter(p => new Date(p.date) <= now);
+  }
+
   res.json(posts);
 });
 
@@ -96,7 +107,7 @@ app.get('/api/blog/posts', (_req, res) => {
  * Body: multipart/form-data with fields: title, content, image (optional file)
  */
 app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, date } = req.body;
 
   if (!title || title.trim().length < 3)
     return res.status(400).json({ error: 'Заголовок должен быть не менее 3 символов' });
@@ -119,7 +130,7 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
     title:      title.trim(),
     content:    content.trim(),
     image_path: req.file ? `/uploads/blog/${req.file.filename}` : null,
-    date:       new Date().toISOString(),
+    date:       date ? new Date(date).toISOString() : new Date().toISOString(),
     source:     'manual',
     tags:       Array.isArray(parsedTags) ? parsedTags : [],
   };
@@ -138,7 +149,7 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
  */
 app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => {
   const { id } = req.params;
-  const { title, content, remove_image } = req.body;
+  const { title, content, remove_image, date } = req.body;
 
   if (title && title.trim().length < 3)
     return res.status(400).json({ error: 'Заголовок должен быть не менее 3 символов' });
@@ -157,6 +168,7 @@ app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => 
   // Only manual posts can be fully edited this way. We might allow editing instagram posts' text too, but mainly manual.
   if (title) post.title = title.trim();
   if (content) post.content = content.trim();
+  if (date) post.date = new Date(date).toISOString();
 
   try {
     if (req.body.tags) {

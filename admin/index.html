@@ -809,7 +809,11 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Опубликовать пост
             </button>
-            <div id="blog-form-feedback" style="font-size:13px;font-weight:500"></div>
+            <button id="blog-schedule-btn" type="button" class="btn btn--outline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Запланировать
+            </button>
+            <div id="blog-form-feedback" style="font-size:13px;font-weight:500;width:100%"></div>
           </div>
         </form>
       </div>
@@ -834,11 +838,37 @@
         <div id="blog-sync-feedback" style="font-size:13px;font-weight:500;width:100%"></div>
       </div>
 
-      <!-- Published Posts -->
+      <!-- Blog Posts List -->
       <div class="card">
-        <h3 style="margin-bottom:16px;font-weight:600">Опубликованные посты</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+          <h3 style="margin:0;font-weight:600">Список постов</h3>
+          <div class="reviews-filter-tabs" style="display: flex; gap: 10px;">
+            <button id="blog-tab-published" class="btn btn--primary btn--sm" onclick="window.switchBlogTab('published')">Опубликованные</button>
+            <button id="blog-tab-scheduled" class="btn btn--outline btn--sm" onclick="window.switchBlogTab('scheduled')">Отложенные</button>
+          </div>
+        </div>
+        
         <div id="blog-posts-list">
           <div style="text-align:center;color:var(--text-muted);padding:32px">Загрузка...</div>
+        </div>
+        
+        <div id="blog-scheduled-list" style="display: none;">
+          <!-- JS will render scheduled posts here -->
+        </div>
+      </div>
+
+      <!-- Scheduling Modal -->
+      <div id="blog-schedule-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:24px; width:90%; max-width:400px; box-shadow:var(--shadow);">
+          <h3 style="margin-top:0; margin-bottom:16px;">Запланировать публикацию</h3>
+          <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Выберите дату и время, когда пост должен появиться на сайте.</p>
+          <div class="form-group">
+            <input type="datetime-local" id="blog-schedule-datetime" class="form-input" required>
+          </div>
+          <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:24px;">
+            <button id="blog-schedule-cancel" class="btn btn--ghost" type="button">Отмена</button>
+            <button id="blog-schedule-confirm" class="btn btn--primary" type="button">Сохранить</button>
+          </div>
         </div>
       </div>
 
