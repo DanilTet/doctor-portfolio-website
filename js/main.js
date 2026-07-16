@@ -362,55 +362,19 @@ const translations = {
 };
 
 let currentLang = 'ua';
+const htmlLang = document.documentElement.lang;
+if (htmlLang === 'ru') {
+  currentLang = 'ru';
+} else if (htmlLang === 'en') {
+  currentLang = 'en';
+}
 
 function initLanguageSwitcher() {
-  const langButtons = document.querySelectorAll('.lang-switch__btn');
-
-  langButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const lang = btn.dataset.lang;
-      if (lang === currentLang) return;
-
-      currentLang = lang;
-
-      // Update active button
-      langButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      // Update html lang attribute
-      document.documentElement.lang = lang === 'ua' ? 'uk' : 'en';
-
-      // Apply translations
-      applyTranslations(lang);
-    });
-  });
+  // Language switching is handled via static HTML pages (ru.html, en.html)
 }
 
 function applyTranslations(lang) {
-  const t = translations[lang];
-  if (!t) return;
-
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    if (t[key]) {
-      // Preserve HTML inside the element (e.g., icons within buttons)
-      const childNodes = el.querySelectorAll('svg, img, .hero__badge-dot');
-      if (childNodes.length > 0) {
-        // Find the text node and update it
-        const textContent = t[key];
-        // Re-render with children preserved
-        const fragment = document.createDocumentFragment();
-        childNodes.forEach(child => fragment.appendChild(child.cloneNode(true)));
-        el.textContent = textContent;
-        // Prepend children back
-        if (fragment.childNodes.length > 0) {
-          el.prepend(fragment);
-        }
-      } else {
-        el.textContent = t[key];
-      }
-    }
-  });
+  // Translations are baked into the HTML files via build.js
 }
 
 /* ============================================================

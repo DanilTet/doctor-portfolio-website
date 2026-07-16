@@ -40,15 +40,15 @@
 
       <!-- Logo -->
       <a href="#" class="header__logo" aria-label="На головну">
-        <span class="header__logo-text">Ендоскопія <span>простими словами</span></span>
+        <span class="header__logo-text"><span data-i18n="logo.main">Endoscopy</span> <span data-i18n="logo.accent">in simple terms</span></span>
       </a>
 
       <!-- Navigation -->
       <nav class="nav" id="nav" aria-label="Головне меню">
         <ul class="nav__list">
           <li><a href="#about" class="nav__link" data-i18n="nav.about">About</a></li>
-          <li><a href="#blog" class="nav__link">Блог</a></li>
-          <li><a href="#topics" class="nav__link">Теми</a></li>
+          <li><a href="#blog" class="nav__link" data-i18n="nav.blog">Blog</a></li>
+          <li><a href="#topics" class="nav__link" data-i18n="nav.topics">Topics</a></li>
           <li><a href="#diplomas" class="nav__link" data-i18n="nav.diplomas">Diplomas</a></li>
           <li><a href="#reviews" class="nav__link" data-i18n="nav.reviews">Reviews</a></li>
           <li><a href="#contacts" class="nav__link" data-i18n="nav.contacts">Contacts</a></li>
@@ -68,7 +68,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            Залишити запитання
+            <span data-i18n="nav.ask">Ask a Question</span>
           </a>
         </div>
       </nav>
@@ -105,19 +105,17 @@
         <!-- Badge -->
         <div class="hero__badge">
           <span class="hero__badge-dot" aria-hidden="true"></span>
-          <span class="hero__badge-text">Освітній блог лікаря Олега Тетерніка</span>
+          <span class="hero__badge-text" data-i18n="hero.badge.blog">Educational blog of Dr. Oleg Teternick</span>
         </div>
 
         <!-- Name -->
         <h1 class="hero__title">
-          <span>Ендоскопія</span>
-          <span class="hero__title-accent">простими словами</span>
+          <span data-i18n="hero.title.main">Endoscopy</span>
+          <span class="hero__title-accent" data-i18n="hero.title.accent">in simple terms</span>
         </h1>
 
         <!-- Specialization -->
-        <p class="hero__specialization">
-          Розповідаю про гастроскопію, колоноскопію, підготовку та лікування без міфів та зайвого страху. Поради лікаря-ендоскопіста, хірурга, лікаря УЗД з 8-річним досвідом.
-        </p>
+        <p class="hero__specialization" data-i18n="hero.specialization">Explaining gastroscopy, colonoscopy, preparation, and treatment without myths and unnecessary fear. Advice from an endoscopist, surgeon, and ultrasound specialist with 8 years of experience.</p>
 
         <!-- Experience Highlight -->
         <div class="hero__experience">
@@ -134,10 +132,10 @@ experience in medicine</span>
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
-            Читати блог
+            <span data-i18n="hero.btn.blog">Read Blog</span>
           </a>
           <a href="#appointment" class="btn btn--ghost">
-            Залишити запитання
+            <span data-i18n="hero.btn.ask">Ask a Question</span>
           </a>
         </div>
       </div>
@@ -578,8 +576,8 @@ experience in medicine</span>
     <div class="container">
       <!-- Section Header -->
       <div class="section__header" data-animate="" data-animate-delay="1">
-        <span class="section-subtitle">Освіта та досягнення</span>
-        <h2 class="section-title">Дипломи та сертифікати</h2>
+        <span class="section-subtitle" data-i18n="diplomas.subtitle">Education &amp; Achievements</span>
+        <h2 class="section-title" data-i18n="diplomas.title">Diplomas &amp; Certificates</h2>
         <div class="section__line"></div>
       </div>
 
@@ -590,21 +588,21 @@ experience in medicine</span>
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
             <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
           </svg>
-          Освіта
+          <span data-i18n="diplomas.tab.education">Education</span>
         </button>
         <button class="diplomas__tab" role="tab" aria-selected="false" data-tab="certificates" id="tab-certificates">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="8" r="6"></circle>
             <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
           </svg>
-          Сертифікати
+          <span data-i18n="diplomas.tab.certificates">Certificates</span>
         </button>
         <button class="diplomas__tab" role="tab" aria-selected="false" data-tab="exhibitions" id="tab-exhibitions">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2"></rect>
             <path d="M3 9h18M9 21V9"></path>
           </svg>
-          Конференції та виставки
+          <span data-i18n="diplomas.tab.exhibitions">Conferences &amp; Exhibitions</span>
         </button>
       </div>
 
