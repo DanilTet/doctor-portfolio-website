@@ -30,5 +30,5 @@ package-lock.json
 
 # Server Data (Do not overwrite production data)
 server/data/posts.json
-server/uploads/
+uploads/
 

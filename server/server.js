@@ -22,7 +22,7 @@ const INSTAGRAM_USERNAME = process.env.INSTAGRAM_USERNAME || '';
 /* ── Paths ───────────────────────────────────────────────── */
 const ROOT_DIR    = path.join(__dirname, '..');            // Project root
 const DATA_FILE   = path.join(__dirname, 'data', 'posts.json');
-const UPLOADS_DIR = path.join(__dirname, 'uploads', 'blog');
+const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
 
 // Ensure directories exist
 fs.mkdirSync(path.join(__dirname, 'data'),    { recursive: true });
