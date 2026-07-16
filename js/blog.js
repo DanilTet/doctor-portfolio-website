@@ -197,10 +197,14 @@
     }
 
     if (body) {
-      body.innerHTML = escHtml(post.content)
-        .replace(/\n\n+/g, '</p><p>')
-        .replace(/\n/g, '<br>');
-      body.innerHTML = `<p>${body.innerHTML}</p>`;
+      if (window.marked && window.DOMPurify) {
+        body.innerHTML = DOMPurify.sanitize(marked.parse(post.content));
+      } else {
+        body.innerHTML = escHtml(post.content)
+          .replace(/\n\n+/g, '</p><p>')
+          .replace(/\n/g, '<br>');
+        body.innerHTML = `<p>${body.innerHTML}</p>`;
+      }
     }
 
     if (igLink) {

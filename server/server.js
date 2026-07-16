@@ -12,6 +12,7 @@ const path     = require('path');
 const fs       = require('fs');
 const fetch    = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
+const archiver = require('archiver');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -130,6 +131,62 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
 });
 
 /**
+ * PUT /api/blog/posts/:id
+ * Edit an existing manual blog post.
+ * Requires header: X-Blog-Secret
+ * Body: multipart/form-data with fields: title, content, image (optional file), remove_image (optional boolean)
+ */
+app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => {
+  const { id } = req.params;
+  const { title, content, remove_image } = req.body;
+
+  if (title && title.trim().length < 3)
+    return res.status(400).json({ error: 'Заголовок должен быть не менее 3 символов' });
+  if (content && content.trim().length < 10)
+    return res.status(400).json({ error: 'Текст поста должен быть не менее 10 символов' });
+
+  const posts = readPosts();
+  const idx = posts.findIndex(p => p.id === id);
+
+  if (idx === -1) {
+    return res.status(404).json({ error: 'Пост не найден' });
+  }
+
+  const post = posts[idx];
+
+  // Only manual posts can be fully edited this way. We might allow editing instagram posts' text too, but mainly manual.
+  if (title) post.title = title.trim();
+  if (content) post.content = content.trim();
+
+  try {
+    if (req.body.tags) {
+      post.tags = JSON.parse(req.body.tags);
+    }
+  } catch (e) {
+    console.warn('[Blog] Failed to parse tags on update:', req.body.tags);
+  }
+
+  // Handle new image upload or removing image
+  if (req.file) {
+    // Delete old local image if it exists
+    if (post.image_path && post.image_path.startsWith('/uploads/blog/')) {
+      const oldPath = path.join(__dirname, post.image_path);
+      fs.rm(oldPath, { force: true }, () => {});
+    }
+    post.image_path = `/uploads/blog/${req.file.filename}`;
+  } else if (remove_image === 'true') {
+    if (post.image_path && post.image_path.startsWith('/uploads/blog/')) {
+      const oldPath = path.join(__dirname, post.image_path);
+      fs.rm(oldPath, { force: true }, () => {});
+    }
+    post.image_path = null;
+  }
+
+  writePosts(posts);
+  res.json(post);
+});
+
+/**
  * DELETE /api/blog/posts/:id
  * Delete a post and its local image (if any).
  * Requires header: X-Blog-Secret
@@ -243,6 +300,35 @@ app.get('*', (req, res) => {
     return res.sendFile(path.join(ROOT_DIR, 'admin', 'index.html'));
   }
   res.sendFile(path.join(ROOT_DIR, 'index.html'));
+});
+
+/**
+ * GET /api/blog/backup-images
+ * Streams a ZIP archive of all blog images and posts.json
+ */
+app.get('/api/blog/backup-images', authGuard, (req, res) => {
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename="doctor_blog_media.zip"');
+
+  const archive = archiver('zip', { zlib: { level: 9 } });
+
+  archive.on('error', (err) => {
+    res.status(500).send({ error: err.message });
+  });
+
+  archive.pipe(res);
+
+  // Append posts.json
+  if (fs.existsSync(DATA_FILE)) {
+    archive.file(DATA_FILE, { name: 'posts.json' });
+  }
+
+  // Append uploads folder
+  if (fs.existsSync(UPLOADS_DIR)) {
+    archive.directory(UPLOADS_DIR, 'uploads/blog');
+  }
+
+  archive.finalize();
 });
 
 /* ── Start ───────────────────────────────────────────────── */

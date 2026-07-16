@@ -177,6 +177,17 @@
         <span>Управление блогом</span>
       </button>
 
+      <div class="nav-section-label" style="margin-top:8px">Система</div>
+
+      <button class="nav-item" data-page="backup" id="nav-backup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Резервне копіювання</span>
+      </button>
+
     </nav>
 
     <div class="sidebar-footer">
@@ -847,6 +858,10 @@
      ============================================================ -->
 
 <!-- Inject Supabase credentials for admin (reads from shared env.js) -->
+<!-- Markdown and Sanitization Libraries -->
+<script src="/js/lib/marked.min.js"></script>
+<script src="/js/lib/purify.min.js"></script>
+
 <script src="/js/env.js"></script>
 <script>
   // Bridge: env.js sets window.ENV, admin.js reads window.ADMIN_ENV
