@@ -157,8 +157,8 @@ const translations = {
 
     // Нові ключі для сторінок послуг
     'service.back': 'Назад на главную',
-    'service.gastro.meta.title': 'Гастроскопия (ВГДС) | Врач Тетерник О.А.',
-    'service.gastro.title': 'Гастроскопия (ВГДС)',
+    'service.gastro.meta.title': 'Гастроскопия | Врач Тетерник О.А.',
+    'service.gastro.title': 'Гастроскопия',
     'service.gastro.subtitle': 'Современное эндоскопическое исследование желудка без мифов, боли и страха.',
     'service.gastro.p1': '<strong>Гастроскопия (видеоэзофагогастродуоденоскопия или ВГДС)</strong> — это высокоточный метод визуального осмотра пищевода, желудка и двенадцатиперстной кишки с помощью современного гибкого эндоскопа.',
     'service.gastro.p2': 'Эта процедура является «золотым стандартом» в диагностике гастрита, язвенной болезни, рефлюкса и выявлении ранних стадий онкологических заболеваний желудочно-кишечного тракта.',
@@ -367,8 +367,8 @@ const translations = {
 
     // New keys for English service pages
     'service.back': 'Back to homepage',
-    'service.gastro.meta.title': 'Gastroscopy (EGD) | Dr. Teternik O.O.',
-    'service.gastro.title': 'Gastroscopy (EGD)',
+    'service.gastro.meta.title': 'Gastroscopy | Dr. Teternik O.O.',
+    'service.gastro.title': 'Gastroscopy',
     'service.gastro.subtitle': 'Modern endoscopic examination of the stomach without fear, pain, and discomfort.',
     'service.gastro.p1': '<strong>Gastroscopy (esophagogastroduodenoscopy or EGD)</strong> — is a highly precise method of visual examination of the esophagus, stomach, and duodenum using a modern flexible endoscope.',
     'service.gastro.p2': 'This procedure is the "gold standard" in diagnosing gastritis, peptic ulcer disease, reflux, and detecting early stages of oncological diseases of the gastrointestinal tract.',
@@ -491,7 +491,7 @@ function generateMainLangs() {
 function localizeLinks($, langCode) {
     const pages = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
     pages.forEach(p => {
-        $(`a[href^="/${p}/"]`).each(function() {
+        $(`a[href^="/${p}/"]`).not('.lang-switch a').each(function() {
             $(this).attr('href', `/${langCode}/${p}/`);
         });
     });
