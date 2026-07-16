@@ -75,21 +75,114 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <div style="font-size: 1.1rem; margin-bottom: 24px;" data-i18n="service.gastro.p1"><strong>Гастроскопия (видеоэзофагогастродуоденоскопия или ВГДС)</strong> — это высокоточный метод визуального осмотра пищевода, желудка и двенадцатиперстной кишки с помощью современного гибкого эндоскопа.</div>
-        <p style="margin-bottom: 16px;" data-i18n="service.gastro.p2">Эта процедура является «золотым стандартом» в диагностике гастрита, язвенной болезни, рефлюкса и выявлении ранних стадий онкологических заболеваний желудочно-кишечного тракта.</p>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.gastro.h1">Показания к проведению:</h3>
-        <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
-          <li data-i18n="service.gastro.li1">Боль или дискомфорт в верхней части живота.</li>
-          <li data-i18n="service.gastro.li2">Частая изжога, кислая отрыжка, горечь во рту.</li>
-          <li data-i18n="service.gastro.li3">Ощущение «комка» при глотании пищи.</li>
-          <li data-i18n="service.gastro.li4">Длительная тошнота, рвота или быстрая потеря веса.</li>
-        </ul>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.gastro.h2">Как подготовиться?</h3>
-        <p style="margin-bottom: 16px;" data-i18n="service.gastro.p3">Исследование проводится исключительно <strong>натощак</strong>. Последний прием пищи должен быть не позднее, чем за 8–10 часов до начала процедуры. Воду (без газа, чистую) можно пить в небольшом количестве минимум за 3–4 часа до обследования.</p>
+        <!-- Table of Contents / Путівник по питанням -->
+        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.gastro.toc.title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>Путеводитель по вопросам подготовки:</h3>
+          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
+            <li>
+              <a href="#why-important" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item1">1. Почему правильная подготовка важна?</a>
+            </li>
+            <li>
+              <a href="#diet-1-day" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item2">2. Рекомендации за 1 день до обследования</a>
+            </li>
+            <li>
+              <a href="#day-of-exam" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item3">3. Что делать в день гастроскопии?</a>
+            </li>
+            <li>
+              <a href="#medication" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item4">4. Если вы постоянно принимаете лекарства</a>
+            </li>
+            <li>
+              <a href="#sedation" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item5">5. Если гастроскопия под седацией (во сне)</a>
+            </li>
+            <li>
+              <a href="#before-exam" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item6">6. Что взять с собой и как одеться?</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section 1: Why Important -->
+        <div id="why-important" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.why.title">1. Почему правильная подготовка важна?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.gastro.why.p1"><strong>Гастроскопия (ВГДС)</strong> — это точный метод обследования пищевода, желудка и двенадцатиперстной кишки. Чтобы врач смог детально осмотреть слизистую оболочку, выявить даже мелкие воспаления, язвы, полипы или ранние формы рака, желудок должен быть абсолютно пустым.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.gastro.why.p2">Даже небольшое количество пищи или жидкости в желудке может значительно ухудшить обзор слизистой оболочки, увеличить риск возникновения рвотного рефлекса во время процедуры и усложнить точную диагностику.</p>
+        </div>
+
+        <!-- Section 2: 1 Day Before -->
+        <div id="diet-1-day" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.diet1.title">2. Рекомендации за 1 день до обследования</h3>
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.diet1.li1">Питайтесь в обычном режиме, но избегайте переедания и тяжелой пищи.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.diet1.li2">Последний легкий прием пищи — не позднее <strong>19:00–20:00</strong> (если исследование запланировано на утро).</li>
+              <li style="color: #ef4444; font-weight: 500;" data-i18n="service.gastro.diet1.li3">Категорически не употребляйте алкоголь накануне процедуры.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 3: Day of Exam -->
+        <div id="day-of-exam" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.day.title">3. Что делать в день гастроскопии?</h3>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-width: 0;">
+            <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px;">
+              <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--color-primary-light); font-weight: 600;" data-i18n="service.gastro.day.morning_title">Если обследование утром:</h4>
+              <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                <li style="margin-bottom: 8px;" data-i18n="service.gastro.day.morning_li1">Не ешьте как минимум <strong>6–8 часов</strong> до процедуры.</li>
+                <li style="margin-bottom: 8px;" data-i18n="service.gastro.day.morning_li2">Не пейте молоко, кофе, соки или газированные напитки.</li>
+                <li data-i18n="service.gastro.day.morning_li3">Чистую негазированную воду можно пить небольшими глотками не позднее чем за <strong>2 часа</strong> до начала процедуры.</li>
+              </ul>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
+              <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--color-text-light); font-weight: 600;" data-i18n="service.gastro.day.afternoon_title">Если гастроскопия после обеда:</h4>
+              <p style="margin: 0;" data-i18n="service.gastro.day.afternoon_p">Разрешается легкий завтрак не позднее чем за <strong>6–8 часов</strong> до обследования. Любой дальнейший прием пищи после этого строго запрещен.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Medications -->
+        <div id="medication" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.med.title">4. Если вы постоянно принимаете лекарства</h3>
+          <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.med.li1">Препараты от артериального давления и большинства сердечных заболеваний можно принять утром в обычном режиме, запив минимальным количеством чистой воды.</li>
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.med.li2">Если вы принимаете инсулин, сахароснижающие препараты или средства, разжижающие кровь (антикоагулянты), обязательно сообщите об этом врачу заранее.</li>
+            <li style="font-weight: 500;" data-i18n="service.gastro.med.li3">Может потребоваться временная коррекция схемы приема или отмена некоторых лекарств по согласованию с врачом.</li>
+          </ul>
+        </div>
+
+        <!-- Section 5: Sedation -->
+        <div id="sedation" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.sedation.title">5. Если гастроскопия проводится под седацией (во сне)</h3>
+          <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; padding: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.sedation.li1">Не ешьте как минимум <strong>6–8 часов</strong> до начала процедуры.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.sedation.li2">Не пейте никакой жидкости в течение последних <strong>2 часов</strong> до процедуры.</li>
+              <li style="color: #ef4444; font-weight: 500;" data-i18n="service.gastro.sedation.li3">Внимание! После седации категорически запрещено управлять автомобилем в течение суток. Пожалуйста, заранее позаботьтесь о сопровождении домой.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 6: Before Exam -->
+        <div id="before-exam" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.before.title">6. Что взять с собой и как одеться?</h3>
+          <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li1">Возьмите с собой результаты предыдущих гастроскопий, биопсий и других медицинских обследований (при наличии), чтобы врач мог оценить динамику.</li>
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li2">Если вы носите съемные зубные протезы — их необходимо будет снять непосредственно перед исследованием.</li>
+            <li data-i18n="service.gastro.before.li3">Наденьте удобную, свободную одежду, которая не сдавливает шею, грудную клетку и живот.</li>
+          </ul>
+        </div>
+
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.gastro.btn">Записаться на гастроскопию</a>
         </div>
-      </div>
+</div>
     </div>
   </section>
 

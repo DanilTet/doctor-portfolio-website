@@ -75,21 +75,114 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <div style="font-size: 1.1rem; margin-bottom: 24px;" data-i18n="service.gastro.p1"><strong>Gastroscopy (esophagogastroduodenoscopy or EGD)</strong> — is a highly precise method of visual examination of the esophagus, stomach, and duodenum using a modern flexible endoscope.</div>
-        <p style="margin-bottom: 16px;" data-i18n="service.gastro.p2">This procedure is the "gold standard" in diagnosing gastritis, peptic ulcer disease, reflux, and detecting early stages of oncological diseases of the gastrointestinal tract.</p>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.gastro.h1">Indications for the procedure:</h3>
-        <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
-          <li data-i18n="service.gastro.li1">Pain or discomfort in the upper abdomen.</li>
-          <li data-i18n="service.gastro.li2">Frequent heartburn, sour belching, bitterness in the mouth.</li>
-          <li data-i18n="service.gastro.li3">Sensation of a "lump" when swallowing food.</li>
-          <li data-i18n="service.gastro.li4">Persistent nausea, vomiting, or rapid weight loss.</li>
-        </ul>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.gastro.h2">How to prepare?</h3>
-        <p style="margin-bottom: 16px;" data-i18n="service.gastro.p3">The examination is performed strictly <strong>fasting</strong>. The last meal should be no later than 8–10 hours before the procedure. Clean water (non-carbonated) can be drunk in small amounts at least 3–4 hours before the examination.</p>
+        <!-- Table of Contents / Путівник по питанням -->
+        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.gastro.toc.title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>Preparation &amp; Procedure Guide:</h3>
+          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
+            <li>
+              <a href="#why-important" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item1">1. Why is proper preparation important?</a>
+            </li>
+            <li>
+              <a href="#diet-1-day" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item2">2. Recommendations 1 day before the exam</a>
+            </li>
+            <li>
+              <a href="#day-of-exam" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item3">3. What to do on the day of gastroscopy?</a>
+            </li>
+            <li>
+              <a href="#medication" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item4">4. If you constantly take medications</a>
+            </li>
+            <li>
+              <a href="#sedation" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item5">5. If gastroscopy is under sedation (medical sleep)</a>
+            </li>
+            <li>
+              <a href="#before-exam" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item6">6. What to bring and how to dress?</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section 1: Why Important -->
+        <div id="why-important" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.why.title">1. Why is proper preparation important?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.gastro.why.p1"><strong>Gastroscopy (EGD)</strong> is a precise method of examining the esophagus, stomach, and duodenum. For the doctor to perform a detailed inspection of the mucous membrane, and detect even tiny inflammations, ulcers, polyps, or early cancer, the stomach must be completely empty.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.gastro.why.p2">Even a small amount of food or fluid in the stomach can significantly impair the visibility of the mucous membrane, increase the risk of vomiting reflex during the procedure, and complicate accurate diagnosis.</p>
+        </div>
+
+        <!-- Section 2: 1 Day Before -->
+        <div id="diet-1-day" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.diet1.title">2. Recommendations 1 day before the exam</h3>
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.diet1.li1">Eat as usual, but avoid overeating and heavy foods.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.diet1.li2">Last light meal — no later than <strong>19:00–20:00</strong> (if the procedure is scheduled for the morning).</li>
+              <li style="color: #ef4444; font-weight: 500;" data-i18n="service.gastro.diet1.li3">Do not consume alcohol under any circumstances the night before the procedure.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 3: Day of Exam -->
+        <div id="day-of-exam" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.day.title">3. What to do on the day of gastroscopy?</h3>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-width: 0;">
+            <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px;">
+              <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--color-primary-light); font-weight: 600;" data-i18n="service.gastro.day.morning_title">If the procedure is in the morning:</h4>
+              <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                <li style="margin-bottom: 8px;" data-i18n="service.gastro.day.morning_li1">Do not eat for at least <strong>6–8 hours</strong> before the procedure.</li>
+                <li style="margin-bottom: 8px;" data-i18n="service.gastro.day.morning_li2">Do not drink milk, coffee, juices, or carbonated beverages.</li>
+                <li data-i18n="service.gastro.day.morning_li3">Clean non-carbonated water can be drunk in small sips no later than <strong>2 hours</strong> before the procedure.</li>
+              </ul>
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
+              <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--color-text-light); font-weight: 600;" data-i18n="service.gastro.day.afternoon_title">If the procedure is in the afternoon:</h4>
+              <p style="margin: 0;" data-i18n="service.gastro.day.afternoon_p">A light breakfast is allowed no later than <strong>6–8 hours</strong> before the examination. Any further food intake after this is strictly forbidden.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Medications -->
+        <div id="medication" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.med.title">4. If you constantly take medications</h3>
+          <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.med.li1">Medications for blood pressure and most heart conditions can be taken in the morning as usual, with a minimal amount of clean water.</li>
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.med.li2">If you take insulin, blood sugar-lowering drugs, or blood thinners (anticoagulants), be sure to inform your doctor in advance.</li>
+            <li style="font-weight: 500;" data-i18n="service.gastro.med.li3">A temporary adjustment of the intake schedule or cancellation of some medications might be needed in agreement with the doctor.</li>
+          </ul>
+        </div>
+
+        <!-- Section 5: Sedation -->
+        <div id="sedation" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.sedation.title">5. If gastroscopy is under sedation (medical sleep)</h3>
+          <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; padding: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.sedation.li1">Do not eat for at least <strong>6–8 hours</strong> before the procedure.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.gastro.sedation.li2">Do not drink any fluids for the last <strong>2 hours</strong> before the procedure.</li>
+              <li style="color: #ef4444; font-weight: 500;" data-i18n="service.gastro.sedation.li3">Warning! After sedation, driving a car is strictly prohibited for 24 hours. Please arrange for someone to accompany you home in advance.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 6: Before Exam -->
+        <div id="before-exam" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.before.title">6. What to bring and how to dress?</h3>
+          <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li1">Bring the results of previous gastroscopies, biopsies, and other medical examinations (if available) so the doctor can assess the dynamics.</li>
+            <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li2">If you wear removable dentures, they must be removed immediately before the examination.</li>
+            <li data-i18n="service.gastro.before.li3">Wear comfortable, loose clothing that does not compress the neck, chest, or abdomen.</li>
+          </ul>
+        </div>
+
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.gastro.btn">Book a Gastroscopy</a>
         </div>
-      </div>
+</div>
     </div>
   </section>
 
