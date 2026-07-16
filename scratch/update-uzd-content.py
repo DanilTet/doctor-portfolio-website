@@ -1,83 +1,6 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Ультразвукова діагностика (УЗД) внутрішніх органів. Переваги та рекомендації лікаря Тетерніка Олега Олександровича.">
-  <meta name="keywords" content="УЗД, ультразвукова діагностика, УЗД черевної порожнини, Тетернік Олег, Харків">
-  <meta name="author" content="Тетернік О.О.">
+import re
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="УЗД (ультразвукова діагностика) | Лікар Тетернік О.О.">
-  <meta property="og:description" content="Дізнайтеся все про процедуру УЗД: показання, безпека та підготовка до дослідження внутрішніх органів.">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="uk_UA">
-  
-  <title data-i18n="service.uzd.meta.title">УЗД (ультразвукова діагностика) | Лікар Тетернік О.О.</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236366f1%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M22 12h-4l-3 9L9 3l-3 9H2%22/></svg>">
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/animations.css">
-  <link rel="stylesheet" href="/css/blog.css">
-</head>
-<body>
-
-  <!-- ============================================================
-       HEADER / NAVIGATION
-       ============================================================ -->
-  <header class="header" id="header">
-    <div class="container header__inner">
-      <a href="/" class="header__logo" aria-label="На головну">
-        <span class="header__logo-text"><span data-i18n="logo.main">Ендоскопія</span> <span data-i18n="logo.accent">простими словами</span></span>
-      </a>
-      <nav class="nav" id="nav" aria-label="Головне меню">
-        <ul class="nav__list">
-          <li><a href="/#about" class="nav__link" data-i18n="nav.about">Про лікаря</a></li>
-          <li><a href="/#blog" class="nav__link" data-i18n="nav.blog">Блог</a></li>
-          <li><a href="/#topics" class="nav__link" data-i18n="nav.topics">Теми</a></li>
-          <li><a href="/#diplomas" class="nav__link" data-i18n="nav.diplomas">Дипломи</a></li>
-          <li><a href="/#reviews" class="nav__link" data-i18n="nav.reviews">Відгуки</a></li>
-          <li><a href="/#contacts" class="nav__link" data-i18n="nav.contacts">Контакти</a></li>
-        </ul>
-        <div class="header__actions">
-          <div class="lang-switch">
-            <a href="/uzd/" class="lang-switch__btn active">UA</a>
-            <a href="/ru/uzd/" class="lang-switch__btn">RU</a>
-            <a href="/en/uzd/" class="lang-switch__btn">EN</a>
-          </div>
-          <a href="/#appointment-section" class="btn btn--primary header__cta open-booking-modal" data-i18n="nav.appointment">Запис на прийом</a>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- ============================================================
-       HERO SECTION
-       ============================================================ -->
-  <section class="section" style="padding-top: 140px; padding-bottom: 60px; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
-    <div class="container">
-      <a href="/" class="btn btn--ghost" style="margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        <span data-i18n="service.back">Назад на головну</span>
-      </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">УЗД (Ультразвукова діагностика)</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.uzd.subtitle">Безпечний, безболісний та точний метод оцінки внутрішніх органів.</p>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       CONTENT SECTION
-       ============================================================ -->
-  <section class="section" style="padding: 60px 0;">
-    <div class="container">
-      <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <!-- Table of Contents / Путівник по питанням -->
+new_content_html = """        <!-- Table of Contents / Путівник по питанням -->
         <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
           <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.uzd.toc.title">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -186,98 +109,20 @@
 
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.uzd.btn">Записатися на УЗД</a>
-        </div>
-</div>
-    </div>
-  </section>
+        </div>"""
 
-  <!-- ============================================================
-       FOOTER
-       ============================================================ -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <p class="footer__copy" data-i18n="footer.copy">© 2026 Тетернік О.О. Всі права захищені.</p>
-    </div>
-  </footer>
+with open('uzd.html', 'r', encoding='utf-8') as f:
+    orig_html = f.read()
 
+card_pattern = r'(<div class="card"[^>]*>)(.*?)(</div>\s*</div>\s*</section>)'
 
-  <!-- ============================================================
-       APPOINTMENT BOOKING MODAL (Telegram + Main Form Link)
-       ============================================================ -->
-  <div class="modal" id="appointment-modal" aria-hidden="true" role="dialog">
-    <div class="modal__overlay" data-modal-close></div>
-    <div class="modal__window modal__window--form" style="max-width: 480px;">
-      <button class="modal__close" data-modal-close aria-label="Close modal">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-
-      <div class="modal__header" style="text-align: center; margin-bottom: 24px;">
-        <h3 class="modal__title" data-i18n="appointment.modal.title">Запис на прийом</h3>
-        <p class="modal__subtitle" data-i18n="appointment.modal.subtitle" style="margin-top: 8px;">Оберіть зручний для вас спосіб запису</p>
-      </div>
-
-      <div class="modal__body" style="display: flex; flex-direction: column; gap: 16px;">
-        <!-- Option 1: Telegram Bot -->
-        <a href="https://t.me/AppointmentEndoscopyBot" class="btn btn--primary" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-          <span data-i18n="appointment.tg.btn">Записатися через Telegram-бот</span>
-        </a>
-
-        <!-- Option 2: Website Form Redirect -->
-        <a href="/#appointment-section" class="btn btn--outline" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span data-i18n="appointment.form.btn_redirect">Заповнити форму на сайті</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Header scrolled state
-      const header = document.getElementById('header');
-      function checkScroll() {
-        if (window.scrollY > 20) {
-          header.classList.add('header--scrolled');
-        } else {
-          header.classList.remove('header--scrolled');
-        }
-      }
-      window.addEventListener('scroll', checkScroll);
-      checkScroll();
-
-      // Modal open/close logic
-      const modal = document.getElementById('appointment-modal');
-      const openBtns = document.querySelectorAll('.open-booking-modal');
-      const closeBtns = document.querySelectorAll('[data-modal-close]');
-
-      openBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          modal.classList.add('modal--active');
-          modal.setAttribute('aria-hidden', 'false');
-        });
-      });
-
-      closeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          modal.classList.remove('modal--active');
-          modal.setAttribute('aria-hidden', 'true');
-        });
-      });
-    });
-  </script>
-</body>
-</html>
-
+content_to_replace = re.search(card_pattern, orig_html, re.DOTALL)
+if content_to_replace:
+    orig_card_open = content_to_replace.group(1)
+    orig_card_close = content_to_replace.group(3)
+    modified_html = orig_html.replace(content_to_replace.group(0), f"{orig_card_open}\n{new_content_html}\n{orig_card_close}")
+    with open('uzd.html', 'w', encoding='utf-8') as f:
+        f.write(modified_html)
+    print("uzd.html content updated successfully.")
+else:
+    print("Could not find the card content to replace in uzd.html.")

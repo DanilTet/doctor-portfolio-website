@@ -75,21 +75,93 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <div style="font-size: 1.1rem; margin-bottom: 24px;" data-i18n="service.uzd.p1"><strong>Ультразвуковая диагностика (УЗИ)</strong> — это быстрый, доступный и полностью безопасный метод медицинского обследования, использующий высокочастотные звуковые волны для получения изображений внутренних органов в реальном времени.</div>
-        <p style="margin-bottom: 16px;" data-i18n="service.uzd.p2">Благодаря отсутствию радиационного излучения, процедуру можно проводить многократно для отслеживания динамики лечения. Она позволяет оценить размеры, структуру и кровообращение в исследуемых органах.</p>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.uzd.h1">Что можно обследовать:</h3>
-        <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
-          <li data-i18n="service.uzd.li1">Органы брюшной полости (печень, желчный пузырь, поджелудочная железа, селезенка).</li>
-          <li data-i18n="service.uzd.li2">Почки и органы мочевыделительной системы.</li>
-          <li data-i18n="service.uzd.li3">Щитовидную железу.</li>
-          <li data-i18n="service.uzd.li4">Мягкие ткани и лимфатические узлы.</li>
-        </ul>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.uzd.h2">Как подготовиться?</h3>
-        <p style="margin-bottom: 16px;" data-i18n="service.uzd.p3">Для УЗИ брюшной полости рекомендуется за 2-3 дня исключить из рациона газообразующие продукты (бобовые, капусту, черный хлеб, газированные напитки) и проходить обследование натощак. Для других видов УЗИ специальная подготовка обычно не требуется.</p>
+        <!-- Table of Contents / Путівник по питанням -->
+        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.uzd.toc.title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>Путеводитель по вопросам подготовки и проведения:</h3>
+          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
+            <li>
+              <a href="#about-uzd" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item1">1. Что такое УЗИ и как оно работает?</a>
+            </li>
+            <li>
+              <a href="#organs" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item2">2. Какие органы можно обследовать с помощью УЗИ?</a>
+            </li>
+            <li>
+              <a href="#prep-abdominal" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item3">3. Как правильно подготовиться к УЗИ брюшной полости?</a>
+            </li>
+            <li>
+              <a href="#prep-urinary" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item4">4. Подготовка к УЗИ почек и мочевого пузыря</a>
+            </li>
+            <li>
+              <a href="#advantages" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item5">5. Какие преимущества УЗИ и когда оно необходимо?</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section 1: About -->
+        <div id="about-uzd" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.about.title">1. Что такое УЗИ и как оно работает?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.about.p1"><strong>Ультразвуковая диагностика (УЗИ)</strong> — это неинвазивный, быстрый и полностью безопасный метод исследования. Он основан на использовании высокочастотных звуковых волн, которые отражаются от тканей организма и формируют четкое изображение внутренних органов на экране сканера в реальном времени.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.about.p2">Поскольку УЗИ не использует ионизирующее (рентгеновское) излучение, оно абсолютно безвредно. Обследование можно проводить многократно пациентам любого возраста, в том числе детям и беременным женщинам, для оценки формы, размеров, структуры органов и кровотока в них.</p>
+        </div>
+
+        <!-- Section 2: Organs -->
+        <div id="organs" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.organs.title">2. Какие органы можно обследовать с помощью УЗИ?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.organs.p1">УЗИ позволяет выявить воспаления, новообразования, камни в желчном пузыре или почках на ранних этапах:</p>
+          <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 8px;" data-i18n="service.uzd.organs.li1"><strong>Органы брюшной полости:</strong> детальный осмотр печени, желчного пузыря, поджелудочной железы и селезенки.</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.uzd.organs.li2"><strong>Мочевыделительная система:</strong> почки, надпочечники, мочевой пузырь.</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.uzd.organs.li3"><strong>Эндокринная система:</strong> щитовидная железа.</li>
+            <li data-i18n="service.uzd.organs.li4"><strong>Мягкие ткани и лимфоузлы:</strong> диагностика поверхностных структур и периферических лимфатических узлов.</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: Abdominal Prep -->
+        <div id="prep-abdominal" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.prep_ab.title">3. Как правильно подготовиться к УЗИ брюшной полости?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.prep_ab.p1">Качество обследования брюшной полости зависит от количества газов в кишечнике (газ создает помехи для ультразвука). Поэтому подготовка крайне важна:</p>
+          
+          <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ab.li1"><strong>За 2-3 дня до исследования:</strong> исключите продукты, усиливающие газообразование (бобовые, свежие овощи и фрукты, капусту, черный хлеб, молоко, сладкие газированные напитки).</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ab.li2">При склонности к метеоризму по рекомендации врача в течение этих дней можно принимать ветрогонные препараты (например, симетикон / эспумизан).</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ab.li3"><strong>В день исследования:</strong> процедура проводится строго <strong>натощак</strong> (последний прием пищи — минимум за 6–8 часов). Перед процедурой не следует курить и жевать резинку.</li>
+              <li data-i18n="service.uzd.prep_ab.li4">Если обследование назначено на вторую половину дня, возможен легкий завтрак не позднее чем за 6 часов до процедуры, после чего есть запрещено.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 4: Urinary Prep -->
+        <div id="prep-urinary" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.prep_ur.title">4. Подготовка к УЗИ почек и мочевого пузыря</h3>
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
+            <p style="margin-top: 0; margin-bottom: 16px;" data-i18n="service.uzd.prep_ur.p1">Для качественного осмотра стенок мочевого пузыря и прилегающих структур он должен быть хорошо заполнен:</p>
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ur.li1">Примерно за 1–1.5 часа до запланированного исследования выпейте 1 литр чистой негазированной воды или компота (без газа).</li>
+              <li data-i18n="service.uzd.prep_ur.li2">После этого не следует посещать туалет до завершения процедуры обследования.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 5: Advantages -->
+        <div id="advantages" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.adv.title">5. Какие преимущества УЗИ и когда оно необходимо?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.adv.p1">УЗИ является первичным инструментом скрининга благодаря скорости выполнения и высокой информативности. Врачи назначают его при болях в животе, нарушениях пищеварения, дискомфорте при мочеиспускании, появлении припухлостей в мягких тканях или отклонениях в лабораторных анализах.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.adv.p2">Исследование позволяет быстро установить предварительный диагноз и определить дальнейшую тактику обследования или терапии, не заставляя пациента ждать.</p>
+        </div>
+
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.uzd.btn">Записаться на УЗИ</a>
         </div>
-      </div>
+</div>
     </div>
   </section>
 

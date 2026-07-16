@@ -75,21 +75,89 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <div style="font-size: 1.1rem; margin-bottom: 24px;" data-i18n="service.surgery.p1"><strong>Малоинвазивная и оперативная хирургия</strong> — это современный подход к проведению операций с минимальным повреждением тканей организма пациента, что значительно сокращает время восстановления и снижает риск осложнений.</div>
-        <p style="margin-bottom: 16px;" data-i18n="service.surgery.p2">Благодаря сочетанию хирургических и эндоскопических техник (оперативная эндоскопия), многие процедуры, ранее требовавшие больших разрезов и длительной госпитализации, сейчас выполняются через естественные отверстия или небольшие проколы под визуальным контролем.</p>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.surgery.h1">Виды вмешательств:</h3>
-        <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
-          <li data-i18n="service.surgery.li1">Эндоскопическая полипэктомия желудка, двенадцатиперстной кишки и толстого кишечника.</li>
-          <li data-i18n="service.surgery.li2">Эндоскопическая остановка желудочно-кишечных кровотечений.</li>
-          <li data-i18n="service.surgery.li3">Удаление инородных тел из ЖКТ.</li>
-          <li data-i18n="service.surgery.li4">Амбулаторные хирургические вмешательства и малоинвазивное лечение.</li>
-        </ul>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.surgery.h2">Преимущества для пациента:</h3>
-        <p style="margin-bottom: 16px;" data-i18n="service.surgery.p3">Малоинвазивные операции обладают низким болевым синдромом, отличным косметическим эффектом (отсутствие рубцов) и позволяют пациенту вернуться к полноценной жизни уже через несколько дней после процедуры.</p>
+        <!-- Table of Contents / Путівник по питанням -->
+        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.surgery.toc.title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>Путеводитель по вопросам подготовки и проведения:</h3>
+          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
+            <li>
+              <a href="#about-surgery" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item1">1. Что такое оперативная эндоскопия?</a>
+            </li>
+            <li>
+              <a href="#operations" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item2">2. Какие операции выполняются эндоскопически?</a>
+            </li>
+            <li>
+              <a href="#polypectomy" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item3">3. Как проходит удаление полипов (полипэктомия)?</a>
+            </li>
+            <li>
+              <a href="#prep-surgery" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item4">4. Как подготовиться к эндоскопической операции?</a>
+            </li>
+            <li>
+              <a href="#recovery" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item5">5. Преимущества и период восстановления</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section 1: About -->
+        <div id="about-surgery" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.about.title">1. Что такое оперативная эндоскопия?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.about.p1"><strong>Оперативная эндоскопия</strong> — это передовое направление малоинвазивной хирургии. Оно позволяет выполнять полноценные хирургические вмешательства внутри полых органов (пищевода, желудка, кишечника) через естественные пути с помощью гибких эндоскопов и специальных микроинструментов.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.about.p2">Главное отличие от классической хирургии — полное отсутствие разрезов на коже (брюшной стенки). Врач контролирует весь процесс на экране монитора с многократным оптическим увеличением, что гарантирует высокую точность и безопасность вмешательства.</p>
+        </div>
+
+        <!-- Section 2: Operations -->
+        <div id="operations" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.ops.title">2. Какие операции выполняются эндоскопически?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.ops.p1">В современной эндоскопической практике выполняется широкий спектр лечебных процедур:</p>
+          <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 8px;" data-i18n="service.surgery.ops.li1"><strong>Полипэктомия:</strong> удаление доброкачественных образований (полипов) в желудке, двенадцатиперстной и толстой кишке для профилактики онкологии.</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.surgery.ops.li2"><strong>Остановка кровотечений:</strong> коагуляция сосудов или клипирование при острых желудочно-кишечных кровотечениях (например, при язве).</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.surgery.ops.li3"><strong>Удаление инородных тел:</strong> безопасное извлечение предметов, случайно попавших в пищевод или желудок.</li>
+            <li data-i18n="service.surgery.ops.li4"><strong>Бужирование и расширение:</strong> восстановление проходимости суженных участков пищевода.</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: Polypectomy -->
+        <div id="polypectomy" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.poly.title">3. Как проходит удаление полипов (полипэктомия)?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.poly.p1">Удаление полипов выполняется безболезненно во время диагностического осмотра (гастроскопии или колоноскопии) в состоянии <strong>медикаментозного сна (седации)</strong>.</p>
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px; margin-bottom: 16px;">
+            <p style="margin: 0;" data-i18n="service.surgery.poly.p2">На ножку полипа набрасывается специальная металлическая петля, через которую пропускается ток высокой частоты. Полип срезается, а сосуд в его основании сразу коагулируется (прижигается), что предотвращает кровотечение. Все удаленные ткани обязательно направляются на <strong>гистологическое исследование</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Section 4: Prep -->
+        <div id="prep-surgery" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.prep.title">4. Как подготовиться к эндоскопической операции?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.prep.p1">Подготовка зависит от того, на каком органе будет выполняться операция, и осуществляется по тем же правилам, что и для диагностического осмотра:</p>
+          <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.surgery.prep.li1"><strong>Желудок (ВГДС-операции):</strong> строго натощак (не есть 6-8 часов, не пить жидкости за 2 часа до седации).</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.surgery.prep.li2"><strong>Толстый кишечник (КС-операции):</strong> соблюдение бесшлаковой диеты в течение 3 дней и полное очищение препаратом Изиклин по схеме.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.surgery.prep.li3"><strong>Анализы:</strong> перед плановым хирургическим вмешательством необходимо сдать стандартный перечень анализов крови (клинический, коагулограмму, группу крови) и сделать ЭКГ.</li>
+              <li style="font-weight: 500;" data-i18n="service.surgery.prep.li4"><strong>Лекарства:</strong> если вы постоянно принимаете антикоагулянты (препараты, разжижающие кровь), обязательно обсудите это с хирургом заранее — некоторые из них необходимо временно отменить за несколько дней до операции.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 5: Recovery -->
+        <div id="recovery" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.rec.title">5. Преимущества и период восстановления</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.rec.p1">Малоинвазивный характер операции обеспечивает отсутствие боли в послеоперационном периоде и быструю реабилитацию. Большинство пациентов отпускают домой уже через несколько часов после операции.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.rec.p2">Рекомендуется соблюдать щадящую диету и исключить тяжелые физические нагрузки, горячую ванну и баню в течение 5-7 дней после вмешательства.</p>
+        </div>
+
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.surgery.btn">Получить консультацию хирурга</a>
         </div>
-      </div>
+</div>
     </div>
   </section>
 

@@ -64,8 +64,8 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Back to homepage</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.surgery.title">Surgery and Minimally Invasive Interventions</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.surgery.subtitle">Modern surgical techniques and endoscopic operations without traditional incisions.</p>
+      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.surgery.title">Surgery &amp; Minimally Invasive Interventions</h1>
+      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.surgery.subtitle">Modern surgical techniques and endoscopic procedures without traditional incisions.</p>
     </div>
   </section>
 
@@ -75,21 +75,89 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <div style="font-size: 1.1rem; margin-bottom: 24px;" data-i18n="service.surgery.p1"><strong>Minimally invasive and operative surgery</strong> — is a modern approach to performing operations with minimal damage to the patient's body tissues, which significantly reduces recovery time and lowers the risk of complications.</div>
-        <p style="margin-bottom: 16px;" data-i18n="service.surgery.p2">Thanks to the combination of surgical and endoscopic techniques (operative endoscopy), many procedures that previously required large incisions and long hospitalization are now performed through natural openings or small punctures under visual control.</p>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.surgery.h1">Types of interventions:</h3>
-        <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
-          <li data-i18n="service.surgery.li1">Endoscopic polypectomy of the stomach, duodenum, and large intestine.</li>
-          <li data-i18n="service.surgery.li2">Endoscopic control of gastrointestinal bleeding.</li>
-          <li data-i18n="service.surgery.li3">Removal of foreign bodies from the GI tract.</li>
-          <li data-i18n="service.surgery.li4">Outpatient surgical interventions and minimally invasive treatment.</li>
-        </ul>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.surgery.h2">Advantages for the patient:</h3>
-        <p style="margin-bottom: 16px;" data-i18n="service.surgery.p3">Minimally invasive surgeries have low pain levels, excellent cosmetic results (no scars), and allow the patient to return to full life within a few days after the procedure.</p>
-        <div style="margin-top: 40px; text-align: center;">
-          <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.surgery.btn">Get a Consultation with a Surgeon</a>
+        <!-- Table of Contents / Путівник по питанням -->
+        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.surgery.toc.title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>Preparation &amp; Procedure Guide:</h3>
+          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
+            <li>
+              <a href="#about-surgery" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item1">1. What is operative endoscopy?</a>
+            </li>
+            <li>
+              <a href="#operations" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item2">2. What operations are performed endoscopically?</a>
+            </li>
+            <li>
+              <a href="#polypectomy" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item3">3. How is polyp removal (polypectomy) performed?</a>
+            </li>
+            <li>
+              <a href="#prep-surgery" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item4">4. How to prepare for an endoscopic surgery?</a>
+            </li>
+            <li>
+              <a href="#recovery" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.surgery.toc.item5">5. Advantages and recovery period</a>
+            </li>
+          </ul>
         </div>
-      </div>
+
+        <!-- Section 1: About -->
+        <div id="about-surgery" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.about.title">1. What is operative endoscopy?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.about.p1"><strong>Operative Endoscopy</strong> is an advanced field of minimally invasive surgery. It allows full surgical interventions inside hollow organs (esophagus, stomach, intestines) through natural pathways using flexible endoscopes and special micro-instruments.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.about.p2">The main difference from classic surgery is the complete absence of incisions on the skin (abdominal wall). The doctor controls the entire process on the monitor screen with multiple optical magnification, which guarantees high precision and safety of the intervention.</p>
+        </div>
+
+        <!-- Section 2: Operations -->
+        <div id="operations" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.ops.title">2. What operations are performed endoscopically?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.ops.p1">In modern endoscopic practice, a wide range of therapeutic procedures is performed:</p>
+          <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 8px;" data-i18n="service.surgery.ops.li1"><strong>Polypectomy:</strong> removal of benign formations (polyps) in the stomach, duodenum, and colon for cancer prevention.</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.surgery.ops.li2"><strong>Hemostasis:</strong> coagulation of blood vessels or clipping in acute gastrointestinal bleeding (e.g., with ulcers).</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.surgery.ops.li3"><strong>Removal of foreign bodies:</strong> safe extraction of objects accidentally ingested into the esophagus or stomach.</li>
+            <li data-i18n="service.surgery.ops.li4"><strong>Dilation and bougienage:</strong> restoring patency of narrowed sections of the esophagus.</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: Polypectomy -->
+        <div id="polypectomy" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.poly.title">3. How is polyp removal (polypectomy) performed?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.poly.p1">Polyp removal is performed painlessly during diagnostic examination (gastroscopy or colonoscopy) under <strong>sedation (medical sleep)</strong>.</p>
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px; margin-bottom: 16px;">
+            <p style="margin: 0;" data-i18n="service.surgery.poly.p2">A special metal snare is placed over the polyp stalk, through which a high-frequency current is passed. The polyp is cut off, and the vessel at its base is immediately coagulated (cauterized), which prevents bleeding. All removed tissues must be sent for <strong>histological examination</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Section 4: Prep -->
+        <div id="prep-surgery" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.prep.title">4. How to prepare for an endoscopic surgery?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.prep.p1">Preparation depends on the organ being operated on and is carried out according to the same rules as for diagnostic examination:</p>
+          <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.surgery.prep.li1"><strong>Stomach (EGD procedures):</strong> strictly fasting (no food for 6-8 hours, no fluids 2 hours before sedation).</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.surgery.prep.li2"><strong>Large intestine (CS procedures):</strong> low-residue diet for 3 days and complete cleansing with Eziclen according to the schedule.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.surgery.prep.li3"><strong>Tests:</strong> before a planned surgical intervention, it is necessary to pass a standard list of blood tests (complete blood count, coagulogram, blood type) and do an ECG.</li>
+              <li style="font-weight: 500;" data-i18n="service.surgery.prep.li4"><strong>Medications:</strong> if you constantly take anticoagulants (blood thinners), be sure to discuss this with the surgeon in advance — some of them must be temporarily stopped a few days before the surgery.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 5: Recovery -->
+        <div id="recovery" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.surgery.rec.title">5. Advantages and recovery period</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.rec.p1">The minimally invasive nature of the operation ensures no pain in the postoperative period and rapid rehabilitation. Most patients are discharged home within a few hours after the procedure.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.surgery.rec.p2">It is recommended to follow a gentle diet and exclude heavy physical exertion, hot baths, and saunas for 5-7 days after the intervention.</p>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center;">
+          <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.surgery.btn">Get consultation from surgeon</a>
+        </div>
+</div>
     </div>
   </section>
 

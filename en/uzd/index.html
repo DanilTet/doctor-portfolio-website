@@ -64,7 +64,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Back to homepage</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">Ultrasound (Ultrasound Diagnostics)</h1>
+      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">Ultrasound Diagnostics (USG)</h1>
       <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.uzd.subtitle">Safe, painless, and accurate method of evaluating internal organs.</p>
     </div>
   </section>
@@ -75,21 +75,93 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <div style="font-size: 1.1rem; margin-bottom: 24px;" data-i18n="service.uzd.p1"><strong>Ultrasound Diagnostics (USG)</strong> — is a fast, accessible, and completely safe medical examination method that uses high-frequency sound waves to obtain real-time images of internal organs.</div>
-        <p style="margin-bottom: 16px;" data-i18n="service.uzd.p2">Due to the lack of radiation exposure, the procedure can be performed repeatedly to track treatment dynamics. It allows evaluating the size, structure, and blood circulation in the organs being examined.</p>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.uzd.h1">What can be examined:</h3>
-        <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
-          <li data-i18n="service.uzd.li1">Abdominal cavity organs (liver, gallbladder, pancreas, spleen).</li>
-          <li data-i18n="service.uzd.li2">Kidneys and urinary tract organs.</li>
-          <li data-i18n="service.uzd.li3">Thyroid gland.</li>
-          <li data-i18n="service.uzd.li4">Soft tissues and lymph nodes.</li>
-        </ul>
-        <h3 style="margin-top: 32px; margin-bottom: 16px; font-weight: 600;" data-i18n="service.uzd.h2">How to prepare?</h3>
-        <p style="margin-bottom: 16px;" data-i18n="service.uzd.p3">For abdominal ultrasound, it is recommended to exclude gas-producing foods (beans, cabbage, black bread, carbonated drinks) from the diet 2-3 days prior and undergo the examination fasting. For other types of ultrasound, special preparation is usually not required.</p>
+        <!-- Table of Contents / Путівник по питанням -->
+        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.uzd.toc.title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>Preparation &amp; Procedure Guide:</h3>
+          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
+            <li>
+              <a href="#about-uzd" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item1">1. What is ultrasound and how does it work?</a>
+            </li>
+            <li>
+              <a href="#organs" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item2">2. What organs can be examined with ultrasound?</a>
+            </li>
+            <li>
+              <a href="#prep-abdominal" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item3">3. How to properly prepare for an abdominal ultrasound?</a>
+            </li>
+            <li>
+              <a href="#prep-urinary" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item4">4. Preparation for kidney and bladder ultrasound</a>
+            </li>
+            <li>
+              <a href="#advantages" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.uzd.toc.item5">5. What are the benefits of ultrasound and when is it needed?</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section 1: About -->
+        <div id="about-uzd" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.about.title">1. What is ultrasound and how does it work?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.about.p1"><strong>Ultrasound Diagnostics (USG)</strong> is a non-invasive, quick, and completely safe examination method. It is based on the use of high-frequency sound waves that reflect from body tissues and form a clear image of internal organs on the scanner screen in real time.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.about.p2">Since ultrasound does not use ionizing (X-ray) radiation, it is absolutely harmless. The examination can be performed multiple times on patients of any age, including children and pregnant women, to assess the shape, size, structure of organs, and blood flow in them.</p>
+        </div>
+
+        <!-- Section 2: Organs -->
+        <div id="organs" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.organs.title">2. What organs can be examined with ultrasound?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.organs.p1">Ultrasound allows detecting inflammation, tumors, stones in the gallbladder or kidneys at early stages:</p>
+          <ul style="margin-bottom: 24px; padding-left: 20px; list-style-type: disc;">
+            <li style="margin-bottom: 8px;" data-i18n="service.uzd.organs.li1"><strong>Abdominal organs:</strong> detailed view of liver, gallbladder, pancreas, and spleen.</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.uzd.organs.li2"><strong>Urinary system:</strong> kidneys, adrenal glands, urinary bladder.</li>
+            <li style="margin-bottom: 8px;" data-i18n="service.uzd.organs.li3"><strong>Endocrine system:</strong> thyroid gland.</li>
+            <li data-i18n="service.uzd.organs.li4"><strong>Soft tissues and lymph nodes:</strong> diagnostics of superficial structures and peripheral lymph nodes.</li>
+          </ul>
+        </div>
+
+        <!-- Section 3: Abdominal Prep -->
+        <div id="prep-abdominal" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.prep_ab.title">3. How to properly prepare for an abdominal ultrasound?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.prep_ab.p1">The quality of the abdominal examination depends on the amount of gas in the bowel (gas interferes with ultrasound). Therefore, preparation is extremely important:</p>
+          
+          <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ab.li1"><strong>2-3 days before the examination:</strong> exclude foods that increase gas production (legumes, fresh vegetables and fruits, cabbage, black bread, milk, sweet carbonated drinks).</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ab.li2">If prone to flatulence, carminative drugs (e.g., simethicone / espumisan) can be taken during these days upon doctor's recommendation.</li>
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ab.li3"><strong>On the day of the examination:</strong> the procedure is performed strictly <strong>fasting</strong> (last meal — at least 6–8 hours). Do not smoke or chew gum before the procedure.</li>
+              <li data-i18n="service.uzd.prep_ab.li4">If the examination is scheduled for the afternoon, a light breakfast is allowed no later than 6 hours before the procedure, after which eating is forbidden.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 4: Urinary Prep -->
+        <div id="prep-urinary" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.prep_ur.title">4. Preparation for kidney and bladder ultrasound</h3>
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
+            <p style="margin-top: 0; margin-bottom: 16px;" data-i18n="service.uzd.prep_ur.p1">For a high-quality view of the bladder walls and adjacent structures, it must be well filled:</p>
+            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+              <li style="margin-bottom: 10px;" data-i18n="service.uzd.prep_ur.li1">Approximately 1–1.5 hours before the scheduled examination, drink 1 liter of clean non-carbonated water or compote.</li>
+              <li data-i18n="service.uzd.prep_ur.li2">After that, do not visit the restroom until the examination procedure is completed.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 5: Advantages -->
+        <div id="advantages" style="scroll-margin-top: 100px; margin-bottom: 40px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.uzd.adv.title">5. What are the benefits of ultrasound and when is it needed?</h3>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.adv.p1">Ultrasound is a primary screening tool due to its speed and high information value. Doctors prescribe it for abdominal pain, digestive disorders, discomfort during urination, swelling in soft tissues, or deviations in laboratory tests.</p>
+          <p style="margin-bottom: 16px;" data-i18n="service.uzd.adv.p2">The examination allows quickly establishing a preliminary diagnosis and determining further tactics of examination or therapy, without making the patient wait.</p>
+        </div>
+
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.uzd.btn">Book an Ultrasound</a>
         </div>
-      </div>
+</div>
     </div>
   </section>
 
