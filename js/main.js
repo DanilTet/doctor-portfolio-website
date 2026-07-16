@@ -1310,20 +1310,8 @@ function initTopicsAccordion() {
 
       const isActive = item.classList.contains('active');
 
-      // Close all other accordions for clean accordion-style behavior
-      accordions.forEach(otherItem => {
-        if (otherItem !== item && otherItem.classList.contains('active')) {
-          otherItem.classList.remove('active');
-          otherItem.setAttribute('aria-expanded', 'false');
-          const otherContent = otherItem.querySelector('.stats__accordion-content');
-          if (otherContent) {
-            otherContent.style.maxHeight = null;
-            otherContent.setAttribute('aria-hidden', 'true');
-          }
-          const otherBtn = otherItem.querySelector('.stats__more-btn');
-          if (otherBtn) otherBtn.textContent = 'Дізнатися більше';
-        }
-      });
+      const tMore = (translations[currentLang] && translations[currentLang]['topics.more']) || 'Дізнатися більше';
+      const tLess = (translations[currentLang] && translations[currentLang]['topics.less']) || 'Згорнути';
 
       // Toggle current item
       if (isActive) {
@@ -1331,13 +1319,13 @@ function initTopicsAccordion() {
         item.setAttribute('aria-expanded', 'false');
         content.style.maxHeight = null;
         content.setAttribute('aria-hidden', 'true');
-        if (moreBtnText) moreBtnText.textContent = 'Дізнатися більше';
+        if (moreBtnText) moreBtnText.textContent = tMore;
       } else {
         item.classList.add('active');
         item.setAttribute('aria-expanded', 'true');
         content.style.maxHeight = content.scrollHeight + 'px';
         content.setAttribute('aria-hidden', 'false');
-        if (moreBtnText) moreBtnText.textContent = 'Згорнути';
+        if (moreBtnText) moreBtnText.textContent = tLess;
       }
     });
 
