@@ -360,7 +360,8 @@
     formData.append('tags', JSON.stringify(tags));
 
     try {
-      const editId = getEl('blog-edit-id').value;
+      const editIdEl = getEl('blog-edit-id');
+      const editId = editIdEl ? editIdEl.value : '';
       const url = editId ? `${API}/posts/${editId}` : `${API}/posts`;
       const method = editId ? 'PUT' : 'POST';
 
@@ -374,8 +375,9 @@
 
       // Reset form
       getEl('blog-post-form').reset();
-      getEl('blog-edit-id').value = '';
-      getEl('blog-modal-title-el').textContent = 'Новый пост';
+      if (editIdEl) editIdEl.value = '';
+      const modalTitleEl = getEl('blog-modal-title-el');
+      if (modalTitleEl) modalTitleEl.textContent = 'Новый пост';
       getEl('blog-image-preview').style.display = 'none';
       hideFieldError('blog-title-error');
       hideFieldError('blog-content-error');
@@ -406,10 +408,14 @@
     const post = window.blogPostsCache.find(p => p.id === id);
     if (!post) return;
 
-    getEl('blog-edit-id').value = id;
-    getEl('blog-title').value = post.title || '';
-    getEl('blog-content').value = post.content || '';
-    getEl('blog-modal-title-el').textContent = 'Редагувати пост';
+    const editIdEl = getEl('blog-edit-id');
+    if (editIdEl) editIdEl.value = id;
+    const titleEl = getEl('blog-title');
+    if (titleEl) titleEl.value = post.title || '';
+    const contentEl = getEl('blog-content');
+    if (contentEl) contentEl.value = post.content || '';
+    const modalTitleEl = getEl('blog-modal-title-el');
+    if (modalTitleEl) modalTitleEl.textContent = 'Редагувати пост';
     getEl('blog-submit-btn').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Зберегти изменения';
 
     // Set tags
