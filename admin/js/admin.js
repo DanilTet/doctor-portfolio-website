@@ -189,6 +189,7 @@ function navigateTo(page) {
     appointments: 'Заявки на прием',
     reviews:      'Модерация отзывов',
     'patient-history': 'Історія пацієнта',
+    backup:       'Резервне копіювання',
   };
   const titleEl = document.getElementById('top-bar-title');
   if (titleEl) titleEl.textContent = titles[page] || page;
@@ -2081,6 +2082,89 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.sidebar')?.classList.remove('open');
     document.querySelector('.sidebar-overlay')?.classList.remove('visible');
   });
+
+  // ── BACKUP HANDLERS ───────────────────────────────────────
+  const btnBackupData = document.getElementById('btn-export-backup-data');
+  if (btnBackupData) {
+    btnBackupData.addEventListener('click', async () => {
+      btnBackupData.disabled = true;
+      const originalText = btnBackupData.innerHTML;
+      btnBackupData.innerHTML = 'Завантаження...';
+      try {
+        // Fetch all appointments
+        const { data: appointments } = await Supabase.get('appointments', '?select=*');
+        // Fetch all reviews
+        const { data: reviews } = await Supabase.get('reviews', '?select=*');
+        // Fetch all blog posts
+        let blogPosts = [];
+        try {
+          const res = await fetch(`/api/blog/posts`);
+          if (res.ok) blogPosts = await res.json();
+        } catch(e) {
+          console.warn('Could not fetch blog posts', e);
+        }
+
+        const backupData = {
+          timestamp: new Date().toISOString(),
+          appointments: appointments || [],
+          reviews: reviews || [],
+          blog_posts: blogPosts
+        };
+
+        const jsonStr = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().split('T')[0];
+        a.download = `doctor_backup_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Помилка під час завантаження даних: ' + err.message);
+      } finally {
+        btnBackupData.disabled = false;
+        btnBackupData.innerHTML = originalText;
+      }
+    });
+  }
+
+  const btnBackupImages = document.getElementById('btn-export-backup-images');
+  if (btnBackupImages) {
+    btnBackupImages.addEventListener('click', () => {
+      btnBackupImages.disabled = true;
+      const originalText = btnBackupImages.innerHTML;
+      btnBackupImages.innerHTML = 'Формування архіву...';
+
+      fetch(`/api/blog/backup-images`, {
+        headers: { 'X-Blog-Secret': sessionStorage.getItem('admin_token') || '' }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Помилка скачування архіву');
+        return res.blob();
+      })
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'doctor_blog_media.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      })
+      .catch(err => {
+        alert(err.message);
+      })
+      .finally(() => {
+        btnBackupImages.disabled = false;
+        btnBackupImages.innerHTML = originalText;
+      });
+    });
+  }
 });
 
 function showApp(email) {
