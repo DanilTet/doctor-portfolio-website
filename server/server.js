@@ -36,7 +36,7 @@ app.use(express.json());
 app.use('/uploads/blog', express.static(UPLOADS_DIR));
 
 // Serve the entire website from project root (index.html, css/, js/, admin/, img/, etc.)
-app.use(express.static(ROOT_DIR));
+app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
 
 /* ── Multer (image upload) ───────────────────────────────── */
 const storage = multer.diskStorage({
