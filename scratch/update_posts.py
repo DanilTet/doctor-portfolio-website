@@ -1,8 +1,9 @@
 import json
 import uuid
 import datetime
+import os
 
-filepath = 'c:/oleg-site/doctor-portfolio-website/server/data/posts.json'
+filepath = os.path.join(os.path.dirname(__file__), '..', 'server', 'data', 'posts.json')
 
 with open(filepath, 'r', encoding='utf-8') as f:
     posts = json.load(f)
@@ -40,9 +41,14 @@ new_posts = [
     }
 ]
 
-posts.extend(new_posts)
+# Ensure we don't add duplicates if ran multiple times
+existing_urls = [p.get('external_url') for p in posts]
+posts_to_add = [p for p in new_posts if p['external_url'] not in existing_urls]
 
-with open(filepath, 'w', encoding='utf-8') as f:
-    json.dump(posts, f, indent=2, ensure_ascii=False)
-
-print("Posts updated successfully.")
+if posts_to_add:
+    posts.extend(posts_to_add)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(posts, f, indent=2, ensure_ascii=False)
+    print(f"Added {len(posts_to_add)} posts successfully.")
+else:
+    print("Posts already exist in the database.")
