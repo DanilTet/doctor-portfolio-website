@@ -41,15 +41,21 @@
 /* ── Reset & Base ────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { height: 100%; }
+html {
+  height: 100%;
+  height: -webkit-fill-available;
+}
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
   height: 100%;
+  height: -webkit-fill-available;
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
+  touch-action: pan-y;
 }
 
 /* ── LOGIN SCREEN ────────────────────────────────────────── */
@@ -212,6 +218,7 @@ body {
 #app {
   display: none;
   height: 100vh;
+  height: 100svh;
   overflow: hidden;
 }
 
@@ -228,9 +235,12 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100svh;
   overflow-y: auto;
-  transition: width var(--transition), transform var(--transition);
   overflow-x: hidden;
+  transition: width var(--transition), transform var(--transition);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .sidebar.collapsed {
@@ -461,7 +471,10 @@ body {
   flex: 1;
   overflow-y: auto;
   height: 100vh;
+  height: 100svh;
   background: var(--bg-base);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .top-bar {
@@ -1083,6 +1096,14 @@ body {
   /* Main scroll fixes */
   .main-content {
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Prevent iOS zoom on input focus — font-size must be >= 16px */
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px;
   }
 
   /* Shrink header padding & height to fit top bar controls */
