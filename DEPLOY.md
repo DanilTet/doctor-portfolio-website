@@ -122,14 +122,25 @@ Nginx виступатиме як «міст» між інтернетом (по
        listen 80;
        server_name yourdomain.com www.yourdomain.com;
 
-       # Головна сторінка сайту (статичні файли)
-       location / {
-           root /var/www/doctor-portfolio-website;
-           index index.html;
-           try_files $uri $uri/ /index.html;
+       # Редиректи .html → чисті URL (301 permanent)
+       rewrite ^/ru\.html$ /ru permanent;
+       rewrite ^/en\.html$ /en permanent;
+
+       # /ru і /en — проксі на Node.js (Express роздає ru.html/en.html за чистим URL)
+       location = /ru {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+       location = /en {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
        }
 
-       # Проксі запитів до API бекенду
+       # API бекенду
        location /api/ {
            proxy_pass http://localhost:3000;
            proxy_http_version 1.1;
@@ -139,11 +150,26 @@ Nginx виступатиме як «міст» між інтернетом (по
            proxy_cache_bypass $http_upgrade;
        }
 
-       # Проксі до адмінки (якщо потрібні запити)
+       # Завантажені зображення блогу
+       location /uploads/ {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Host $host;
+       }
+
+       # Адмінка
        location /admin {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+
+       # Всі інші запити → статика
+       location / {
            root /var/www/doctor-portfolio-website;
            index index.html;
-           try_files $uri $uri/ /admin/index.html;
+           try_files $uri $uri/ /index.html;
        }
    }
    ```
