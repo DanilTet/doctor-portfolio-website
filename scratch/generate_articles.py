@@ -14,9 +14,9 @@ def generate_html(lang, title, meta_desc, h1, subtitle, toc, content, uk_url, ru
     toc_html = f"""
     <div style="background: rgba(43, 217, 185, 0.05); border-left: 4px solid var(--color-primary); padding: 24px; border-radius: 0 8px 8px 0; margin-bottom: 40px;">
         <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--color-primary); font-size: 1.2rem;">{toc_title}</h4>
-        <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.8; list-style-type: decimal;">
             {toc}
-        </ul>
+        </ol>
     </div>
     """
 
