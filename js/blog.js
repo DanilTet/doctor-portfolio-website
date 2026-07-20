@@ -159,8 +159,17 @@
       </div>
     `;
 
-    article.addEventListener('click', () => openModal(post));
-    article.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(post); });
+    article.addEventListener('click', () => {
+      if (post.external_url) window.open(post.external_url, '_blank');
+      else openModal(post);
+    });
+    article.addEventListener('keydown', e => { 
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (post.external_url) window.open(post.external_url, '_blank');
+        else openModal(post);
+      }
+    });
     return article;
   }
 
