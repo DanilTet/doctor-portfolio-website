@@ -35,10 +35,6 @@ app.use(express.json());
 // Serve uploaded blog images
 app.use('/uploads/blog', express.static(UPLOADS_DIR));
 
-// 301 redirects: clean URLs for language pages (no .html extension)
-app.get('/ru.html', (_req, res) => res.redirect(301, '/ru'));
-app.get('/en.html', (_req, res) => res.redirect(301, '/en'));
-
 // Serve the entire website from project root (index.html, css/, js/, admin/, img/, etc.)
 app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
 
