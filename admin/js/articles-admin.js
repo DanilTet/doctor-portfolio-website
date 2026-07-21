@@ -190,8 +190,8 @@
           </button>
           <span class="article-editor-title">${isNew ? '✚ Нова стаття' : '✎ Редагувати статтю'}</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
-            <button id="art-save-draft-btn" class="btn btn--outline btn--sm">💾 Зберегти чернетку</button>
-            <button id="art-publish-btn" class="btn btn--primary btn--sm">🚀 Опублікувати</button>
+            <button id="art-save-draft-btn" class="btn btn--outline btn--sm">${isNew ? '💾 Зберегти чернетку' : '💾 Зберегти як чернетку'}</button>
+            <button id="art-publish-btn" class="btn btn--primary btn--sm">${isNew ? '🚀 Опублікувати статтю' : '💾 Зберегти зміни'}</button>
             ${!isNew ? `<button id="art-translate-btn" class="btn btn--secondary btn--sm" style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">🇷🇺 Перевести на RU</button>` : ''}
           </div>
         </div>
@@ -254,9 +254,11 @@
                 : `<div class="cover-preview-placeholder" id="art-cover-placeholder" title="Натисніть щоб вибрати">🖼️</div>`}
             </div>
             <div style="flex:1">
-              <input id="art-cover-input" type="file" accept="image/*" class="form-input" style="padding:8px;margin-bottom:8px">
-              ${a.image_card ? `<div style="font-size:12px;color:var(--text-muted);word-break:break-all">${escHtml(a.image_card)}</div>` : ''}
-              ${a.image_card ? `<button id="art-remove-cover" class="btn btn--ghost btn--sm" style="color:var(--danger);margin-top:6px">✕ Видалити обкладинку</button>` : ''}
+              <input id="art-cover-input" type="file" accept="image/*" class="form-input" style="padding:8px;margin-bottom:4px">
+              <div id="art-cover-status" style="font-size:12px;color:var(--text-muted);word-break:break-all;margin-bottom:6px">
+                ${a.image_card ? `<span style="color:var(--success, #22c55e);font-weight:500">✓ Поточна обкладинка:</span> ${escHtml(a.image_card)}` : 'Файл не обрано'}
+              </div>
+              ${a.image_card ? `<button id="art-remove-cover" class="btn btn--ghost btn--sm" style="color:var(--danger)">✕ Видалити обкладинку</button>` : ''}
             </div>
           </div>
           <input type="hidden" id="art-image-card" value="${escHtml(a.image_card || '')}">
@@ -291,8 +293,8 @@
       <div class="card">
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end">
           <div id="art-feedback-bottom" class="article-feedback" style="flex:1"></div>
-          <button id="art-save-draft-btn2" class="btn btn--outline">💾 Зберегти чернетку</button>
-          <button id="art-publish-btn2" class="btn btn--primary">🚀 Опублікувати</button>
+          <button id="art-save-draft-btn2" class="btn btn--outline">${isNew ? '💾 Зберегти чернетку' : '💾 Зберегти як чернетку'}</button>
+          <button id="art-publish-btn2" class="btn btn--primary">${isNew ? '🚀 Опублікувати статтю' : '💾 Зберегти зміни'}</button>
           ${!isNew ? `<button id="art-translate-btn2" class="btn btn--secondary" style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">🇷🇺 Перевести на RU</button>` : ''}
         </div>
       </div>
@@ -566,7 +568,11 @@
       getEl('art-image-card').value = url;
       currentArticle.image_card = url;
       updateCoverPreview(url);
-      showFeedback('✅ Обкладинку успішно завантажено!', 'success');
+      const statusEl = getEl('art-cover-status');
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:var(--success, #22c55e);font-weight:600">✅ Завантажено:</span> ${escHtml(url)}`;
+      }
+      showFeedback('✅ Обкладинку успішно завантажено на сервер!', 'success');
     }
   }
 

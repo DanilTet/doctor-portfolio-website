@@ -27,7 +27,7 @@ const DATA_FILE = path.join(__dirname, 'data', 'posts.json');
 const ANALYTICS_FILE = path.join(__dirname, 'data', 'analytics.json');
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
 const ARTICLES_DIR = path.join(__dirname, 'data', 'articles');
-const ARTICLES_UPLOADS_DIR = path.join(__dirname, 'uploads', 'articles');
+const ARTICLES_UPLOADS_DIR = path.join(ROOT_DIR, 'uploads', 'articles');
 
 // Ensure directories exist
 fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
@@ -39,11 +39,15 @@ fs.mkdirSync(ARTICLES_UPLOADS_DIR, { recursive: true });
 app.use(cors());
 app.use(express.json());
 
-// Serve uploaded blog images
+// Serve uploaded blog & article images
 app.use('/uploads/blog', express.static(UPLOADS_DIR));
+app.use('/uploads/blog', express.static(path.join(__dirname, 'uploads', 'blog')));
 
-// Serve uploaded article images
 app.use('/uploads/articles', express.static(ARTICLES_UPLOADS_DIR));
+app.use('/uploads/articles', express.static(path.join(__dirname, 'uploads', 'articles')));
+
+app.use('/uploads', express.static(path.join(ROOT_DIR, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve the entire website from project root (index.html, css/, js/, admin/, img/, etc.)
 app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
