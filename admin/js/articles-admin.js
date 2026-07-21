@@ -206,8 +206,14 @@
         </div>
 
         <div class="form-group" style="margin-bottom:16px">
-          <label class="form-label" for="art-seo">SEO-опис (meta description)</label>
-          <textarea id="art-seo" class="form-input" rows="2" placeholder="Для пошукових систем..." style="resize:vertical">${escHtml(a.seo_description)}</textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <label class="form-label" for="art-seo" style="margin-bottom:0">SEO-опис (meta description)</label>
+            <span id="art-seo-counter" style="font-size:12px;color:var(--text-muted)">0 / 160 символів</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin:4px 0 6px">
+            💡 <strong>Для чого це:</strong> Короткий анонс для Google (показується під посиланням у пошуку). Оптимально 140–160 символів з ключовими словами.
+          </div>
+          <textarea id="art-seo" class="form-input" rows="2" placeholder="Чому печія може быть небезпечною і коли час робити гастроскопію? Симптоми та поради лікаря..." style="resize:vertical">${escHtml(a.seo_description)}</textarea>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
@@ -287,6 +293,32 @@
     // Render existing sections
     const sectionsContainer = getEl('art-sections-container');
     (a.sections || []).forEach(s => appendSection(sectionsContainer, s));
+
+    // SEO description character counter
+    const seoEl = getEl('art-seo');
+    const seoCounterEl = getEl('art-seo-counter');
+    function updateSeoCounter() {
+      if (!seoEl || !seoCounterEl) return;
+      const len = seoEl.value.length;
+      let status = '';
+      let color = 'var(--text-muted)';
+      if (len >= 130 && len <= 160) {
+        status = ' (Ідеально)';
+        color = 'var(--success, #22c55e)';
+      } else if (len > 160) {
+        status = ' (Задовгий, Google обріже)';
+        color = 'var(--danger)';
+      } else if (len > 0) {
+        status = ' (Закороткий)';
+        color = 'var(--warning, #f59e0b)';
+      }
+      seoCounterEl.textContent = `${len} / 160 символів${status}`;
+      seoCounterEl.style.color = color;
+    }
+    if (seoEl) {
+      seoEl.addEventListener('input', updateSeoCounter);
+      updateSeoCounter();
+    }
 
     // Auto-generate slug from title
     getEl('art-title').addEventListener('input', function () {
