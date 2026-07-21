@@ -1009,10 +1009,16 @@
           </h2>
           <p style="margin:0;font-size:13px;color:var(--text-muted)">Блочний редактор статей з генерацією HTML, обкладинками та перекладом на RU</p>
         </div>
-        <button class="btn btn--primary" onclick="window.openNewArticleEditor()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Нова стаття
-        </button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn--outline" onclick="window.downloadFullBackup()" title="Завантажити всі JSON-файли статей, фотографії та згенерований HTML в одному ZIP-архіві">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            📦 Завантажити бекап (ZIP)
+          </button>
+          <button class="btn btn--primary" onclick="window.openNewArticleEditor()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Нова стаття
+          </button>
+        </div>
       </div>
 
       <!-- Collapsible Guide & SEO Instructions -->
@@ -1111,10 +1117,16 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Завантажити дані (JSON)
         </button>
+        <h3 style="color:var(--primary)">Повний архів статей, блогу та зображень (ZIP)</h3>
+        <p style="margin-bottom: 20px; color: var(--text-muted)">Завантажити один загальний архів (.zip), який містить <strong>всі статті</strong> (JSON та HTML), <strong>всі завантажені фотографії</strong>, дописи блогу, відгуки та аналітику.</p>
+        <button onclick="window.downloadFullBackup()" class="btn btn--primary" style="margin-bottom: 30px; background:var(--primary); color:#000;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          📦 Завантажити повний архів (ZIP)
+        </button>
         <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:20px 0;">
         <h3>Резервне копіювання медіа (Зображень)</h3>
         <p style="margin-bottom: 20px; color: var(--text-muted)">Завантажити архів (.zip) з усіма картинками, які були завантажені до блогу.</p>
-        <button id="btn-export-backup-images" class="btn btn--outline" style="margin-bottom: 30px;">
+        <button onclick="window.downloadFullBackup()" class="btn btn--outline" style="margin-bottom: 30px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           Завантажити картинки та медіа (ZIP)
         </button>

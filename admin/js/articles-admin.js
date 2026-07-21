@@ -149,7 +149,19 @@
      ════════════════════════════════════════════════════════════ */
 
   function openEditor(article = null) {
-    currentArticle = article ? JSON.parse(JSON.stringify(article)) : null;
+    if (!article) {
+      const generatedId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('art-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9));
+      currentArticle = {
+        id: generatedId,
+        title: '', subtitle: '', seo_description: '',
+        slug: '', tags: [], image_card: null,
+        sections: [], show_final_cta: true, show_in_blog: true,
+        date: new Date().toISOString(),
+        isNew: true
+      };
+    } else {
+      currentArticle = JSON.parse(JSON.stringify(article));
+    }
     sectionCounter = 0;
     showView('editor');
     buildEditorForm(currentArticle);
@@ -159,13 +171,8 @@
     const editorEl = getEl('articles-editor-view');
     if (!editorEl) return;
 
-    const isNew = !article;
-    const a = article || {
-      title: '', subtitle: '', seo_description: '',
-      slug: '', tags: [], image_card: null,
-      sections: [], show_final_cta: true, show_in_blog: true,
-      date: new Date().toISOString(),
-    };
+    const isNew = !article || article.isNew;
+    const a = article;
 
     const tagsHtml = TAGS.map(tag => `
       <label class="admin-tag-checkbox">
@@ -223,6 +230,7 @@
               <span style="color:var(--text-muted);font-size:13px;white-space:nowrap">/articles/</span>
               <input id="art-slug" type="text" class="form-input" placeholder="pidgotovka-kolonoskopiya" value="${escHtml(a.slug)}" style="font-family:monospace;font-size:13px">
             </div>
+            <div id="art-slug-error" style="color:var(--danger);font-size:12px;margin-top:4px;display:none;font-weight:600"></div>
           </div>
           <div class="form-group">
             <label class="form-label" for="art-date">Дата публікації</label>
@@ -320,15 +328,40 @@
       updateSeoCounter();
     }
 
+    // Slug validation helper
+    function validateSlug() {
+      const slugInput = getEl('art-slug');
+      const slugErrorEl = getEl('art-slug-error');
+      if (!slugInput || !slugErrorEl) return true;
+
+      const val = slugInput.value.trim().toLowerCase();
+      if (!val) {
+        slugErrorEl.style.display = 'none';
+        return true;
+      }
+      const duplicate = articlesCache.find(item => item.slug === val && item.id !== currentArticle.id);
+
+      if (duplicate) {
+        slugErrorEl.textContent = `⚠️ Стаття з таким URL-slug ("${val}") вже існує! Змініть slug.`;
+        slugErrorEl.style.display = 'block';
+        return false;
+      } else {
+        slugErrorEl.style.display = 'none';
+        return true;
+      }
+    }
+
     // Auto-generate slug from title
     getEl('art-title').addEventListener('input', function () {
       const slugEl = getEl('art-slug');
       if (!slugEl.dataset.manuallyEdited) {
         slugEl.value = transliterate(this.value);
+        validateSlug();
       }
     });
     getEl('art-slug').addEventListener('input', function () {
       this.dataset.manuallyEdited = '1';
+      validateSlug();
     });
 
     // Back button
@@ -525,24 +558,15 @@
 
   async function handleCoverUpload(e) {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !currentArticle || !currentArticle.id) return;
 
-    // If article already has an ID — upload to server; otherwise preview locally
-    if (currentArticle && currentArticle.id) {
-      const url = await uploadImageToServer(currentArticle.id, file);
-      if (url) {
-        getEl('art-image-card').value = url;
-        updateCoverPreview(url);
-      }
-    } else {
-      // Preview locally; actual upload will happen after article is created
-      const reader = new FileReader();
-      reader.onload = ev => {
-        // Store file for later upload
-        window._artPendingCoverFile = file;
-        updateCoverPreview(ev.target.result);
-      };
-      reader.readAsDataURL(file);
+    showFeedback('⏳ Завантаження обкладинки...', 'muted');
+    const url = await uploadImageToServer(currentArticle.id, file);
+    if (url) {
+      getEl('art-image-card').value = url;
+      currentArticle.image_card = url;
+      updateCoverPreview(url);
+      showFeedback('✅ Обкладинку успішно завантажено!', 'success');
     }
   }
 
@@ -554,6 +578,7 @@
 
   function removeCover() {
     getEl('art-image-card').value = '';
+    if (currentArticle) currentArticle.image_card = null;
     const wrap = getEl('art-cover-preview-wrap');
     if (wrap) wrap.innerHTML = `<div class="cover-preview-placeholder" id="art-cover-placeholder">🖼️</div>`;
   }
@@ -562,24 +587,15 @@
 
   async function handleSectionImageUpload(input, block) {
     const file = input.files[0];
-    if (!file) return;
+    if (!file || !currentArticle || !currentArticle.id) return;
 
     const urlInput = block.querySelector('.sec-img-url');
-
-    if (currentArticle && currentArticle.id) {
-      const url = await uploadImageToServer(currentArticle.id, file);
-      if (url) {
-        urlInput.value = url;
-        showSectionImagePreview(block, url);
-      }
-    } else {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        // Store temp data-url — will be replaced after article creation
-        urlInput.value = ev.target.result;
-        showSectionImagePreview(block, ev.target.result);
-      };
-      reader.readAsDataURL(file);
+    showFeedback('⏳ Завантаження фото розділу...', 'muted');
+    const url = await uploadImageToServer(currentArticle.id, file);
+    if (url) {
+      urlInput.value = url;
+      showSectionImagePreview(block, url);
+      showFeedback('✅ Фото розділу завантажено!', 'success');
     }
   }
 
@@ -655,32 +671,21 @@
     showFeedback('⏳ Збереження...', 'muted');
 
     try {
-      const isNew = !currentArticle;
+      const isNew = currentArticle.isNew;
       const url   = isNew ? API : `${API}/${currentArticle.id}`;
       const method = isNew ? 'POST' : 'PUT';
+
+      const payload = { ...data, id: currentArticle.id, status };
 
       const res  = await fetch(url, {
         method,
         headers: { 'X-Blog-Secret': SECRET(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, status }),
+        body: JSON.stringify(payload),
       });
       const article = await res.json();
       if (!res.ok) throw new Error(article.error || 'Помилка сервера');
 
-      // If new article — upload pending cover image
-      if (isNew && window._artPendingCoverFile) {
-        const coverUrl = await uploadImageToServer(article.id, window._artPendingCoverFile);
-        window._artPendingCoverFile = null;
-        if (coverUrl) {
-          article.image_card = coverUrl;
-          await fetch(`${API}/${article.id}`, {
-            method: 'PUT',
-            headers: { 'X-Blog-Secret': SECRET(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image_card: coverUrl }),
-          });
-        }
-      }
-
+      delete article.isNew;
       currentArticle = article;
       showFeedback('✅ Збережено!', 'success');
       // Refresh list cache
@@ -801,8 +806,27 @@
     return str.toLowerCase().split('').map(c => map[c] !== undefined ? map[c] : (/[a-z0-9]/.test(c) ? c : (/\s/.test(c) ? '-' : ''))).join('').replace(/-+/g, '-').replace(/^-|-$/g, '');
   }
 
-  /* ── Expose new article button ───────────────────────────── */
+  /* ── Expose global helpers ──────────────────────────────── */
   window.openNewArticleEditor = function () { openEditor(null); };
+
+  window.downloadFullBackup = function () {
+    fetch('/api/backup/full', { headers: { 'X-Blog-Secret': SECRET() } })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.blob();
+      })
+      .then(blob => {
+        const dateStr = new Date().toISOString().split('T')[0];
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `doctor_website_full_backup_${dateStr}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+      .catch(err => alert('Помилка завантаження бекапу: ' + err.message));
+  };
 
   /* ── Boot ────────────────────────────────────────────────── */
   if (document.readyState === 'loading') {

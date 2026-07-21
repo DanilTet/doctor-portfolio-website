@@ -613,20 +613,29 @@ app.post('/api/articles', authGuard, (req, res) => {
       return map[c.toLowerCase()] || c;
     });
 
+  const finalSlug = slug || uuidv4().slice(0, 8);
+  const articleId = body.id || uuidv4();
+
+  // Slug duplication check
+  const existingArticles = readArticles();
+  if (existingArticles.some(a => a.slug === finalSlug && a.id !== articleId)) {
+    return res.status(400).json({ error: `Стаття з таким URL-slug ("${finalSlug}") вже існує! Будь ласка, вкажіть інший slug.` });
+  }
+
   const article = {
-    id: uuidv4(),
-    slug: slug || uuidv4().slice(0, 8),
+    id: articleId,
+    slug: finalSlug,
     title: body.title.trim(),
     subtitle: body.subtitle || '',
     seo_description: body.seo_description || '',
     image_card: body.image_card || null,
     tags: Array.isArray(body.tags) ? body.tags : [],
     date: body.date ? new Date(body.date).toISOString() : new Date().toISOString(),
-    status: 'draft',
+    status: body.status || 'draft',
     show_in_blog: body.show_in_blog !== false,
     sections: Array.isArray(body.sections) ? body.sections : [],
     show_final_cta: body.show_final_cta !== false,
-    translations: {},
+    translations: body.translations || {},
   };
 
   writeArticle(article);
@@ -656,12 +665,29 @@ app.put('/api/articles/:id', authGuard, (req, res) => {
   if (Array.isArray(body.sections)) article.sections = body.sections;
   if (body.show_final_cta !== undefined) article.show_final_cta = body.show_final_cta;
   if (body.slug !== undefined && body.slug !== article.slug) {
+    const existingArticles = readArticles();
+    if (existingArticles.some(a => a.slug === body.slug && a.id !== article.id)) {
+      return res.status(400).json({ error: `Стаття з таким URL-slug ("${body.slug}") вже існує! Будь ласка, вкажіть інший slug.` });
+    }
     // slug changed — rename file
     if (fs.existsSync(oldFile)) fs.rmSync(oldFile, { force: true });
     article.slug = body.slug;
   }
 
   writeArticle(article);
+
+  // Sync updated info to posts.json if published in blog
+  const posts = readPosts();
+  const pIdx = posts.findIndex(p => p.article_id === article.id);
+  if (pIdx >= 0) {
+    posts[pIdx].title = article.title;
+    posts[pIdx].content = article.subtitle || '';
+    posts[pIdx].image_path = article.image_card || null;
+    posts[pIdx].external_url = `/articles/${article.slug}`;
+    posts[pIdx].tags = article.tags || [];
+    writePosts(posts);
+  }
+
   res.json(article);
 });
 
@@ -691,8 +717,7 @@ app.delete('/api/articles/:id', authGuard, (req, res) => {
  */
 app.post('/api/articles/:id/upload-image', authGuard, (req, res, next) => {
   const article = readArticle(req.params.id);
-  if (!article) return res.status(404).json({ error: 'Статья не найдена' });
-  req.params.slug = article.slug;
+  req.params.slug = (article && article.slug) ? article.slug : (req.body.slug || req.params.id);
   next();
 }, uploadArticle.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Файл не загружен' });
@@ -778,6 +803,58 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/backup/full & GET /api/blog/backup-images
+ * Streams a full ZIP archive containing all articles, database files, uploaded media and generated HTML pages.
+ */
+const handleFullBackup = (req, res) => {
+  const dateStr = new Date().toISOString().split('T')[0];
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="doctor_website_full_backup_${dateStr}.zip"`);
+
+  const archive = archiver('zip', { zlib: { level: 9 } });
+
+  archive.on('error', (err) => {
+    console.error('[Backup API] ZIP Archive Error:', err);
+    if (!res.headersSent) res.status(500).send({ error: err.message });
+  });
+
+  archive.pipe(res);
+
+  // 1. Data folder (posts.json, analytics.json, articles/*.json)
+  const dataDir = path.join(__dirname, 'data');
+  if (fs.existsSync(dataDir)) {
+    archive.directory(dataDir, 'server/data');
+  }
+
+  // 2. Server uploads (server/uploads/articles/)
+  if (fs.existsSync(ARTICLES_UPLOADS_DIR)) {
+    archive.directory(ARTICLES_UPLOADS_DIR, 'server/uploads/articles');
+  }
+
+  // 3. Blog uploads (uploads/blog/)
+  if (fs.existsSync(UPLOADS_DIR)) {
+    archive.directory(UPLOADS_DIR, 'uploads/blog');
+  }
+
+  // 4. Generated article HTML pages (articles/)
+  const articlesHtmlDir = path.join(ROOT_DIR, 'articles');
+  if (fs.existsSync(articlesHtmlDir)) {
+    archive.directory(articlesHtmlDir, 'articles');
+  }
+
+  // 5. Russian article HTML pages (ru/articles/)
+  const ruArticlesHtmlDir = path.join(ROOT_DIR, 'ru', 'articles');
+  if (fs.existsSync(ruArticlesHtmlDir)) {
+    archive.directory(ruArticlesHtmlDir, 'ru/articles');
+  }
+
+  archive.finalize();
+};
+
+app.get('/api/backup/full', authGuard, handleFullBackup);
+app.get('/api/blog/backup-images', authGuard, handleFullBackup);
+
 /* ── SPA fallback: serve index.html for all non-API routes ─ */
 app.get('*', (req, res) => {
   // If requesting admin, serve admin/index.html
@@ -785,40 +862,6 @@ app.get('*', (req, res) => {
     return res.sendFile(path.join(ROOT_DIR, 'admin', 'index.html'));
   }
   res.sendFile(path.join(ROOT_DIR, 'index.html'));
-});
-
-/**
- * GET /api/blog/backup-images
- * Streams a ZIP archive of all blog images, posts.json and analytics.json
- */
-app.get('/api/blog/backup-images', authGuard, (req, res) => {
-  res.setHeader('Content-Type', 'application/zip');
-  res.setHeader('Content-Disposition', 'attachment; filename="doctor_blog_media.zip"');
-
-  const archive = archiver('zip', { zlib: { level: 9 } });
-
-  archive.on('error', (err) => {
-    res.status(500).send({ error: err.message });
-  });
-
-  archive.pipe(res);
-
-  // Append posts.json
-  if (fs.existsSync(DATA_FILE)) {
-    archive.file(DATA_FILE, { name: 'posts.json' });
-  }
-
-  // Append analytics.json
-  if (fs.existsSync(ANALYTICS_FILE)) {
-    archive.file(ANALYTICS_FILE, { name: 'analytics.json' });
-  }
-
-  // Append uploads folder
-  if (fs.existsSync(UPLOADS_DIR)) {
-    archive.directory(UPLOADS_DIR, 'uploads/blog');
-  }
-
-  archive.finalize();
 });
 
 /* ── Start ───────────────────────────────────────────────── */
