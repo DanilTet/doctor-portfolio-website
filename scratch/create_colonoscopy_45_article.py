@@ -1,17 +1,17 @@
 import os
 import sys
 
-# Ensure root dir is in path
 sys.path.append(os.getcwd())
 from scratch.generate_articles import generate_html
 
 base_dir = os.getcwd()
 
-article_id = "age-colonoscopy"
+article_ids = ["kolonoskopiya-45", "age-colonoscopy"]
+
 uk_title = "45 років — час виконати першу колоноскопію | Скринінг"
-uk_meta = "Чому у віці 45 років важно пройти першу профілактичну колоноскопію. Безболісно та безпечно у 17-й лікарні м. Харків."
+uk_meta = "Чому у віці 45 років варто пройти першу профілактичну колоноскопію. Безболісно та безпечно у 17-й лікарні м. Харків."
 uk_h1 = "45 років — час виконати першу колоноскопію"
-uk_sub = "Чому профілактична колоноскопія у 45 років рятує життя і як пройти її без болю."
+uk_sub = "Якщо вам виповнилося 45 років і вас нічого не турбує — це саме той момент, коли варто пройти першу профілактичну колоноскопію."
 uk_toc = """
     <li><a href="#section-1" class="toc-link">Чому саме 45 років — золотий стандарт скринінгу?</a></li>
     <li><a href="#section-2" class="toc-link">Безсимптомний перебіг поліпів і раку кишківника</a></li>
@@ -41,7 +41,7 @@ uk_content = """
 ru_title = "45 лет — время выполнить первую колоноскопию | Скрининг"
 ru_meta = "Почему в возрасте 45 лет важно пройти первую профилактическую колоноскопию. Безболезненно и безопасно в 17-й больнице г. Харьков."
 ru_h1 = "45 лет — время выполнить первую колоноскопию"
-ru_sub = "Почему профилактическая колоноскопия в 45 лет спасает жизнь и как пройти её без боли."
+ru_sub = "Если вам исполнилось 45 лет и вас ничего не беспокоит — это именно тот момент, когда стоит пройти первую профилактическую колоноскопию."
 ru_toc = """
     <li><a href="#section-1" class="toc-link">Почему именно 45 лет — золотой стандарт скрининга?</a></li>
     <li><a href="#section-2" class="toc-link">Бессимптомное течение полипов и рака кишечника</a></li>
@@ -68,17 +68,18 @@ ru_content = """
 <p style="margin-bottom: 16px;">Не ждите появления жалоб. Позаботьтесь о своем здоровье вовремя — профилактика всегда эффективнее и проще лечения.</p>
 """
 
-uk_url = f"/articles/{article_id}/"
-ru_url = f"/ru/articles/{article_id}/"
+for aid in article_ids:
+    uk_url = f"/articles/{aid}"
+    ru_url = f"/ru/articles/{aid}"
 
-uk_dir = os.path.join(base_dir, "articles", article_id)
-os.makedirs(uk_dir, exist_ok=True)
-with open(os.path.join(uk_dir, "index.html"), "w", encoding="utf-8") as f:
-    f.write(generate_html("uk", uk_title, uk_meta, uk_h1, uk_sub, uk_toc, uk_content, uk_url, ru_url))
+    uk_dir = os.path.join(base_dir, "articles", aid)
+    os.makedirs(uk_dir, exist_ok=True)
+    with open(os.path.join(uk_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(generate_html("uk", uk_title, uk_meta, uk_h1, uk_sub, uk_toc, uk_content, uk_url, ru_url))
 
-ru_dir = os.path.join(base_dir, "ru", "articles", article_id)
-os.makedirs(ru_dir, exist_ok=True)
-with open(os.path.join(ru_dir, "index.html"), "w", encoding="utf-8") as f:
-    f.write(generate_html("ru", ru_title, ru_meta, ru_h1, ru_sub, ru_toc, ru_content, uk_url, ru_url))
+    ru_dir = os.path.join(base_dir, "ru", "articles", aid)
+    os.makedirs(ru_dir, exist_ok=True)
+    with open(os.path.join(ru_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(generate_html("ru", ru_title, ru_meta, ru_h1, ru_sub, ru_toc, ru_content, uk_url, ru_url))
 
-print("Static article pages generated successfully.")
+print("Both kolonoskopiya-45 and age-colonoscopy article routes generated successfully.")
