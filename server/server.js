@@ -74,9 +74,15 @@ function readPosts() {
       const seedPosts = JSON.parse(fs.readFileSync(seedFile, 'utf-8'));
       let updated = false;
       seedPosts.forEach(sp => {
-        const idx = posts.findIndex(cp => cp.id === sp.id || (cp.title && cp.title.includes('45')));
+        const idx = posts.findIndex(cp => cp.id === sp.id);
         if (idx !== -1) {
-          posts[idx] = { ...posts[idx], ...sp };
+          // Merge seed into existing post, but DO NOT overwrite fields that
+          // the admin may have changed (image_path, tags, source, title, content).
+          const existing = posts[idx];
+          const merged = { ...sp, ...existing };
+          // Always keep external_url from seed if not set in existing
+          if (!existing.external_url && sp.external_url) merged.external_url = sp.external_url;
+          posts[idx] = merged;
           updated = true;
         } else {
           posts.unshift(sp);
