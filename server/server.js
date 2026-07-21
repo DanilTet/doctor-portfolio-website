@@ -5,29 +5,29 @@
  */
 
 require('dotenv').config();
-const express  = require('express');
-const multer   = require('multer');
-const cors     = require('cors');
-const path     = require('path');
-const fs       = require('fs');
-const fetch    = require('node-fetch');
+const express = require('express');
+const multer = require('multer');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 const archiver = require('archiver');
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 3000;
 const BLOG_SECRET = process.env.BLOG_SECRET || 'super-secret-key-123';
 const INSTAGRAM_USERNAME = process.env.INSTAGRAM_USERNAME || '';
 
 /* ── Paths ───────────────────────────────────────────────── */
-const ROOT_DIR       = path.join(__dirname, '..');            // Project root
-const DATA_FILE      = path.join(__dirname, 'data', 'posts.json');
+const ROOT_DIR = path.join(__dirname, '..');            // Project root
+const DATA_FILE = path.join(__dirname, 'data', 'posts.json');
 const ANALYTICS_FILE = path.join(__dirname, 'data', 'analytics.json');
-const UPLOADS_DIR    = path.join(__dirname, '..', 'uploads', 'blog');
+const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
 
 // Ensure directories exist
-fs.mkdirSync(path.join(__dirname, 'data'),    { recursive: true });
-fs.mkdirSync(UPLOADS_DIR,                      { recursive: true });
+fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 /* ── Middleware ──────────────────────────────────────────── */
 app.use(cors());
@@ -42,7 +42,7 @@ app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
 /* ── Multer (image upload) ───────────────────────────────── */
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-  filename:    (_req, file, cb) => {
+  filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
     cb(null, `${uuidv4()}${ext}`);
   },
@@ -68,33 +68,6 @@ function readPosts() {
 function writePosts(posts) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), 'utf-8');
 }
-
-function ensureSeedPosts() {
-  const seedFile = path.join(__dirname, 'data', 'posts.seed.json');
-  if (!fs.existsSync(seedFile)) return;
-  try {
-    const seedPosts = JSON.parse(fs.readFileSync(seedFile, 'utf-8'));
-    let currentPosts = readPosts();
-    let updated = false;
-
-    seedPosts.forEach(sp => {
-      const exists = currentPosts.some(cp => cp.id === sp.id || cp.title === sp.title);
-      if (!exists) {
-        currentPosts.unshift(sp);
-        updated = true;
-      }
-    });
-
-    if (updated) {
-      writePosts(currentPosts);
-      console.log('[Blog API] Seed posts auto-merged into posts.json');
-    }
-  } catch (e) {
-    console.warn('[Blog API] Could not auto-merge seed posts:', e.message);
-  }
-}
-
-ensureSeedPosts();
 
 function readAnalytics() {
   try {
@@ -134,7 +107,7 @@ function authGuard(req, res, next) {
  */
 app.get('/api/blog/posts', (req, res) => {
   let posts = readPosts().sort((a, b) => new Date(b.date) - new Date(a.date));
-  
+
   const wantAll = req.query.all === 'true';
   const secret = req.headers['x-blog-secret'];
   const isAdmin = wantAll && secret === BLOG_SECRET;
@@ -173,13 +146,13 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
   }
 
   const newPost = {
-    id:         uuidv4(),
-    title:      title.trim(),
-    content:    content.trim(),
+    id: uuidv4(),
+    title: title.trim(),
+    content: content.trim(),
     image_path: req.file ? `/uploads/blog/${req.file.filename}` : null,
-    date:       date ? new Date(date).toISOString() : new Date().toISOString(),
-    source:     'manual',
-    tags:       Array.isArray(parsedTags) ? parsedTags : [],
+    date: date ? new Date(date).toISOString() : new Date().toISOString(),
+    source: 'manual',
+    tags: Array.isArray(parsedTags) ? parsedTags : [],
   };
 
   posts.push(newPost);
@@ -230,13 +203,13 @@ app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => 
     // Delete old local image if it exists
     if (post.image_path && post.image_path.startsWith('/uploads/blog/')) {
       const oldPath = path.join(__dirname, post.image_path);
-      fs.rm(oldPath, { force: true }, () => {});
+      fs.rm(oldPath, { force: true }, () => { });
     }
     post.image_path = `/uploads/blog/${req.file.filename}`;
   } else if (remove_image === 'true') {
     if (post.image_path && post.image_path.startsWith('/uploads/blog/')) {
       const oldPath = path.join(__dirname, post.image_path);
-      fs.rm(oldPath, { force: true }, () => {});
+      fs.rm(oldPath, { force: true }, () => { });
     }
     post.image_path = null;
   }
@@ -253,9 +226,9 @@ app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => 
 app.delete('/api/blog/posts/:id', authGuard, (req, res) => {
   const { id } = req.params;
   console.log(`[Blog API] DELETE requested for post ID: "${id}"`);
-  
+
   const posts = readPosts();
-  const idx   = posts.findIndex(p => p.id === id);
+  const idx = posts.findIndex(p => p.id === id);
 
   if (idx === -1) {
     console.warn(`[Blog API] Post with ID "${id}" not found.`);
@@ -267,7 +240,7 @@ app.delete('/api/blog/posts/:id', authGuard, (req, res) => {
   // Delete local image if it's stored locally (not an external URL)
   if (deleted.image_path && deleted.image_path.startsWith('/uploads/blog/')) {
     const filePath = path.join(__dirname, deleted.image_path);
-    fs.rm(filePath, { force: true }, () => {});
+    fs.rm(filePath, { force: true }, () => { });
     console.log(`[Blog API] Deleted local image: "${filePath}"`);
   }
 
@@ -308,7 +281,7 @@ app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
       if (existingIg.has(igPostId)) continue; // Уже синхронизирован
 
       const caption = raw.caption || '';
-      const imgUrl  = raw.mediaUrl;
+      const imgUrl = raw.mediaUrl;
 
       // Скачиваем изображение локально на сервер
       let localImagePath = null;
@@ -317,9 +290,9 @@ app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
           const imgRes = await fetch(imgUrl, { timeout: 10000 });
           if (imgRes.ok) {
             const buffer = await imgRes.buffer();
-            const ext    = '.jpg';
-            const fname  = `ig_${igPostId}${ext}`;
-            const fpath  = path.join(UPLOADS_DIR, fname);
+            const ext = '.jpg';
+            const fname = `ig_${igPostId}${ext}`;
+            const fpath = path.join(UPLOADS_DIR, fname);
             fs.writeFileSync(fpath, buffer);
             localImagePath = `/uploads/blog/${fname}`;
           }
@@ -329,14 +302,14 @@ app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
       }
 
       const post = {
-        id:            uuidv4(),
-        instagram_id:  igPostId,
-        title:         caption.split('\n')[0].slice(0, 100) || 'Пост из Instagram',
-        content:       caption,
-        image_path:    localImagePath,
+        id: uuidv4(),
+        instagram_id: igPostId,
+        title: caption.split('\n')[0].slice(0, 100) || 'Пост из Instagram',
+        content: caption,
+        image_path: localImagePath,
         instagram_url: raw.permalink || `https://www.instagram.com/p/${igPostId}/`,
-        date:          raw.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString(),
-        source:        'instagram',
+        date: raw.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString(),
+        source: 'instagram',
       };
 
       posts.push(post);
@@ -478,8 +451,8 @@ app.get('/api/database/tables', authGuard, (_req, res) => {
         try {
           const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
           rowCount = Array.isArray(content) ? content.length : 1;
-        } catch(e) {}
-        
+        } catch (e) { }
+
         result.push({
           name: tableName,
           fileName: file,
