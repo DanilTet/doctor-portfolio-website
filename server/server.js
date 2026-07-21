@@ -58,11 +58,40 @@ const upload = multer({
 
 /* ── Helpers ─────────────────────────────────────────────── */
 function readPosts() {
+  let posts = [];
   try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-  } catch {
-    return [];
+    if (fs.existsSync(DATA_FILE)) {
+      posts = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    }
+  } catch (e) {
+    posts = [];
   }
+
+  // Auto-merge seed posts (tracked in git) if missing in local data/posts.json
+  const seedFile = path.join(__dirname, 'data', 'posts.seed.json');
+  if (fs.existsSync(seedFile)) {
+    try {
+      const seedPosts = JSON.parse(fs.readFileSync(seedFile, 'utf-8'));
+      let updated = false;
+      seedPosts.forEach(sp => {
+        const idx = posts.findIndex(cp => cp.id === sp.id || (cp.title && cp.title.includes('45')));
+        if (idx !== -1) {
+          posts[idx] = { ...posts[idx], ...sp };
+          updated = true;
+        } else {
+          posts.unshift(sp);
+          updated = true;
+        }
+      });
+      if (updated) {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), 'utf-8');
+      }
+    } catch (e) {
+      console.warn('[Blog] Seed posts merge error:', e);
+    }
+  }
+
+  return posts;
 }
 
 function writePosts(posts) {
