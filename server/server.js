@@ -434,6 +434,62 @@ app.get('/api/analytics/backup', authGuard, (_req, res) => {
   }
 });
 
+/**
+ * GET /api/database/tables
+ * Lists all available local JSON database tables in server/data/
+ */
+app.get('/api/database/tables', authGuard, (_req, res) => {
+  const dataDir = path.join(__dirname, 'data');
+  const result = [];
+  try {
+    const files = fs.readdirSync(dataDir);
+    for (const file of files) {
+      if (file.endsWith('.json') && !file.endsWith('.example.json')) {
+        const tableName = file.replace('.json', '');
+        const filePath = path.join(dataDir, file);
+        let rowCount = 0;
+        try {
+          const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+          rowCount = Array.isArray(content) ? content.length : 1;
+        } catch(e) {}
+        
+        result.push({
+          name: tableName,
+          fileName: file,
+          rowCount: rowCount
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[DB Explorer] Error listing tables:', err.message);
+  }
+  res.json(result);
+});
+
+/**
+ * GET /api/database/tables/:tableName
+ * Returns records of a specific local JSON table
+ */
+app.get('/api/database/tables/:tableName', authGuard, (req, res) => {
+  const { tableName } = req.params;
+  const safeName = tableName.replace(/[^a-zA-Z0-9_-]/g, '');
+  const filePath = path.join(__dirname, 'data', `${safeName}.json`);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: `Таблица "${safeName}" не найдена` });
+  }
+
+  try {
+    const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    res.json({
+      name: safeName,
+      data: Array.isArray(content) ? content : [content]
+    });
+  } catch (err) {
+    res.status(500).json({ error: `Ошибка чтения таблицы: ${err.message}` });
+  }
+});
+
 /* ── SPA fallback: serve index.html for all non-API routes ─ */
 app.get('*', (req, res) => {
   // If requesting admin, serve admin/index.html

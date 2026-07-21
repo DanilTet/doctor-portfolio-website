@@ -179,6 +179,15 @@
 
       <div class="nav-section-label" style="margin-top:8px">Система</div>
 
+      <button class="nav-item" data-page="database" id="nav-database">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <ellipse cx="12" cy="5" rx="9" ry="3"/>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+        </svg>
+        <span>База даних</span>
+      </button>
+
       <button class="nav-item" data-page="backup" id="nav-backup">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -1000,6 +1009,96 @@
       </div>
     </section>
 
+    <!-- ── LOCAL DATABASE EXPLORER (SUPABASE-STYLE) ─────────── -->
+    <section class="page-section" id="page-database">
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Локальні бази даних</h2>
+          <p class="page-desc">Інтерактивний перегляд та аналіз локальних JSON колекцій у стилі Supabase Table Editor.</p>
+        </div>
+      </div>
+
+      <div class="db-explorer-card">
+        <!-- Sub-sidebar: Table List -->
+        <div class="db-tables-subsidebar">
+          <div class="db-subsidebar-header">
+            <span>Таблиці</span>
+            <span class="db-tables-count-badge" id="db-tables-total-count">0</span>
+          </div>
+          <div class="db-tables-list" id="db-tables-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="db-workspace">
+          <!-- Top Control Bar -->
+          <div class="db-toolbar">
+            <div class="db-toolbar-left">
+              <span class="db-current-table-icon">⚡</span>
+              <div>
+                <div class="db-current-table-title" id="db-active-table-name">Обрати таблицю</div>
+                <div class="db-current-table-subtitle" id="db-active-table-meta">0 записів</div>
+              </div>
+            </div>
+            
+            <div class="db-toolbar-right">
+              <!-- Search Bar -->
+              <div class="db-search-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="db-table-search" placeholder="Пошук у таблиці..." class="db-search-input">
+              </div>
+
+              <!-- View Mode Switcher -->
+              <div class="db-view-toggle-group">
+                <button class="db-view-toggle-btn active" id="btn-db-view-grid" title="Режим Таблиці">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  Grid
+                </button>
+                <button class="db-view-toggle-btn" id="btn-db-view-json" title="Режим Raw JSON">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  JSON
+                </button>
+              </div>
+
+              <!-- Exports -->
+              <button class="btn btn--outline btn--sm" id="btn-db-export-csv" title="Експорт в CSV">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                CSV
+              </button>
+              <button class="btn btn--outline btn--sm" id="btn-db-export-json" title="Експорт в JSON">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Table Grid Container -->
+          <div class="db-grid-view" id="db-grid-view">
+            <div class="db-table-scroll-wrap">
+              <table class="db-data-table" id="db-main-table">
+                <thead id="db-table-thead">
+                  <!-- Columns rendered dynamically -->
+                </thead>
+                <tbody id="db-table-tbody">
+                  <!-- Rows rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Raw JSON View Container -->
+          <div class="db-json-view" id="db-json-view" style="display:none;">
+            <div class="db-json-actions">
+              <span>Raw JSON Editor / Viewer</span>
+              <button class="btn btn--ghost btn--sm" id="btn-db-copy-json">📋 Копіювати JSON</button>
+            </div>
+            <pre class="db-json-pre" id="db-raw-json-code">[]</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div><!-- /main-content -->
 
 </div><!-- /app -->
@@ -1020,6 +1119,26 @@
     </div>
     <div style="padding:14px 24px; border-top:1px solid var(--border); text-align:right; background:var(--bg-surface);">
       <button id="btn-close-daily-modal-bottom" class="btn btn--secondary btn--sm">Закрити</button>
+    </div>
+  </div>
+</div>
+
+<!-- Row Inspector Modal -->
+<div id="db-row-inspector-modal" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+  <div class="modal-card" style="background:var(--bg-card); border:1px solid var(--border); border-radius:16px; max-width:720px; width:100%; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:var(--shadow);">
+    <div style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface);">
+      <div>
+        <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--text-primary);">Інспектор запису (Row Inspector)</h3>
+        <p style="margin:2px 0 0 0; font-size:12px; color:var(--text-secondary);">Повний вміст та структура обраного об'єкта</p>
+      </div>
+      <button id="btn-close-row-inspector" class="btn btn--ghost btn--sm" style="font-size:18px; padding:4px 10px;">✕</button>
+    </div>
+    <div id="row-inspector-content" style="padding:20px 24px; overflow-y:auto; flex:1; font-size:13px; font-family:monospace;">
+      <!-- Content populated dynamically -->
+    </div>
+    <div style="padding:14px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-surface); gap:12px;">
+      <button id="btn-copy-inspector-json" class="btn btn--secondary btn--sm">📋 Копіювати об'єкт (JSON)</button>
+      <button id="btn-done-row-inspector" class="btn btn--primary btn--sm">Закрити</button>
     </div>
   </div>
 </div>

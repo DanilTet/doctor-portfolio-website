@@ -189,6 +189,7 @@ function navigateTo(page) {
     appointments: 'Заявки на прием',
     reviews:      'Модерация отзывов',
     'patient-history': 'Історія пацієнта',
+    database:     'Локальні бази даних',
     backup:       'Резервне копіювання',
   };
   const titleEl = document.getElementById('top-bar-title');
@@ -202,6 +203,7 @@ function navigateTo(page) {
   if (page === 'reviews')      loadReviews();
   if (page === 'premium-dashboard') initPremiumDashboard();
   if (page === 'patient-history') initPatientHistory();
+  if (page === 'database')     loadDatabaseExplorer();
 }
 
 /* ============================================================
@@ -2755,7 +2757,328 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // ── LOCAL DATABASE EXPLORER LISTENERS ──────────────────────
+  document.getElementById('db-table-search')?.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    if (!q) {
+      filteredDbData = [...currentDbData];
+    } else {
+      filteredDbData = currentDbData.filter(row => JSON.stringify(row).toLowerCase().includes(q));
+    }
+    const metaEl = document.getElementById('db-active-table-meta');
+    if (metaEl) metaEl.textContent = `${filteredDbData.length} з ${currentDbData.length} записів`;
+    renderDbGridTable();
+    renderDbRawJson();
+  });
+
+  document.getElementById('btn-db-view-grid')?.addEventListener('click', () => {
+    document.getElementById('btn-db-view-grid')?.classList.add('active');
+    document.getElementById('btn-db-view-json')?.classList.remove('active');
+    document.getElementById('db-grid-view').style.display = 'flex';
+    document.getElementById('db-json-view').style.display = 'none';
+  });
+
+  document.getElementById('btn-db-view-json')?.addEventListener('click', () => {
+    document.getElementById('btn-db-view-json')?.classList.add('active');
+    document.getElementById('btn-db-view-grid')?.classList.remove('active');
+    document.getElementById('db-grid-view').style.display = 'none';
+    document.getElementById('db-json-view').style.display = 'flex';
+  });
+
+  document.getElementById('btn-db-copy-json')?.addEventListener('click', () => {
+    const jsonStr = JSON.stringify(filteredDbData, null, 2);
+    navigator.clipboard.writeText(jsonStr);
+    toast('JSON копійовано в буфер обміну!', 'success');
+  });
+
+  document.getElementById('btn-close-row-inspector')?.addEventListener('click', () => {
+    document.getElementById('db-row-inspector-modal').style.display = 'none';
+  });
+  document.getElementById('btn-done-row-inspector')?.addEventListener('click', () => {
+    document.getElementById('db-row-inspector-modal').style.display = 'none';
+  });
+  document.getElementById('btn-copy-inspector-json')?.addEventListener('click', () => {
+    if (window.currentInspectedRowJson) {
+      navigator.clipboard.writeText(window.currentInspectedRowJson);
+      toast('Об\'єкт копійовано в буфер обміну!', 'success');
+    }
+  });
+
+  document.getElementById('btn-db-export-json')?.addEventListener('click', () => {
+    if (!filteredDbData || filteredDbData.length === 0) {
+      alert('Немає даних для експорту');
+      return;
+    }
+    const jsonStr = JSON.stringify(filteredDbData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${activeDbTable || 'table'}_export.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Файл JSON успішно збережено!', 'success');
+  });
+
+  document.getElementById('btn-db-export-csv')?.addEventListener('click', () => {
+    if (!filteredDbData || filteredDbData.length === 0) {
+      alert('Немає даних для експорту');
+      return;
+    }
+    const colKeys = [];
+    filteredDbData.forEach(r => {
+      if (r && typeof r === 'object') {
+        Object.keys(r).forEach(k => {
+          if (!colKeys.includes(k)) colKeys.push(k);
+        });
+      }
+    });
+
+    let csvContent = '\uFEFF';
+    csvContent += colKeys.map(k => `"${k.replace(/"/g, '""')}"`).join(',') + '\n';
+
+    filteredDbData.forEach(row => {
+      const line = colKeys.map(k => {
+        const val = row[k];
+        if (val === null || val === undefined) return '""';
+        if (typeof val === 'object') return `"${JSON.stringify(val).replace(/"/g, '""')}"`;
+        return `"${String(val).replace(/"/g, '""')}"`;
+      }).join(',');
+      csvContent += line + '\n';
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${activeDbTable || 'table'}_export.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Файл CSV успішно збережено!', 'success');
+  });
 });
+
+/* ============================================================
+   SUPABASE-STYLE LOCAL DATABASE EXPLORER FUNCTIONS
+   ============================================================ */
+let activeDbTable = null;
+let currentDbData = [];
+let filteredDbData = [];
+
+async function loadDatabaseExplorer() {
+  const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+  const tablesListEl = document.getElementById('db-tables-list');
+  const totalCountEl = document.getElementById('db-tables-total-count');
+
+  if (!tablesListEl) return;
+
+  tablesListEl.innerHTML = '<div style="padding:12px; color:var(--text-muted); font-size:12px;">Завантаження...</div>';
+
+  try {
+    const res = await fetch('/api/database/tables', {
+      headers: { 'X-Blog-Secret': secret }
+    });
+
+    let tables = [];
+    if (res.ok) {
+      tables = await res.json();
+    }
+
+    if (!Array.isArray(tables) || tables.length === 0) {
+      tables = [
+        { name: 'posts', fileName: 'posts.json', rowCount: 0 },
+        { name: 'analytics', fileName: 'analytics.json', rowCount: 0 }
+      ];
+    }
+
+    if (totalCountEl) totalCountEl.textContent = tables.length;
+    tablesListEl.innerHTML = '';
+
+    tables.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'db-table-item' + (activeDbTable === t.name ? ' active' : '');
+      btn.onclick = () => selectDbTable(t.name);
+
+      const icon = t.name === 'posts' ? '📝' : t.name === 'analytics' ? '📊' : t.name === 'reviews' ? '⭐' : '📁';
+
+      btn.innerHTML = `
+        <div class="db-table-item-name">
+          <span>${icon}</span>
+          <span>${escText(t.name)}</span>
+        </div>
+        <span class="db-table-item-count">${t.rowCount}</span>
+      `;
+      tablesListEl.appendChild(btn);
+    });
+
+    if (!activeDbTable && tables.length > 0) {
+      selectDbTable(tables[0].name);
+    } else if (activeDbTable) {
+      selectDbTable(activeDbTable);
+    }
+  } catch (err) {
+    console.error('Failed to load database tables:', err);
+    tablesListEl.innerHTML = '<div style="padding:12px; color:var(--danger); font-size:12px;">Помилка завантаження</div>';
+  }
+}
+
+async function selectDbTable(tableName) {
+  activeDbTable = tableName;
+  const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+
+  document.querySelectorAll('#db-tables-list .db-table-item').forEach(el => {
+    const isThis = el.querySelector('.db-table-item-name span:last-child')?.textContent === tableName;
+    el.classList.toggle('active', isThis);
+  });
+
+  const titleEl = document.getElementById('db-active-table-name');
+  const metaEl  = document.getElementById('db-active-table-meta');
+  const tbodyEl = document.getElementById('db-table-tbody');
+
+  if (titleEl) titleEl.textContent = tableName;
+  if (metaEl)  metaEl.textContent = 'Завантаження даних...';
+  if (tbodyEl) tbodyEl.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:30px; color:var(--text-muted);">Завантаження записів...</td></tr>';
+
+  try {
+    const res = await fetch(`/api/database/tables/${tableName}`, {
+      headers: { 'X-Blog-Secret': secret }
+    });
+
+    let records = [];
+    if (res.ok) {
+      const json = await res.json();
+      records = json.data || [];
+    } else {
+      throw new Error('HTTP Status ' + res.status);
+    }
+
+    currentDbData = records;
+    filteredDbData = [...records];
+    if (metaEl) metaEl.textContent = `${records.length} записів (${records.length > 0 ? Object.keys(records[0]).length : 0} полів)`;
+
+    renderDbGridTable();
+    renderDbRawJson();
+  } catch (err) {
+    console.error(`Error loading table ${tableName}:`, err);
+    if (metaEl) metaEl.textContent = 'Помилка завантаження';
+    if (tbodyEl) tbodyEl.innerHTML = `<tr><td colspan="100%" style="text-align:center; padding:30px; color:var(--danger);">Не вдалося завантажити таблицю ${escText(tableName)}</td></tr>`;
+  }
+}
+
+function renderDbGridTable() {
+  const theadEl = document.getElementById('db-table-thead');
+  const tbodyEl = document.getElementById('db-table-tbody');
+  if (!theadEl || !tbodyEl) return;
+
+  const records = filteredDbData;
+  if (!records || records.length === 0) {
+    theadEl.innerHTML = '<tr><th>#</th><th>Дані</th></tr>';
+    tbodyEl.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:30px; color:var(--text-muted);">Записи відсутні або не знайдено за запитом</td></tr>';
+    return;
+  }
+
+  const colKeys = [];
+  records.forEach(r => {
+    if (r && typeof r === 'object') {
+      Object.keys(r).forEach(k => {
+        if (!colKeys.includes(k)) colKeys.push(k);
+      });
+    }
+  });
+
+  const getTypeBadge = (key) => {
+    const val = records.find(r => r && r[key] !== undefined && r[key] !== null)?.[key];
+    if (val === undefined || val === null) return '<span class="db-type-badge type-string">null</span>';
+    if (Array.isArray(val)) return '<span class="db-type-badge type-array">array</span>';
+    if (typeof val === 'object') return '<span class="db-type-badge type-object">jsonb</span>';
+    if (typeof val === 'number') return '<span class="db-type-badge type-number">int</span>';
+    if (typeof val === 'boolean') return '<span class="db-type-badge type-boolean">bool</span>';
+    return '<span class="db-type-badge type-string">text</span>';
+  };
+
+  let headHtml = '<tr><th style="width:40px; text-align:center;">#</th>';
+  colKeys.forEach(k => {
+    headHtml += `<th>${escText(k)} ${getTypeBadge(k)}</th>`;
+  });
+  headHtml += '<th style="width:70px; text-align:center;">Дії</th></tr>';
+  theadEl.innerHTML = headHtml;
+
+  let bodyHtml = '';
+  records.forEach((row, idx) => {
+    bodyHtml += `<tr style="cursor:pointer;" onclick="openRowInspector(${idx})">`;
+    bodyHtml += `<td style="text-align:center; color:var(--text-muted); font-size:11px;">${idx + 1}</td>`;
+
+    colKeys.forEach(k => {
+      const val = row[k];
+      let cellStr = '';
+      if (val === null || val === undefined) {
+        cellStr = '<span style="color:var(--text-muted); font-style:italic;">null</span>';
+      } else if (typeof val === 'object') {
+        const count = Array.isArray(val) ? val.length : Object.keys(val).length;
+        cellStr = `<span class="db-cell-json-badge" onclick="event.stopPropagation(); openRowInspector(${idx})">{ } ${Array.isArray(val) ? 'Array' : 'Object'} (${count})</span>`;
+      } else if (typeof val === 'boolean') {
+        cellStr = val ? '<span style="color:var(--success); font-weight:600;">true</span>' : '<span style="color:var(--danger);">false</span>';
+      } else {
+        cellStr = escText(String(val));
+      }
+      bodyHtml += `<td>${cellStr}</td>`;
+    });
+
+    bodyHtml += `<td style="text-align:center;" onclick="event.stopPropagation();">
+      <button class="db-row-inspect-btn" onclick="openRowInspector(${idx})">👁️ Inspect</button>
+    </td>`;
+    bodyHtml += '</tr>';
+  });
+
+  tbodyEl.innerHTML = bodyHtml;
+}
+
+function renderDbRawJson() {
+  const jsonCodeEl = document.getElementById('db-raw-json-code');
+  if (jsonCodeEl) {
+    jsonCodeEl.textContent = JSON.stringify(filteredDbData, null, 2);
+  }
+}
+
+function openRowInspector(rowIndex) {
+  const row = filteredDbData[rowIndex];
+  if (!row) return;
+
+  const modal = document.getElementById('db-row-inspector-modal');
+  const content = document.getElementById('row-inspector-content');
+  if (!modal || !content) return;
+
+  let html = `<div style="margin-bottom:12px; font-size:12px; color:var(--accent-light); font-weight:600;">Запис #${rowIndex + 1} в таблиці "${activeDbTable}"</div>`;
+
+  html += '<div style="display:flex; flex-direction:column; gap:10px;">';
+  Object.keys(row).forEach(key => {
+    const val = row[key];
+    let formattedVal = '';
+    if (typeof val === 'object' && val !== null) {
+      formattedVal = `<pre style="margin:4px 0 0 0; padding:10px; background:#0d1117; border-radius:6px; color:#e6edf3; font-size:12px; overflow-x:auto;">${escText(JSON.stringify(val, null, 2))}</pre>`;
+    } else {
+      formattedVal = `<span style="color:var(--text-primary); font-weight:500;">${escText(String(val))}</span>`;
+    }
+
+    html += `
+      <div style="background:var(--bg-surface); padding:10px 14px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-bottom:4px;">${escText(key)}</div>
+        <div>${formattedVal}</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  content.innerHTML = html;
+  modal.style.display = 'flex';
+
+  window.currentInspectedRowJson = JSON.stringify(row, null, 2);
+}
 
 function showApp(email) {
   document.getElementById('login-screen').style.display = 'none';
