@@ -31,7 +31,11 @@ package-lock.json
 # Server Data (Do not overwrite production data)
 server/data/posts.json
 server/data/analytics.json
+server/data/articles/
 uploads/
+server/uploads/
 
 # Content drafts
 instagram_posts.txt
+
+ARTICLES_EDITOR_PLAN.md

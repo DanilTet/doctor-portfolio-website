@@ -13,6 +13,8 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 const archiver = require('archiver');
+const { writeArticleHtml } = require('./utils/article-renderer');
+const { translateArticle } = require('./utils/article-translator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,10 +26,14 @@ const ROOT_DIR = path.join(__dirname, '..');            // Project root
 const DATA_FILE = path.join(__dirname, 'data', 'posts.json');
 const ANALYTICS_FILE = path.join(__dirname, 'data', 'analytics.json');
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
+const ARTICLES_DIR = path.join(__dirname, 'data', 'articles');
+const ARTICLES_UPLOADS_DIR = path.join(__dirname, 'uploads', 'articles');
 
 // Ensure directories exist
 fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+fs.mkdirSync(ARTICLES_DIR, { recursive: true });
+fs.mkdirSync(ARTICLES_UPLOADS_DIR, { recursive: true });
 
 /* ── Middleware ──────────────────────────────────────────── */
 app.use(cors());
@@ -35,6 +41,9 @@ app.use(express.json());
 
 // Serve uploaded blog images
 app.use('/uploads/blog', express.static(UPLOADS_DIR));
+
+// Serve uploaded article images
+app.use('/uploads/articles', express.static(ARTICLES_UPLOADS_DIR));
 
 // Serve the entire website from project root (index.html, css/, js/, admin/, img/, etc.)
 app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
@@ -50,6 +59,28 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+  fileFilter: (_req, file, cb) => {
+    if (/^image\//.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Только изображения!'));
+  },
+});
+
+/* ── Multer for article images ───────────────────────────── */
+const articleStorage = multer.diskStorage({
+  destination: (req, _file, cb) => {
+    const slug = req.params.slug || req.body.slug || 'tmp';
+    const dir = path.join(ARTICLES_UPLOADS_DIR, slug.replace(/[^a-z0-9-]/gi, '-'));
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `${uuidv4()}${ext}`);
+  },
+});
+const uploadArticle = multer({
+  storage: articleStorage,
+  limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (/^image\//.test(file.mimetype)) cb(null, true);
     else cb(new Error('Только изображения!'));
@@ -522,6 +553,228 @@ app.get('/api/database/tables/:tableName', authGuard, (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: `Ошибка чтения таблицы: ${err.message}` });
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ARTICLES API
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Helpers ─────────────────────────────────────────────── */
+function readArticles() {
+  const files = fs.existsSync(ARTICLES_DIR) ? fs.readdirSync(ARTICLES_DIR).filter(f => f.endsWith('.json')) : [];
+  return files.map(f => {
+    try { return JSON.parse(fs.readFileSync(path.join(ARTICLES_DIR, f), 'utf-8')); }
+    catch(e) { return null; }
+  }).filter(Boolean);
+}
+
+function readArticle(id) {
+  const articles = readArticles();
+  return articles.find(a => a.id === id) || null;
+}
+
+function writeArticle(article) {
+  const file = path.join(ARTICLES_DIR, `${article.slug}.json`);
+  fs.writeFileSync(file, JSON.stringify(article, null, 2), 'utf-8');
+}
+
+function deleteArticleFile(article) {
+  const file = path.join(ARTICLES_DIR, `${article.slug}.json`);
+  if (fs.existsSync(file)) fs.rmSync(file, { force: true });
+}
+
+/**
+ * GET /api/articles
+ * Returns list of all articles (sorted newest first).
+ */
+app.get('/api/articles', authGuard, (_req, res) => {
+  const articles = readArticles().sort((a, b) => new Date(b.date) - new Date(a.date));
+  res.json(articles);
+});
+
+/**
+ * POST /api/articles
+ * Create a new article (draft).
+ * Body: JSON
+ */
+app.post('/api/articles', authGuard, (req, res) => {
+  const body = req.body;
+  if (!body.title || body.title.trim().length < 2)
+    return res.status(400).json({ error: 'Заголовок обязателен' });
+
+  const slug = (body.slug || body.title)
+    .toLowerCase()
+    .replace(/[^a-zа-яёіїєґ0-9\s-]/gi, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[а-яёіїєґ]/g, c => {
+      const map = {а:'a',б:'b',в:'v',г:'h',ґ:'g',д:'d',е:'e',є:'ye',ж:'zh',з:'z',и:'y',і:'i',ї:'yi',й:'j',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'kh',ц:'ts',ч:'ch',ш:'sh',щ:'shch',ь:'',ю:'yu',я:'ya',ё:'yo'};
+      return map[c.toLowerCase()] || c;
+    });
+
+  const article = {
+    id: uuidv4(),
+    slug: slug || uuidv4().slice(0, 8),
+    title: body.title.trim(),
+    subtitle: body.subtitle || '',
+    seo_description: body.seo_description || '',
+    image_card: body.image_card || null,
+    tags: Array.isArray(body.tags) ? body.tags : [],
+    date: body.date ? new Date(body.date).toISOString() : new Date().toISOString(),
+    status: 'draft',
+    show_in_blog: body.show_in_blog !== false,
+    sections: Array.isArray(body.sections) ? body.sections : [],
+    show_final_cta: body.show_final_cta !== false,
+    translations: {},
+  };
+
+  writeArticle(article);
+  res.status(201).json(article);
+});
+
+/**
+ * PUT /api/articles/:id
+ * Update an existing article.
+ */
+app.put('/api/articles/:id', authGuard, (req, res) => {
+  const article = readArticle(req.params.id);
+  if (!article) return res.status(404).json({ error: 'Статья не найдена' });
+
+  const body = req.body;
+  const oldFile = path.join(ARTICLES_DIR, `${article.slug}.json`);
+
+  // Merge fields
+  if (body.title !== undefined) article.title = body.title;
+  if (body.subtitle !== undefined) article.subtitle = body.subtitle;
+  if (body.seo_description !== undefined) article.seo_description = body.seo_description;
+  if (body.image_card !== undefined) article.image_card = body.image_card;
+  if (Array.isArray(body.tags)) article.tags = body.tags;
+  if (body.date !== undefined) article.date = new Date(body.date).toISOString();
+  if (body.status !== undefined) article.status = body.status;
+  if (body.show_in_blog !== undefined) article.show_in_blog = body.show_in_blog;
+  if (Array.isArray(body.sections)) article.sections = body.sections;
+  if (body.show_final_cta !== undefined) article.show_final_cta = body.show_final_cta;
+  if (body.slug !== undefined && body.slug !== article.slug) {
+    // slug changed — rename file
+    if (fs.existsSync(oldFile)) fs.rmSync(oldFile, { force: true });
+    article.slug = body.slug;
+  }
+
+  writeArticle(article);
+  res.json(article);
+});
+
+/**
+ * DELETE /api/articles/:id
+ * Delete an article and its generated HTML files.
+ */
+app.delete('/api/articles/:id', authGuard, (req, res) => {
+  const article = readArticle(req.params.id);
+  if (!article) return res.status(404).json({ error: 'Статья не найдена' });
+
+  deleteArticleFile(article);
+
+  // Remove from posts.json if it was published there
+  const posts = readPosts();
+  const filtered = posts.filter(p => p.article_id !== article.id);
+  if (filtered.length !== posts.length) writePosts(filtered);
+
+  console.log(`[Articles API] Deleted article "${article.slug}"`);
+  res.json({ ok: true });
+});
+
+/**
+ * POST /api/articles/:id/upload-image
+ * Upload an image for an article (cover or section).
+ * URL param :slug is read from article.slug
+ */
+app.post('/api/articles/:id/upload-image', authGuard, (req, res, next) => {
+  const article = readArticle(req.params.id);
+  if (!article) return res.status(404).json({ error: 'Статья не найдена' });
+  req.params.slug = article.slug;
+  next();
+}, uploadArticle.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Файл не загружен' });
+  const url = `/uploads/articles/${req.params.slug}/${req.file.filename}`;
+  res.json({ ok: true, url });
+});
+
+/**
+ * POST /api/articles/:id/publish
+ * Generate HTML files and add/update entry in posts.json for blog display.
+ */
+app.post('/api/articles/:id/publish', authGuard, async (req, res) => {
+  const article = readArticle(req.params.id);
+  if (!article) return res.status(404).json({ error: 'Статья не найдена' });
+
+  try {
+    // Generate Ukrainian HTML
+    const ukFile = writeArticleHtml(article, 'uk');
+
+    // If Russian translation exists — generate RU HTML too
+    let ruFile = null;
+    if (article.translations && article.translations.ru && article.translations.ru.title) {
+      ruFile = writeArticleHtml(article, 'ru');
+    }
+
+    // Update article status
+    article.status = 'published';
+    writeArticle(article);
+
+    // Upsert into posts.json (blog card)
+    if (article.show_in_blog) {
+      const posts = readPosts();
+      const existing = posts.findIndex(p => p.article_id === article.id);
+      const blogPost = {
+        id: existing >= 0 ? posts[existing].id : uuidv4(),
+        article_id: article.id,
+        title: article.title,
+        content: article.subtitle || '',
+        image_path: article.image_card || null,
+        external_url: `/articles/${article.slug}`,
+        date: article.date,
+        source: 'article',
+        tags: article.tags || [],
+      };
+      if (existing >= 0) { posts[existing] = blogPost; } else { posts.unshift(blogPost); }
+      writePosts(posts);
+    }
+
+    console.log(`[Articles API] Published "${article.slug}": ${ukFile}`);
+    res.json({ ok: true, uk: ukFile, ru: ruFile });
+  } catch (err) {
+    console.error('[Articles API] Publish error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/articles/:id/translate
+ * Translate article from Ukrainian to Russian and generate RU HTML.
+ */
+app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
+  const article = readArticle(req.params.id);
+  if (!article) return res.status(404).json({ error: 'Статья не найдена' });
+
+  try {
+    console.log(`[Articles API] Starting translation for "${article.slug}"...`);
+    const ruTranslation = await translateArticle(article);
+    article.translations = article.translations || {};
+    article.translations.ru = ruTranslation;
+    writeArticle(article);
+
+    // Generate RU HTML if article is published
+    let ruFile = null;
+    if (article.status === 'published') {
+      ruFile = writeArticleHtml(article, 'ru');
+    }
+
+    console.log(`[Articles API] Translation done for "${article.slug}"`);
+    res.json({ ok: true, ru: ruTranslation, ruFile });
+  } catch (err) {
+    console.error('[Articles API] Translation error:', err.message);
+    res.status(500).json({ error: `Ошибка перевода: ${err.message}` });
   }
 });
 
