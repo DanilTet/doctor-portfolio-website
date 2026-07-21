@@ -2661,11 +2661,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const originalText = btnBackupImages.innerHTML;
       btnBackupImages.innerHTML = 'Формування архіву...';
 
+      const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+
       fetch(`/api/blog/backup-images`, {
-        headers: { 'X-Blog-Secret': sessionStorage.getItem('admin_token') || '' }
+        headers: { 'X-Blog-Secret': secret }
       })
       .then(res => {
-        if (!res.ok) throw new Error('Помилка скачування архіву');
+        if (!res.ok) throw new Error('Помилка скачування архіву (HTTP ' + res.status + ')');
         return res.blob();
       })
       .then(blob => {
@@ -2677,14 +2679,66 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        toast('Архів медіа успішно завантажено!', 'success');
       })
       .catch(err => {
-        alert(err.message);
+        alert('Помилка скачування архіву: ' + err.message);
       })
       .finally(() => {
         btnBackupImages.disabled = false;
         btnBackupImages.innerHTML = originalText;
       });
+    });
+  }
+
+  const btnBackupAnalytics = document.getElementById('btn-export-backup-analytics');
+  if (btnBackupAnalytics) {
+    btnBackupAnalytics.addEventListener('click', async () => {
+      btnBackupAnalytics.disabled = true;
+      const originalText = btnBackupAnalytics.innerHTML;
+      btnBackupAnalytics.innerHTML = 'Формування бекапу...';
+
+      const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+
+      try {
+        let jsonBlob = null;
+        try {
+          const res = await fetch('/api/analytics/backup', {
+            headers: { 'X-Blog-Secret': secret }
+          });
+          if (res.ok) {
+            jsonBlob = await res.blob();
+          }
+        } catch (e) {
+          console.warn('Could not fetch analytics from server API, fallback to client Supabase data', e);
+        }
+
+        if (!jsonBlob) {
+          let analyticsData = cachedDailyDays;
+          if (!analyticsData || analyticsData.length === 0) {
+            const { data } = await Supabase.get('daily_analytics', '?select=*&order=date.desc&limit=1000');
+            analyticsData = data || [];
+          }
+          const jsonStr = JSON.stringify(analyticsData, null, 2);
+          jsonBlob = new Blob([jsonStr], { type: 'application/json' });
+        }
+
+        const url = URL.createObjectURL(jsonBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().split('T')[0];
+        a.download = `analytics_backup_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast('Бекап аналітики успішно завантажено!', 'success');
+      } catch (err) {
+        alert('Помилка завантаження бекапу аналітики: ' + err.message);
+      } finally {
+        btnBackupAnalytics.disabled = false;
+        btnBackupAnalytics.innerHTML = originalText;
+      }
     });
   }
 });
