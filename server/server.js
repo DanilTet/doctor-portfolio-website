@@ -327,18 +327,18 @@ app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
 
 /**
  * GET /api/analytics
- * Returns local daily analytics JSON.
+ * Returns local daily analytics JSON (requires admin secret).
  */
-app.get('/api/analytics', (_req, res) => {
+app.get('/api/analytics', authGuard, (_req, res) => {
   const data = readAnalytics();
   res.json(data);
 });
 
 /**
  * GET /api/analytics/backup
- * Download analytics.json backup file directly.
+ * Download analytics.json backup file directly (requires admin secret).
  */
-app.get('/api/analytics/backup', (_req, res) => {
+app.get('/api/analytics/backup', authGuard, (_req, res) => {
   if (fs.existsSync(ANALYTICS_FILE)) {
     res.download(ANALYTICS_FILE, `analytics_backup_${new Date().toISOString().split('T')[0]}.json`);
   } else {
