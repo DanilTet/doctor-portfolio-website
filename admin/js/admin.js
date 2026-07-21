@@ -344,13 +344,31 @@ function formatDurationTime(avgSeconds) {
   return secs > 0 ? `${mins}хв ${secs}с` : `${mins}хв`;
 }
 
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function setCookie(name, value, days = 365) {
+  const d = new Date();
+  d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+}
+
+function removeCookie(name) {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+}
+
 function updateAdminTrackingUI() {
   const container = document.getElementById('admin-device-tracking-status');
   const textEl = document.getElementById('admin-tracking-status-text');
   const btnEl = document.getElementById('btn-toggle-admin-tracking');
   if (!container || !textEl || !btnEl) return;
 
-  const isIgnored = localStorage.getItem('ignore_analytics') === 'true' || localStorage.getItem('is_admin_device') === 'true';
+  const isIgnored = 
+    localStorage.getItem('ignore_analytics') === 'true' || 
+    localStorage.getItem('is_admin_device') === 'true' ||
+    getCookie('ignore_analytics') === 'true';
 
   if (isIgnored) {
     container.style.background = 'rgba(34, 197, 94, 0.1)';
@@ -365,13 +383,19 @@ function updateAdminTrackingUI() {
   }
 
   btnEl.onclick = () => {
-    if (localStorage.getItem('ignore_analytics') === 'true' || localStorage.getItem('is_admin_device') === 'true') {
+    if (localStorage.getItem('ignore_analytics') === 'true' || localStorage.getItem('is_admin_device') === 'true' || getCookie('ignore_analytics') === 'true') {
       localStorage.removeItem('ignore_analytics');
       localStorage.removeItem('is_admin_device');
+      sessionStorage.removeItem('is_admin_device');
+      removeCookie('ignore_analytics');
+      removeCookie('is_admin_device');
       toast('Аналітику для цього пристрою увімкнено (ваші візити рахуватимуться)', 'info');
     } else {
       localStorage.setItem('ignore_analytics', 'true');
       localStorage.setItem('is_admin_device', 'true');
+      sessionStorage.setItem('is_admin_device', 'true');
+      setCookie('ignore_analytics', 'true', 365);
+      setCookie('is_admin_device', 'true', 365);
       toast('Пристрій виключено з аналітики (ваші візити НЕ рахуватимуться)!', 'success');
     }
     updateAdminTrackingUI();
@@ -380,10 +404,13 @@ function updateAdminTrackingUI() {
 
 async function loadMarketingAnalytics(rangeDays) {
   try {
-    // Automatically set ignore flag for admin panel devices by default if not set
+    // Automatically mark device as admin & ignore analytics
     if (localStorage.getItem('ignore_analytics') === null && localStorage.getItem('is_admin_device') === null) {
       localStorage.setItem('ignore_analytics', 'true');
       localStorage.setItem('is_admin_device', 'true');
+      sessionStorage.setItem('is_admin_device', 'true');
+      setCookie('ignore_analytics', 'true', 365);
+      setCookie('is_admin_device', 'true', 365);
     }
     updateAdminTrackingUI();
 
@@ -584,7 +611,7 @@ async function loadMarketingAnalytics(rangeDays) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// DAILY VISITS CHART (Line & Bar Dual Chart)
+// DAILY VISITS CHART (Line & Bar Dual Chart with Yellow Update Line Marker)
 // ─────────────────────────────────────────────────────────────
 function renderDailyVisitsChart(dailyDays) {
   const canvas = document.getElementById('chart-daily-visits');
@@ -611,6 +638,67 @@ function renderDailyVisitsChart(dailyDays) {
   const gradientCyan = ctx.createLinearGradient(0, 0, 0, 300);
   gradientCyan.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
   gradientCyan.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+  // Plugin to draw vertical yellow annotation line on date of exact tracking update (2026-07-21)
+  const updateMarkerPlugin = {
+    id: 'updateMarkerPlugin',
+    afterDraw: (chart) => {
+      const targetIndex = sortedDays.findIndex(d => d.date === '2026-07-21');
+      if (targetIndex === -1) return;
+
+      const meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data || !meta.data[targetIndex]) return;
+
+      const x = meta.data[targetIndex].x;
+      const topY = chart.chartArea.top;
+      const bottomY = chart.chartArea.bottom;
+      const cCtx = chart.ctx;
+
+      cCtx.save();
+
+      // Vertical dashed yellow line
+      cCtx.beginPath();
+      cCtx.setLineDash([5, 5]);
+      cCtx.strokeStyle = '#f59e0b';
+      cCtx.lineWidth = 2;
+      cCtx.moveTo(x, topY + 22);
+      cCtx.lineTo(x, bottomY);
+      cCtx.stroke();
+
+      // Yellow pill badge on top
+      const labelText = '⚡ 21 Лип: Оновлення точного відстеження';
+      cCtx.font = 'bold 10.5px Inter, sans-serif';
+      const textMetrics = cCtx.measureText(labelText);
+      const badgePaddingX = 8;
+      const badgeH = 20;
+      const badgeW = textMetrics.width + badgePaddingX * 2;
+      let badgeX = x - badgeW / 2;
+
+      // Keep badge within chart area bounds
+      if (badgeX < chart.chartArea.left + 4) badgeX = chart.chartArea.left + 4;
+      if (badgeX + badgeW > chart.chartArea.right - 4) badgeX = chart.chartArea.right - badgeW - 4;
+
+      const badgeY = topY + 2;
+
+      // Draw background pill
+      cCtx.fillStyle = '#f59e0b';
+      if (typeof cCtx.roundRect === 'function') {
+        cCtx.beginPath();
+        cCtx.roundRect(badgeX, badgeY, badgeW, badgeH, 10);
+        cCtx.fill();
+      } else {
+        cCtx.fillRect(badgeX, badgeY, badgeW, badgeH);
+      }
+
+      // Draw label text
+      cCtx.fillStyle = '#000000';
+      cCtx.textAlign = 'center';
+      cCtx.textBaseline = 'middle';
+      cCtx.fillText(labelText, badgeX + badgeW / 2, badgeY + badgeH / 2 + 1);
+
+      cCtx.restore();
+    }
+  };
 
   dailyVisitsChart = new Chart(ctx, {
     type: 'line',
@@ -648,6 +736,7 @@ function renderDailyVisitsChart(dailyDays) {
         }
       ]
     },
+    plugins: [updateMarkerPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,

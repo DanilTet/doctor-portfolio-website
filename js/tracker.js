@@ -6,15 +6,35 @@
 
 (async function initTracker() {
   try {
-    // ── 0. Check Excluded / Admin Device ────────────────────────────────────
+    // ── 0. Storage & Cookie Helpers ─────────────────────────────────────────
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    function setCookie(name, value, days = 365) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+    }
+
+    function removeCookie(name) {
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+    }
+
+    // ── 1. Check Excluded / Admin Device ────────────────────────────────────
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('no_track') === '1' || urlParams.get('admin') === '1' || urlParams.get('ignore_analytics') === '1') {
       localStorage.setItem('ignore_analytics', 'true');
       localStorage.setItem('is_admin_device', 'true');
+      setCookie('ignore_analytics', 'true', 365);
+      setCookie('is_admin_device', 'true', 365);
       console.log('[Tracker] Device marked as ignored for analytics.');
     } else if (urlParams.get('track') === '1' || urlParams.get('enable_analytics') === '1') {
       localStorage.removeItem('ignore_analytics');
       localStorage.removeItem('is_admin_device');
+      removeCookie('ignore_analytics');
+      removeCookie('is_admin_device');
       console.log('[Tracker] Analytics tracking re-enabled for this device.');
     }
 
@@ -22,6 +42,8 @@
       localStorage.getItem('ignore_analytics') === 'true' || 
       localStorage.getItem('is_admin_device') === 'true' || 
       sessionStorage.getItem('is_admin_device') === 'true' ||
+      getCookie('ignore_analytics') === 'true' ||
+      getCookie('is_admin_device') === 'true' ||
       window.location.pathname.includes('/admin');
 
     if (isIgnoredDevice) {
