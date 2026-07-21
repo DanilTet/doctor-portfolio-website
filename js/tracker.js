@@ -6,8 +6,30 @@
 
 (async function initTracker() {
   try {
-    // ── 1. UTM Parameters Setup ─────────────────────────────────────────────
+    // ── 0. Check Excluded / Admin Device ────────────────────────────────────
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('no_track') === '1' || urlParams.get('admin') === '1' || urlParams.get('ignore_analytics') === '1') {
+      localStorage.setItem('ignore_analytics', 'true');
+      localStorage.setItem('is_admin_device', 'true');
+      console.log('[Tracker] Device marked as ignored for analytics.');
+    } else if (urlParams.get('track') === '1' || urlParams.get('enable_analytics') === '1') {
+      localStorage.removeItem('ignore_analytics');
+      localStorage.removeItem('is_admin_device');
+      console.log('[Tracker] Analytics tracking re-enabled for this device.');
+    }
+
+    const isIgnoredDevice = 
+      localStorage.getItem('ignore_analytics') === 'true' || 
+      localStorage.getItem('is_admin_device') === 'true' || 
+      sessionStorage.getItem('is_admin_device') === 'true' ||
+      window.location.pathname.includes('/admin');
+
+    if (isIgnoredDevice) {
+      console.debug('[Tracker] Admin device / path detected. Analytics tracking skipped.');
+      return;
+    }
+
+    // ── 1. UTM Parameters Setup ─────────────────────────────────────────────
     const utmSource = urlParams.get('utm_source');
     const utmMedium = urlParams.get('utm_medium');
     const utmCampaign = urlParams.get('utm_campaign');
@@ -22,23 +44,50 @@
       utm_campaign: sessionStorage.getItem('utm_campaign') || null
     };
 
-    // ── 2. Identification (daily aggregation) ──────────────
+    // ── 2. Storage Helpers (localStorage + cookie fallback) ─────────
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    function setCookie(name, value, days = 365) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+    }
+
+    function getStored(key) {
+      try {
+        const val = localStorage.getItem(key);
+        if (val) return val;
+      } catch(e) {}
+      return getCookie(key);
+    }
+
+    function setStored(key, value) {
+      try { localStorage.setItem(key, value); } catch(e) {}
+      setCookie(key, value);
+    }
+
+    // ── 3. Identification (Daily Unique & Returning Detection) ──────
     const today = new Date().toISOString().split('T')[0];
-    let isNewVisitor = false;
+    let isDailyUnique = false;
     let isReturning = false;
     
-    const lastVisit = localStorage.getItem('last_visit_date');
-    const firstVisit = localStorage.getItem('first_visit_date');
+    let firstVisit = getStored('first_visit_date');
+    const lastTrackedDay = getStored('last_tracked_day');
     
     if (!firstVisit) {
-      localStorage.setItem('first_visit_date', today);
-      isNewVisitor = true;
-    } else if (lastVisit && lastVisit !== today) {
+      setStored('first_visit_date', today);
+      firstVisit = today;
+    } else if (firstVisit < today) {
       isReturning = true;
     }
     
-    if (lastVisit !== today) {
-      localStorage.setItem('last_visit_date', today);
+    // Check if this visitor has been counted for today's daily unique count
+    if (lastTrackedDay !== today) {
+      setStored('last_tracked_day', today);
+      isDailyUnique = true;
     }
 
     // ── 3. Device / Browser / OS & Referrer Detection ───────────────────────
@@ -148,8 +197,8 @@
           p_event_target: eventData.eventTarget || null,
           p_scroll_depth: eventData.scroll_depth !== undefined ? eventData.scroll_depth : null,
           p_time_on_site: eventData.time_on_site !== undefined ? eventData.time_on_site : null,
-          p_is_new_visitor: isNewVisitor,
-          p_is_returning: isReturning,
+          p_is_new_visitor: isDailyUnique,
+          p_is_returning: isReturning && isDailyUnique,
           p_utm_source: currentUtm.utm_source,
           p_city: city,
           p_os: os,
@@ -160,8 +209,8 @@
 
         await supabase.rpc('track_analytics_event', payload);
         
-        // Reset boolean flags after the first event so they aren't double-counted
-        isNewVisitor = false;
+        // Reset daily flags after the first event of the day so they aren't double-counted
+        isDailyUnique = false;
         isReturning = false;
       } catch (err) {
         console.debug('[Tracker] Error logging event:', err.message);

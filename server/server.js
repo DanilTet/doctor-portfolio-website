@@ -20,9 +20,10 @@ const BLOG_SECRET = process.env.BLOG_SECRET || 'super-secret-key-123';
 const INSTAGRAM_USERNAME = process.env.INSTAGRAM_USERNAME || '';
 
 /* ── Paths ───────────────────────────────────────────────── */
-const ROOT_DIR    = path.join(__dirname, '..');            // Project root
-const DATA_FILE   = path.join(__dirname, 'data', 'posts.json');
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
+const ROOT_DIR       = path.join(__dirname, '..');            // Project root
+const DATA_FILE      = path.join(__dirname, 'data', 'posts.json');
+const ANALYTICS_FILE = path.join(__dirname, 'data', 'analytics.json');
+const UPLOADS_DIR    = path.join(__dirname, '..', 'uploads', 'blog');
 
 // Ensure directories exist
 fs.mkdirSync(path.join(__dirname, 'data'),    { recursive: true });
@@ -66,6 +67,25 @@ function readPosts() {
 
 function writePosts(posts) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), 'utf-8');
+}
+
+function readAnalytics() {
+  try {
+    if (fs.existsSync(ANALYTICS_FILE)) {
+      return JSON.parse(fs.readFileSync(ANALYTICS_FILE, 'utf-8'));
+    }
+  } catch (e) {
+    console.warn('[Analytics API] Failed to read analytics.json:', e.message);
+  }
+  return [];
+}
+
+function writeAnalytics(data) {
+  try {
+    fs.writeFileSync(ANALYTICS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('[Analytics API] Failed to write analytics.json:', e.message);
+  }
 }
 
 function authGuard(req, res, next) {
@@ -305,6 +325,27 @@ app.post('/api/blog/sync-instagram', authGuard, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/analytics
+ * Returns local daily analytics JSON.
+ */
+app.get('/api/analytics', (_req, res) => {
+  const data = readAnalytics();
+  res.json(data);
+});
+
+/**
+ * GET /api/analytics/backup
+ * Download analytics.json backup file directly.
+ */
+app.get('/api/analytics/backup', (_req, res) => {
+  if (fs.existsSync(ANALYTICS_FILE)) {
+    res.download(ANALYTICS_FILE, `analytics_backup_${new Date().toISOString().split('T')[0]}.json`);
+  } else {
+    res.status(404).json({ error: 'Файл аналитики не найден' });
+  }
+});
+
 /* ── SPA fallback: serve index.html for all non-API routes ─ */
 app.get('*', (req, res) => {
   // If requesting admin, serve admin/index.html
@@ -316,7 +357,7 @@ app.get('*', (req, res) => {
 
 /**
  * GET /api/blog/backup-images
- * Streams a ZIP archive of all blog images and posts.json
+ * Streams a ZIP archive of all blog images, posts.json and analytics.json
  */
 app.get('/api/blog/backup-images', authGuard, (req, res) => {
   res.setHeader('Content-Type', 'application/zip');
@@ -333,6 +374,11 @@ app.get('/api/blog/backup-images', authGuard, (req, res) => {
   // Append posts.json
   if (fs.existsSync(DATA_FILE)) {
     archive.file(DATA_FILE, { name: 'posts.json' });
+  }
+
+  // Append analytics.json
+  if (fs.existsSync(ANALYTICS_FILE)) {
+    archive.file(ANALYTICS_FILE, { name: 'analytics.json' });
   }
 
   // Append uploads folder

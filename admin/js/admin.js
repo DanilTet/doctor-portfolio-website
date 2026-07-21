@@ -342,8 +342,49 @@ function formatDurationTime(avgSeconds) {
   return secs > 0 ? `${mins}хв ${secs}с` : `${mins}хв`;
 }
 
+function updateAdminTrackingUI() {
+  const container = document.getElementById('admin-device-tracking-status');
+  const textEl = document.getElementById('admin-tracking-status-text');
+  const btnEl = document.getElementById('btn-toggle-admin-tracking');
+  if (!container || !textEl || !btnEl) return;
+
+  const isIgnored = localStorage.getItem('ignore_analytics') === 'true' || localStorage.getItem('is_admin_device') === 'true';
+
+  if (isIgnored) {
+    container.style.background = 'rgba(34, 197, 94, 0.1)';
+    container.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+    container.style.color = '#22c55e';
+    textEl.textContent = '🛡️ Ваш пристрій виключено з аналітики';
+  } else {
+    container.style.background = 'rgba(239, 68, 68, 0.1)';
+    container.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+    container.style.color = '#ef4444';
+    textEl.textContent = '⚠️ Ваш пристрій входить до статистики';
+  }
+
+  btnEl.onclick = () => {
+    if (localStorage.getItem('ignore_analytics') === 'true' || localStorage.getItem('is_admin_device') === 'true') {
+      localStorage.removeItem('ignore_analytics');
+      localStorage.removeItem('is_admin_device');
+      toast('Аналітику для цього пристрою увімкнено (ваші візити рахуватимуться)', 'info');
+    } else {
+      localStorage.setItem('ignore_analytics', 'true');
+      localStorage.setItem('is_admin_device', 'true');
+      toast('Пристрій виключено з аналітики (ваші візити НЕ рахуватимуться)!', 'success');
+    }
+    updateAdminTrackingUI();
+  };
+}
+
 async function loadMarketingAnalytics(rangeDays) {
   try {
+    // Automatically set ignore flag for admin panel devices by default if not set
+    if (localStorage.getItem('ignore_analytics') === null && localStorage.getItem('is_admin_device') === null) {
+      localStorage.setItem('ignore_analytics', 'true');
+      localStorage.setItem('is_admin_device', 'true');
+    }
+    updateAdminTrackingUI();
+
     const rangeSelect = document.getElementById('marketing-time-range');
     if (rangeSelect) {
       rangeSelect.removeEventListener('change', handleMarketingRangeChange);
