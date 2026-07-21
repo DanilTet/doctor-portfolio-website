@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "sync-analytics": "node sync-analytics.js"
   },
   "dependencies": {
     "archiver": "^8.0.0",
