@@ -207,13 +207,17 @@
           p_referrer: referrer
         };
 
-        await supabase.rpc('track_analytics_event', payload);
+        await fetch('/api/analytics/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
         
         // Reset daily flags after the first event of the day so they aren't double-counted
         isDailyUnique = false;
         isReturning = false;
       } catch (err) {
-        console.debug('[Tracker] Error logging event:', err.message);
+        console.debug('[Tracker] Error logging event locally:', err.message);
       }
     }
 

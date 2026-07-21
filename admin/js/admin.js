@@ -392,10 +392,24 @@ async function loadMarketingAnalytics(rangeDays) {
     }
 
     const daysCount = rangeDays || (rangeSelect ? parseInt(rangeSelect.value, 10) : 30);
-    const fetchLimit = daysCount * 2;
 
-    const { data } = await Supabase.get('daily_analytics', `?limit=${fetchLimit}&order=date.desc`);
-    const days = data || [];
+    const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+    let days = [];
+
+    try {
+      const res = await fetch(`/api/analytics`, {
+        headers: { 'X-Blog-Secret': secret }
+      });
+      if (res.ok) {
+        days = await res.json();
+      } else {
+        throw new Error('HTTP Status ' + res.status);
+      }
+    } catch (e) {
+      console.warn('Could not load local analytics, falling back to Supabase client', e);
+      const { data } = await Supabase.get('daily_analytics', `?limit=${daysCount * 2}&order=date.desc`);
+      days = data || [];
+    }
 
     // Split into current and previous periods
     cachedDailyDays = days.slice(0, daysCount);

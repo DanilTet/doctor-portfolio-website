@@ -335,6 +335,94 @@ app.get('/api/analytics', authGuard, (_req, res) => {
 });
 
 /**
+ * POST /api/analytics/track
+ * Receives visitor analytics events and records them locally in analytics.json.
+ * Public endpoint called by tracker.js.
+ */
+app.post('/api/analytics/track', (req, res) => {
+  try {
+    const event = req.body;
+    const today = new Date().toISOString().split('T')[0];
+
+    const data = readAnalytics();
+    let dayEntry = data.find(d => d.date === today);
+
+    if (!dayEntry) {
+      dayEntry = {
+        date: today,
+        pageviews: 0,
+        unique_visitors: 0,
+        returning_visitors: 0,
+        total_scroll_depth: 0,
+        scroll_events: 0,
+        total_time_on_site: 0,
+        time_events: 0,
+        utm_sources: {},
+        cities: {},
+        os: {},
+        browsers: {},
+        devices: {},
+        clicks: {},
+        referrers: {}
+      };
+      data.unshift(dayEntry); // Add to beginning (newest first)
+    }
+
+    // Increment pageviews
+    if (event.p_event_type === 'pageview') {
+      dayEntry.pageviews += 1;
+    }
+
+    // Increment visitors
+    if (event.p_is_new_visitor) {
+      dayEntry.unique_visitors += 1;
+    }
+    if (event.p_is_returning) {
+      dayEntry.returning_visitors += 1;
+    }
+
+    // Handle scroll depth
+    if (event.p_scroll_depth !== null && event.p_scroll_depth !== undefined) {
+      dayEntry.total_scroll_depth += parseInt(event.p_scroll_depth, 10) || 0;
+      dayEntry.scroll_events += 1;
+    }
+
+    // Handle time on site
+    if (event.p_time_on_site !== null && event.p_time_on_site !== undefined) {
+      dayEntry.total_time_on_site += parseInt(event.p_time_on_site, 10) || 0;
+      dayEntry.time_events += 1;
+    }
+
+    // Incrementor helper
+    const incrementObjKey = (obj, key) => {
+      if (!key) return;
+      const cleanKey = String(key).trim();
+      if (!cleanKey) return;
+      obj[cleanKey] = (obj[cleanKey] || 0) + 1;
+    };
+
+    if (event.p_event_type === 'pageview') {
+      incrementObjKey(dayEntry.utm_sources, event.p_utm_source);
+      incrementObjKey(dayEntry.cities, event.p_city);
+      incrementObjKey(dayEntry.os, event.p_os);
+      incrementObjKey(dayEntry.browsers, event.p_browser);
+      incrementObjKey(dayEntry.devices, event.p_device);
+      incrementObjKey(dayEntry.referrers, event.p_referrer);
+    }
+
+    if (event.p_event_type === 'click') {
+      incrementObjKey(dayEntry.clicks, event.p_event_target);
+    }
+
+    writeAnalytics(data);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[Analytics API] Tracking error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+/**
  * GET /api/analytics/backup
  * Download analytics.json backup file directly (requires admin secret).
  */
