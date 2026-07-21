@@ -1936,10 +1936,11 @@ body {
 .top-actions-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .action-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1947,17 +1948,45 @@ body {
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  transition: background var(--transition);
+  overflow: hidden;
+  transition: background var(--transition), border-color var(--transition);
 }
 
 .action-item:hover {
   background: var(--bg-hover);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.action-progress-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(99, 102, 241, 0.08);
+  pointer-events: none;
+  transition: width 0.4s ease;
+  z-index: 0;
 }
 
 .action-name {
-  font-size: 14px;
+  position: relative;
+  z-index: 1;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--text-primary);
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-right-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .action-count-badge {
@@ -1968,6 +1997,146 @@ body {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Daily Visits Table Styles */
+.daily-visits-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.daily-visits-table th {
+  background: rgba(19, 22, 30, 0.6);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  padding: 12px 14px;
+}
+
+.daily-visits-table tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+
+.daily-visits-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.daily-visits-table td {
+  padding: 12px 14px;
+  vertical-align: middle;
+  color: var(--text-primary);
+}
+
+.daily-date-cell {
+  font-weight: 600;
+  color: var(--accent-light);
+  white-space: nowrap;
+}
+
+.daily-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+/* Tech Category Tabs */
+.tech-tabs-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tech-tab-btn {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tech-tab-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tech-tab-btn.active {
+  background: var(--accent-glow);
+  border-color: var(--border-active);
+  color: var(--accent-light);
+  font-weight: 600;
+}
+
+/* Expandable Toggle Button */
+.btn-toggle-expand {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--accent-light);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-toggle-expand:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent-light);
+}
+
+/* Mobile Responsiveness for Marketing */
+@media (max-width: 768px) {
+  .marketing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .marketing-card {
+    padding: 16px;
+  }
+
+  .marketing-value {
+    font-size: 24px;
+  }
+
+  .marketing-chart-card, .marketing-list-card {
+    padding: 16px;
+  }
+
+  .daily-visits-table th, .daily-visits-table td {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marketing-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── Blog Tags ── */
@@ -2051,3 +2220,4 @@ body {
     padding: 20px !important;
   }
 }
+

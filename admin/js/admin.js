@@ -292,9 +292,54 @@ async function loadAnalytics() {
 }
 
 let marketingSourcesChart = null;
+let dailyVisitsChart = null;
+let cachedDailyDays = [];
+let cachedPreviousDailyDays = [];
+let activeTechTab = 'all';
+let showAllSources = false;
+let showAllClicks = false;
+let showAllTech = false;
 
 function handleMarketingRangeChange(e) {
   loadMarketingAnalytics(parseInt(e.target.value, 10));
+}
+
+// Helper: Format date into readable Ukrainian format e.g. "21 Лип (Вт)"
+function formatDailyDate(dateStr, includeYear = false) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const yr = parts[0];
+    const moIdx = parseInt(parts[1], 10) - 1;
+    const dayNum = parts[2];
+    const d = new Date(parseInt(parts[0], 10), moIdx, parseInt(dayNum, 10));
+    const daysUa = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    const monthsUa = ['січ', 'лют', 'бер', 'кви', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру'];
+    const dayOfWeek = daysUa[d.getDay()];
+    const month = monthsUa[moIdx] || '';
+    return includeYear 
+      ? `${dayNum} ${month} ${yr} (${dayOfWeek})` 
+      : `${dayNum} ${month} (${dayOfWeek})`;
+  }
+  return dateStr;
+}
+
+// Helper: Find top item in a count dictionary (e.g. {"direct": 10, "google": 25} -> "google (25)")
+function getTopKeyFromObj(obj) {
+  if (!obj || typeof obj !== 'object') return '—';
+  const entries = Object.entries(obj).filter(([_, v]) => parseInt(v, 10) > 0);
+  if (entries.length === 0) return '—';
+  entries.sort((a, b) => (parseInt(b[1], 10) || 0) - (parseInt(a[1], 10) || 0));
+  return `${entries[0][0]} (${entries[0][1]})`;
+}
+
+// Format duration seconds
+function formatDurationTime(avgSeconds) {
+  if (!avgSeconds || avgSeconds <= 0) return '0с';
+  if (avgSeconds < 60) return `${avgSeconds}с`;
+  const mins = Math.floor(avgSeconds / 60);
+  const secs = avgSeconds % 60;
+  return secs > 0 ? `${mins}хв ${secs}с` : `${mins}хв`;
 }
 
 async function loadMarketingAnalytics(rangeDays) {
@@ -312,8 +357,8 @@ async function loadMarketingAnalytics(rangeDays) {
     const days = data || [];
 
     // Split into current and previous periods
-    const currentPeriodDays = days.slice(0, daysCount);
-    const previousPeriodDays = days.slice(daysCount, daysCount * 2);
+    cachedDailyDays = days.slice(0, daysCount);
+    cachedPreviousDailyDays = days.slice(daysCount, daysCount * 2);
 
     const aggregatePeriodData = (daysList) => {
       let totalVisits = 0;
@@ -380,28 +425,15 @@ async function loadMarketingAnalytics(rangeDays) {
       };
     };
 
-    const current = aggregatePeriodData(currentPeriodDays);
-    const previous = aggregatePeriodData(previousPeriodDays);
+    const current = aggregatePeriodData(cachedDailyDays);
+    const previous = aggregatePeriodData(cachedPreviousDailyDays);
 
-    // Helper for formatting time
-    const formatTime = (avgSeconds) => {
-      let timeDisplay = '0с';
-      if (avgSeconds < 60) {
-        timeDisplay = `${avgSeconds}с`;
-      } else {
-        const mins = Math.floor(avgSeconds / 60);
-        const secs = avgSeconds % 60;
-        timeDisplay = secs > 0 ? `${mins}хв ${secs}с` : `${mins}хв`;
-      }
-      return timeDisplay;
-    };
-
-    // Render primary stats
+    // Render primary stats cards
     document.getElementById('m-stat-visitors').textContent = current.uniqueVisitors.toLocaleString();
     document.getElementById('m-stat-sessions').textContent = current.totalVisits.toLocaleString();
     document.getElementById('m-stat-returning').textContent = `${current.returningRate}%`;
     document.getElementById('m-stat-scroll').textContent = `${current.avgScroll}%`;
-    document.getElementById('m-stat-time').textContent = formatTime(current.avgSeconds);
+    document.getElementById('m-stat-time').textContent = formatDurationTime(current.avgSeconds);
 
     // Format trends
     const formatTrend = (curVal, prevVal, isPercent = false, suffix = '') => {
@@ -432,205 +464,654 @@ async function loadMarketingAnalytics(rangeDays) {
     document.getElementById('m-trend-scroll').innerHTML = formatTrend(current.avgScroll, previous.avgScroll, false, '%') + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
     document.getElementById('m-trend-time').innerHTML = formatTrend(current.avgSeconds, previous.avgSeconds, true) + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
 
-    // 2. Traffic Sources Chart
-    const labels = Object.keys(current.sourceCounts);
-    const chartValues = Object.values(current.sourceCounts);
+    // 1. Render Daily Visits Dynamic Chart
+    renderDailyVisitsChart(cachedDailyDays);
 
-    const premiumColors = [
-      '#6366f1', '#a855f7', '#38bdf8', '#22c55e', '#f59e0b', '#ec4899', '#14b8a6'
-    ];
+    // 2. Render Daily Visits Detailed Table
+    renderDailyVisitsTable(cachedDailyDays);
 
-    let finalColors = premiumColors.slice(0, labels.length);
-
-    if (labels.length === 0) {
-      labels.push('Немає даних');
-      chartValues.push(1);
-      finalColors = ['rgba(255, 255, 255, 0.05)'];
+    // Bind table search input listener
+    const searchInput = document.getElementById('daily-table-search');
+    if (searchInput) {
+      searchInput.oninput = (e) => {
+        renderDailyVisitsTable(cachedDailyDays, e.target.value);
+      };
     }
 
-    if (marketingSourcesChart) {
-      marketingSourcesChart.destroy();
-    }
+    // 3. Traffic Sources Doughnut Chart
+    renderTrafficSourcesChart(current.sourceCounts);
 
-    const canvas = document.getElementById('chart-marketing-sources');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      marketingSourcesChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: chartValues,
-            backgroundColor: finalColors,
-            borderColor: '#13161e',
-            borderWidth: 2,
-            hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: { color: '#f1f3f9', font: { family: "'Inter', sans-serif", size: 12 }, padding: 15 }
-            },
-            tooltip: {
-              backgroundColor: '#1a1e2a', titleColor: '#f1f3f9', bodyColor: '#8b93a8', borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1
-            }
-          }
-        }
-      });
-    }
+    // 4. Render detailed list of sources with progress bars
+    renderSourcesList(current, previous);
 
-    // Render detailed list of sources with comparisons
-    const sourcesListContainer = document.getElementById('marketing-sources-list');
-    if (sourcesListContainer) {
-      const sortedSources = Object.entries(current.sourceCounts)
-        .map(([name, count]) => ({ name, count }))
-        .sort((a, b) => b.count - a.count);
+    // 5. Render click actions with progress bars & pagination toggle
+    renderClicksList(current, previous);
 
-      if (sortedSources.length === 0) {
-        sourcesListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про джерела...</div>`;
-      } else {
-        const totalVisitsCount = current.totalVisits || 1;
-        sourcesListContainer.innerHTML = sortedSources.map(item => {
-          const prevCount = previous.sourceCounts[item.name] || 0;
-          const diff = item.count - prevCount;
-          const pct = Math.round((item.count / totalVisitsCount) * 100);
-          
-          let diffBadge = '';
-          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
-          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
+    // 6. Render Top Cities
+    renderCitiesList(current, previous);
 
-          const tempNode = document.createElement('div');
-          tempNode.textContent = item.name;
-          return `
-            <div class="action-item">
-              <span class="action-name">📥 ${tempNode.innerHTML}</span>
-              <span class="action-count-badge">${item.count} відв. (${pct}%)${diffBadge}</span>
-            </div>
-          `;
-        }).join('');
-      }
-    }
+    // 7. Render Tech Breakdown (devices, OS, browsers, referrers) with Tabs & Complete lists
+    renderTechList(current, previous);
 
-    // 3. Render click actions with comparisons
-    const clicksListContainer = document.getElementById('marketing-clicks-list');
-    if (clicksListContainer) {
-      const sortedClicks = Object.entries(current.clickCounts)
-        .map(([name, count]) => ({ name, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10); // Show top 10
+    // Bind Tech Tab listeners
+    document.querySelectorAll('.tech-tab-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        document.querySelectorAll('.tech-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTechTab = btn.getAttribute('data-tech-tab') || 'all';
+        renderTechList(current, previous);
+      };
+    });
 
-      if (sortedClicks.length === 0) {
-        clicksListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про кліки...</div>`;
-      } else {
-        clicksListContainer.innerHTML = sortedClicks.map(item => {
-          const prevCount = previous.clickCounts[item.name] || 0;
-          const diff = item.count - prevCount;
-          
-          let diffBadge = '';
-          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
-          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
+    // Bind Modal Close buttons
+    const btnCloseModal = document.getElementById('btn-close-daily-modal');
+    const btnCloseModalBtm = document.getElementById('btn-close-daily-modal-bottom');
+    const dailyModal = document.getElementById('daily-detail-modal');
 
-          const tempNode = document.createElement('div');
-          tempNode.textContent = item.name;
-          return `
-            <div class="action-item">
-              <span class="action-name">🎯 ${tempNode.innerHTML}</span>
-              <span class="action-count-badge">${item.count} кліків ${diffBadge}</span>
-            </div>
-          `;
-        }).join('');
-      }
-    }
+    const closeModalFunc = () => {
+      if (dailyModal) dailyModal.style.display = 'none';
+    };
 
-    // 4. Render Top Cities with comparisons
-    const citiesListContainer = document.getElementById('marketing-cities-list');
-    if (citiesListContainer) {
-      const sortedCities = Object.entries(current.cityCounts)
-        .map(([name, count]) => ({ name, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 6);
-
-      if (sortedCities.length === 0) {
-        citiesListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про міста...</div>`;
-      } else {
-        const totalGeoSessions = Object.values(current.cityCounts).reduce((sum, v) => sum + v, 0) || 1;
-        citiesListContainer.innerHTML = sortedCities.map(item => {
-          const prevCount = previous.cityCounts[item.name] || 0;
-          const diff = item.count - prevCount;
-          const pct = Math.round((item.count / totalGeoSessions) * 100);
-          
-          let diffBadge = '';
-          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
-          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
-
-          const tempNode = document.createElement('div');
-          tempNode.textContent = item.name;
-          return `
-            <div class="action-item">
-              <span class="action-name">📍 ${tempNode.innerHTML}</span>
-              <span class="action-count-badge">${item.count} відв. (${pct}%)${diffBadge}</span>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-
-    // 5. Render Tech Breakdown (devices, OS, browsers, referrers) with comparisons
-    const techListContainer = document.getElementById('marketing-tech-list');
-    if (techListContainer) {
-      const totalTechSessions = Object.values(current.deviceCounts).reduce((sum, v) => sum + v, 0) || 1;
-      const totalRefs = Object.values(current.referrerCounts).reduce((sum, v) => sum + v, 0) || 1;
-
-      const topDevice = Object.entries(current.deviceCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalTechSessions) * 100) })).sort((a, b) => b.count - a.count)[0];
-      const topOS = Object.entries(current.osCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalTechSessions) * 100) })).sort((a, b) => b.count - a.count)[0];
-      const topBrowser = Object.entries(current.browserCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalTechSessions) * 100) })).sort((a, b) => b.count - a.count)[0];
-      const topReferrer = Object.entries(current.referrerCounts).map(([name, count]) => ({ name, count, pct: Math.round((count / totalRefs) * 100) })).sort((a, b) => b.count - a.count)[0];
-
-      let html = '';
-      if (!topDevice && !topOS && !topBrowser && !topReferrer) {
-        techListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про пристрої...</div>`;
-      } else {
-        const renderTechItem = (icon, label, item, prevCounts) => {
-          if (!item) return '';
-          const prevCount = prevCounts[item.name] || 0;
-          const diff = item.count - prevCount;
-          
-          let diffBadge = '';
-          if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 6px;">(+${diff})</span>`;
-          else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 6px;">(${diff})</span>`;
-
-          let displayName = item.name;
-          if (displayName.startsWith('http')) {
-            try { displayName = new URL(displayName).hostname; } catch(e) {}
-          }
-
-          const tempNode = document.createElement('div');
-          tempNode.textContent = displayName;
-
-          return `
-            <div class="action-item">
-              <span class="action-name">${icon} ${label}: <strong>${tempNode.innerHTML}</strong></span>
-              <span class="action-count-badge">${item.pct}%${diffBadge}</span>
-            </div>
-          `;
-        };
-
-        html += renderTechItem('📱', 'Пристрій', topDevice, previous.deviceCounts);
-        html += renderTechItem('💻', 'ОС', topOS, previous.osCounts);
-        html += renderTechItem('🌐', 'Браузер', topBrowser, previous.browserCounts);
-        html += renderTechItem('🔗', 'Реферер', topReferrer, previous.referrerCounts);
-        techListContainer.innerHTML = html;
-      }
+    if (btnCloseModal) btnCloseModal.onclick = closeModalFunc;
+    if (btnCloseModalBtm) btnCloseModalBtm.onclick = closeModalFunc;
+    if (dailyModal) {
+      dailyModal.onclick = (e) => {
+        if (e.target === dailyModal) closeModalFunc();
+      };
     }
 
   } catch (err) {
     console.error('loadMarketingAnalytics error:', err);
     toast('Помилка завантаження маркетингової аналітики', 'error');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// DAILY VISITS CHART (Line & Bar Dual Chart)
+// ─────────────────────────────────────────────────────────────
+function renderDailyVisitsChart(dailyDays) {
+  const canvas = document.getElementById('chart-daily-visits');
+  if (!canvas) return;
+
+  if (dailyVisitsChart) {
+    dailyVisitsChart.destroy();
+    dailyVisitsChart = null;
+  }
+
+  // Reverse slice to show dates chronologically ascending (left to right)
+  const sortedDays = [...dailyDays].reverse();
+  const labels = sortedDays.map(d => formatDailyDate(d.date));
+  const uniqueData = sortedDays.map(d => d.unique_visitors || 0);
+  const pageviewData = sortedDays.map(d => d.pageviews || 0);
+
+  const ctx = canvas.getContext('2d');
+  
+  // Create gradient backgrounds
+  const gradientPurple = ctx.createLinearGradient(0, 0, 0, 300);
+  gradientPurple.addColorStop(0, 'rgba(129, 140, 248, 0.4)');
+  gradientPurple.addColorStop(1, 'rgba(129, 140, 248, 0.0)');
+
+  const gradientCyan = ctx.createLinearGradient(0, 0, 0, 300);
+  gradientCyan.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
+  gradientCyan.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+  dailyVisitsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Унікальні відвідувачі',
+          data: uniqueData,
+          borderColor: '#818cf8',
+          backgroundColor: gradientPurple,
+          fill: true,
+          tension: 0.35,
+          borderWidth: 3,
+          pointBackgroundColor: '#818cf8',
+          pointBorderColor: '#13161e',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        },
+        {
+          label: 'Перегляди сторінок',
+          data: pageviewData,
+          borderColor: '#38bdf8',
+          backgroundColor: gradientCyan,
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2.5,
+          borderDash: [4, 4],
+          pointBackgroundColor: '#38bdf8',
+          pointBorderColor: '#13161e',
+          pointBorderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: false // Handled by custom HTML legend
+        },
+        tooltip: {
+          backgroundColor: '#1a1e2a',
+          titleColor: '#f1f3f9',
+          bodyColor: '#8b93a8',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 12,
+          boxPadding: 6,
+          usePointStyle: true,
+          callbacks: {
+            title: function(context) {
+              const idx = context[0].dataIndex;
+              const rawDay = sortedDays[idx];
+              return rawDay ? formatDailyDate(rawDay.date, true) : context[0].label;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: { color: '#8b93a8', font: { family: "'Inter', sans-serif", size: 11 } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { color: '#8b93a8', font: { family: "'Inter', sans-serif", size: 11 }, precision: 0 }
+        }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// DAILY VISITS TABLE
+// ─────────────────────────────────────────────────────────────
+function renderDailyVisitsTable(dailyDays, filterQuery = '') {
+  const tbody = document.getElementById('daily-visits-tbody');
+  if (!tbody) return;
+
+  let filtered = dailyDays;
+  if (filterQuery.trim()) {
+    const q = filterQuery.toLowerCase();
+    filtered = dailyDays.filter(day => {
+      const dateFormatted = formatDailyDate(day.date, true).toLowerCase();
+      const topSrc = getTopKeyFromObj(day.utm_sources).toLowerCase();
+      const topClick = getTopKeyFromObj(day.clicks).toLowerCase();
+      return (day.date || '').toLowerCase().includes(q) || 
+             dateFormatted.includes(q) || 
+             topSrc.includes(q) || 
+             topClick.includes(q);
+    });
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">За вашим запитом даних не знайдено...</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(day => {
+    const dateFormatted = formatDailyDate(day.date, true);
+    const unique = day.unique_visitors || 0;
+    const pageviews = day.pageviews || 0;
+    const returning = day.returning_visitors || 0;
+    
+    const avgSec = day.time_events > 0 ? Math.round((day.total_time_on_site || 0) / day.time_events) : 0;
+    const formattedTime = formatDurationTime(avgSec);
+
+    const topSource = getTopKeyFromObj(day.utm_sources);
+    const topClick = getTopKeyFromObj(day.clicks);
+
+    const tempNodeSrc = document.createElement('div');
+    tempNodeSrc.textContent = topSource;
+
+    const tempNodeClk = document.createElement('div');
+    tempNodeClk.textContent = topClick;
+
+    return `
+      <tr>
+        <td class="daily-date-cell">📅 ${dateFormatted}</td>
+        <td><span class="daily-badge-pill" style="color:var(--accent-light); border-color:rgba(129,140,248,0.3); background:rgba(129,140,248,0.1);">${unique}</span></td>
+        <td><span class="daily-badge-pill" style="color:var(--info); border-color:rgba(56,189,248,0.3); background:rgba(56,189,248,0.1);">${pageviews}</span></td>
+        <td><span style="color:var(--warning); font-weight:500;">${returning}</span></td>
+        <td><span style="color:var(--text-secondary);">${formattedTime}</span></td>
+        <td><span style="font-size:12px; color:var(--text-primary);">📥 ${tempNodeSrc.innerHTML}</span></td>
+        <td><span style="font-size:12px; color:var(--text-primary);">🎯 ${tempNodeClk.innerHTML}</span></td>
+        <td style="text-align: right;">
+          <button class="btn btn--secondary btn--sm btn-view-day-detail" data-day-date="${day.date}" style="padding:4px 10px; font-size:11px;">
+            🔍 Деталі
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Bind detail buttons
+  tbody.querySelectorAll('.btn-view-day-detail').forEach(btn => {
+    btn.onclick = () => {
+      const dateStr = btn.getAttribute('data-day-date');
+      openDailyDetailModal(dateStr);
+    };
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// DAILY DETAIL MODAL
+// ─────────────────────────────────────────────────────────────
+function openDailyDetailModal(dateStr) {
+  const day = cachedDailyDays.find(d => d.date === dateStr);
+  const modal = document.getElementById('daily-detail-modal');
+  const titleEl = document.getElementById('modal-daily-title');
+  const subtitleEl = document.getElementById('modal-daily-subtitle');
+  const contentEl = document.getElementById('modal-daily-content');
+
+  if (!day || !modal || !contentEl) return;
+
+  const dateTitle = formatDailyDate(day.date, true);
+  titleEl.textContent = `📊 Аналітика за ${dateTitle}`;
+  subtitleEl.textContent = `Повна інформація про візити, кліки та джерела за ${day.date}`;
+
+  const avgSec = day.time_events > 0 ? Math.round((day.total_time_on_site || 0) / day.time_events) : 0;
+  const avgScroll = day.scroll_events > 0 ? Math.round((day.total_scroll_depth || 0) / day.scroll_events) : 0;
+
+  const renderDictList = (dict, icon, title, emptyMsg) => {
+    if (!dict || Object.keys(dict).length === 0) {
+      return `<div style="font-size:12px; color:var(--text-muted); font-style:italic;">${emptyMsg}</div>`;
+    }
+    const sorted = Object.entries(dict)
+      .map(([k, v]) => ({ name: k, count: parseInt(v, 10) || 0 }))
+      .sort((a, b) => b.count - a.count);
+    
+    return `
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        ${sorted.map(item => {
+          const tempNode = document.createElement('div');
+          tempNode.textContent = item.name;
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:8px 12px; border-radius:6px; border:1px solid var(--border);">
+              <span style="font-size:13px;">${icon} ${tempNode.innerHTML}</span>
+              <span style="font-weight:600; color:var(--accent-light); font-size:12px;">${item.count}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  };
+
+  contentEl.innerHTML = `
+    <!-- Top Day Cards Grid -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:10px;">
+      <div style="background:var(--bg-input); border:1px solid var(--border); padding:12px; border-radius:10px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#818cf8;">${day.unique_visitors || 0}</div>
+        <div style="font-size:11px; color:var(--text-secondary);">Унікальні</div>
+      </div>
+      <div style="background:var(--bg-input); border:1px solid var(--border); padding:12px; border-radius:10px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#38bdf8;">${day.pageviews || 0}</div>
+        <div style="font-size:11px; color:var(--text-secondary);">Перегляди</div>
+      </div>
+      <div style="background:var(--bg-input); border:1px solid var(--border); padding:12px; border-radius:10px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#f59e0b;">${day.returning_visitors || 0}</div>
+        <div style="font-size:11px; color:var(--text-secondary);">Повторні</div>
+      </div>
+      <div style="background:var(--bg-input); border:1px solid var(--border); padding:12px; border-radius:10px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#22c55e;">${avgScroll}%</div>
+        <div style="font-size:11px; color:var(--text-secondary);">Сер. Скролл</div>
+      </div>
+      <div style="background:var(--bg-input); border:1px solid var(--border); padding:12px; border-radius:10px; text-align:center;">
+        <div style="font-size:20px; font-weight:700; color:#ec4899;">${formatDurationTime(avgSec)}</div>
+        <div style="font-size:11px; color:var(--text-secondary);">Сер. Час</div>
+      </div>
+    </div>
+
+    <!-- Day Sources & Clicks Row -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+      <div>
+        <h4 style="margin:0 0 8px 0; font-size:13px; font-weight:600; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">📥 Джерела трафіку</h4>
+        ${renderDictList(day.utm_sources, '📥', 'Джерела', 'Немає даних про джерела за цей день')}
+      </div>
+      <div>
+        <h4 style="margin:0 0 8px 0; font-size:13px; font-weight:600; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">🎯 Кліки та дії</h4>
+        ${renderDictList(day.clicks, '🎯', 'Кліки', 'Немає даних про кліки за цей день')}
+      </div>
+    </div>
+
+    <!-- Day Cities & Devices -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+      <div>
+        <h4 style="margin:0 0 8px 0; font-size:13px; font-weight:600; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">📍 Міста</h4>
+        ${renderDictList(day.cities, '📍', 'Міста', 'Немає даних про міста')}
+      </div>
+      <div>
+        <h4 style="margin:0 0 8px 0; font-size:13px; font-weight:600; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">📱 Пристрої та ОС</h4>
+        ${renderDictList(day.devices, '📱', 'Пристрої', 'Немає даних про пристрої')}
+        <div style="margin-top:8px;">
+          ${renderDictList(day.os, '💻', 'ОС', 'Немає даних про ОС')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+}
+
+// ─────────────────────────────────────────────────────────────
+// SOURCES LIST (WITH PROGRESS BARS & EXPAND TOGGLE)
+// ─────────────────────────────────────────────────────────────
+function renderSourcesList(current, previous) {
+  const sourcesListContainer = document.getElementById('marketing-sources-list');
+  if (!sourcesListContainer) return;
+
+  const sortedSources = Object.entries(current.sourceCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  if (sortedSources.length === 0) {
+    sourcesListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про джерела...</div>`;
+    return;
+  }
+
+  const totalVisitsCount = current.totalVisits || 1;
+  const itemsToDisplay = showAllSources ? sortedSources : sortedSources.slice(0, 6);
+
+  let html = itemsToDisplay.map(item => {
+    const prevCount = previous.sourceCounts[item.name] || 0;
+    const diff = item.count - prevCount;
+    const pct = Math.round((item.count / totalVisitsCount) * 100);
+    
+    let diffBadge = '';
+    if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 4px;">(+${diff})</span>`;
+    else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 4px;">(${diff})</span>`;
+
+    const tempNode = document.createElement('div');
+    tempNode.textContent = item.name;
+
+    return `
+      <div class="action-item">
+        <div class="action-progress-bg" style="width: ${Math.min(pct, 100)}%;"></div>
+        <span class="action-name">📥 ${tempNode.innerHTML}</span>
+        <div class="action-right-wrap">
+          <span class="action-count-badge">${item.count} відв. (${pct}%)${diffBadge}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (sortedSources.length > 6) {
+    const toggleLabel = showAllSources ? '▲ Згорнути список' : `▼ Показати всі (${sortedSources.length})`;
+    html += `<button id="btn-toggle-sources" class="btn-toggle-expand">${toggleLabel}</button>`;
+  }
+
+  sourcesListContainer.innerHTML = html;
+
+  const btnToggle = document.getElementById('btn-toggle-sources');
+  if (btnToggle) {
+    btnToggle.onclick = () => {
+      showAllSources = !showAllSources;
+      renderSourcesList(current, previous);
+    };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// CLICKS LIST (WITH PROGRESS BARS & EXPAND TOGGLE)
+// ─────────────────────────────────────────────────────────────
+function renderClicksList(current, previous) {
+  const clicksListContainer = document.getElementById('marketing-clicks-list');
+  if (!clicksListContainer) return;
+
+  const sortedClicks = Object.entries(current.clickCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  if (sortedClicks.length === 0) {
+    clicksListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про кліки...</div>`;
+    return;
+  }
+
+  const totalClicksCount = sortedClicks.reduce((sum, item) => sum + item.count, 0) || 1;
+  const itemsToDisplay = showAllClicks ? sortedClicks : sortedClicks.slice(0, 6);
+
+  let html = itemsToDisplay.map(item => {
+    const prevCount = previous.clickCounts[item.name] || 0;
+    const diff = item.count - prevCount;
+    const pct = Math.round((item.count / totalClicksCount) * 100);
+    
+    let diffBadge = '';
+    if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 4px;">(+${diff})</span>`;
+    else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 4px;">(${diff})</span>`;
+
+    const tempNode = document.createElement('div');
+    tempNode.textContent = item.name;
+
+    return `
+      <div class="action-item">
+        <div class="action-progress-bg" style="width: ${Math.min(pct, 100)}%;"></div>
+        <span class="action-name">🎯 ${tempNode.innerHTML}</span>
+        <div class="action-right-wrap">
+          <span class="action-count-badge">${item.count} кліків (${pct}%)${diffBadge}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (sortedClicks.length > 6) {
+    const toggleLabel = showAllClicks ? '▲ Згорнути список' : `▼ Показати всі (${sortedClicks.length})`;
+    html += `<button id="btn-toggle-clicks" class="btn-toggle-expand">${toggleLabel}</button>`;
+  }
+
+  clicksListContainer.innerHTML = html;
+
+  const btnToggle = document.getElementById('btn-toggle-clicks');
+  if (btnToggle) {
+    btnToggle.onclick = () => {
+      showAllClicks = !showAllClicks;
+      renderClicksList(current, previous);
+    };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// CITIES LIST
+// ─────────────────────────────────────────────────────────────
+function renderCitiesList(current, previous) {
+  const citiesListContainer = document.getElementById('marketing-cities-list');
+  if (!citiesListContainer) return;
+
+  const sortedCities = Object.entries(current.cityCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  if (sortedCities.length === 0) {
+    citiesListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про міста...</div>`;
+    return;
+  }
+
+  const totalGeoSessions = Object.values(current.cityCounts).reduce((sum, v) => sum + v, 0) || 1;
+  citiesListContainer.innerHTML = sortedCities.map(item => {
+    const prevCount = previous.cityCounts[item.name] || 0;
+    const diff = item.count - prevCount;
+    const pct = Math.round((item.count / totalGeoSessions) * 100);
+    
+    let diffBadge = '';
+    if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 4px;">(+${diff})</span>`;
+    else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 4px;">(${diff})</span>`;
+
+    const tempNode = document.createElement('div');
+    tempNode.textContent = item.name;
+
+    return `
+      <div class="action-item">
+        <div class="action-progress-bg" style="width: ${Math.min(pct, 100)}%;"></div>
+        <span class="action-name">📍 ${tempNode.innerHTML}</span>
+        <div class="action-right-wrap">
+          <span class="action-count-badge">${item.count} відв. (${pct}%)${diffBadge}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// TRAFFIC SOURCES DOUGHNUT CHART
+// ─────────────────────────────────────────────────────────────
+function renderTrafficSourcesChart(sourceCounts) {
+  const labels = Object.keys(sourceCounts);
+  const chartValues = Object.values(sourceCounts);
+
+  const premiumColors = [
+    '#6366f1', '#a855f7', '#38bdf8', '#22c55e', '#f59e0b', '#ec4899', '#14b8a6', '#f43f5e', '#8b5cf6'
+  ];
+
+  let finalColors = premiumColors.slice(0, labels.length);
+
+  if (labels.length === 0) {
+    labels.push('Немає даних');
+    chartValues.push(1);
+    finalColors = ['rgba(255, 255, 255, 0.05)'];
+  }
+
+  if (marketingSourcesChart) {
+    marketingSourcesChart.destroy();
+    marketingSourcesChart = null;
+  }
+
+  const canvas = document.getElementById('chart-marketing-sources');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    marketingSourcesChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: chartValues,
+          backgroundColor: finalColors,
+          borderColor: '#13161e',
+          borderWidth: 2,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#f1f3f9', font: { family: "'Inter', sans-serif", size: 12 }, padding: 15 }
+          },
+          tooltip: {
+            backgroundColor: '#1a1e2a', titleColor: '#f1f3f9', bodyColor: '#8b93a8', borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1
+          }
+        }
+      }
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// TECH BREAKDOWN & REFERRERS (COMPLETE LISTS WITH TABS)
+// ─────────────────────────────────────────────────────────────
+function renderTechList(current, previous) {
+  const techListContainer = document.getElementById('marketing-tech-list');
+  if (!techListContainer) return;
+
+  const totalTechSessions = Object.values(current.deviceCounts).reduce((sum, v) => sum + v, 0) || 1;
+  const totalRefs = Object.values(current.referrerCounts).reduce((sum, v) => sum + v, 0) || 1;
+
+  const getSortedItems = (dict, total) => {
+    return Object.entries(dict)
+      .map(([name, count]) => ({
+        name,
+        count: parseInt(count, 10) || 0,
+        pct: Math.round(((parseInt(count, 10) || 0) / total) * 100)
+      }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const devices = getSortedItems(current.deviceCounts, totalTechSessions);
+  const osList = getSortedItems(current.osCounts, totalTechSessions);
+  const browsers = getSortedItems(current.browserCounts, totalTechSessions);
+  const referrers = getSortedItems(current.referrerCounts, totalRefs);
+
+  let itemsToRender = [];
+
+  if (activeTechTab === 'devices') {
+    itemsToRender = devices.map(i => ({ ...i, icon: '📱', label: 'Пристрій', prevDict: previous.deviceCounts }));
+  } else if (activeTechTab === 'os') {
+    itemsToRender = osList.map(i => ({ ...i, icon: '💻', label: 'ОС', prevDict: previous.osCounts }));
+  } else if (activeTechTab === 'browsers') {
+    itemsToRender = browsers.map(i => ({ ...i, icon: '🌐', label: 'Браузер', prevDict: previous.browserCounts }));
+  } else if (activeTechTab === 'referrers') {
+    itemsToRender = referrers.map(i => ({ ...i, icon: '🔗', label: 'Реферер', prevDict: previous.referrerCounts }));
+  } else {
+    // 'all' tab: Combine all categories
+    const allCombined = [];
+    if (devices.length) allCombined.push(...devices.map(i => ({ ...i, icon: '📱', label: 'Пристрій', prevDict: previous.deviceCounts })));
+    if (osList.length) allCombined.push(...osList.map(i => ({ ...i, icon: '💻', label: 'ОС', prevDict: previous.osCounts })));
+    if (browsers.length) allCombined.push(...browsers.map(i => ({ ...i, icon: '🌐', label: 'Браузер', prevDict: previous.browserCounts })));
+    if (referrers.length) allCombined.push(...referrers.map(i => ({ ...i, icon: '🔗', label: 'Реферер', prevDict: previous.referrerCounts })));
+    itemsToRender = allCombined;
+  }
+
+  if (itemsToRender.length === 0) {
+    techListContainer.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px">Немає даних про технічні параметри...</div>`;
+    return;
+  }
+
+  const itemsToDisplay = showAllTech ? itemsToRender : itemsToRender.slice(0, 10);
+
+  let html = itemsToDisplay.map(item => {
+    const prevCount = (item.prevDict && item.prevDict[item.name]) || 0;
+    const diff = item.count - prevCount;
+    
+    let diffBadge = '';
+    if (diff > 0) diffBadge = `<span class="trend-up" style="font-size:11px; margin-left: 4px;">(+${diff})</span>`;
+    else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 4px;">(${diff})</span>`;
+
+    let displayName = item.name;
+    if (displayName.startsWith('http')) {
+      try { displayName = new URL(displayName).hostname; } catch(e) {}
+    }
+
+    const tempNode = document.createElement('div');
+    tempNode.textContent = displayName;
+
+    return `
+      <div class="action-item">
+        <div class="action-progress-bg" style="width: ${Math.min(item.pct, 100)}%;"></div>
+        <span class="action-name">${item.icon} <span style="color:var(--text-secondary); font-size:12px; margin-right:4px;">${item.label}:</span> <strong>${tempNode.innerHTML}</strong></span>
+        <div class="action-right-wrap">
+          <span class="action-count-badge">${item.count} (${item.pct}%)${diffBadge}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (itemsToRender.length > 10) {
+    const toggleLabel = showAllTech ? '▲ Згорнути список' : `▼ Показати всі (${itemsToRender.length})`;
+    html += `<button id="btn-toggle-tech" class="btn-toggle-expand">${toggleLabel}</button>`;
+  }
+
+  techListContainer.innerHTML = html;
+
+  const btnToggle = document.getElementById('btn-toggle-tech');
+  if (btnToggle) {
+    btnToggle.onclick = () => {
+      showAllTech = !showAllTech;
+      renderTechList(current, previous);
+    };
   }
 }
 
