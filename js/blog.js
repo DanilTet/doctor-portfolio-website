@@ -206,14 +206,55 @@
     }
 
     if (body) {
+      let contentHtml = '';
       if (window.marked && window.DOMPurify) {
-        body.innerHTML = DOMPurify.sanitize(marked.parse(post.content, { breaks: true }));
+        contentHtml = DOMPurify.sanitize(marked.parse(post.content, { breaks: true }));
       } else {
-        body.innerHTML = escHtml(post.content)
+        contentHtml = escHtml(post.content)
           .replace(/\n\n+/g, '</p><p>')
           .replace(/\n/g, '<br>');
-        body.innerHTML = `<p>${body.innerHTML}</p>`;
+        contentHtml = `<p>${contentHtml}</p>`;
       }
+
+      contentHtml += `
+        <div class="blog-modal__actions" style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--color-border, rgba(255,255,255,0.1)); display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-weight: 600; font-size: 15px; color: var(--color-primary, #6366f1); margin-bottom: 2px;">
+            🏥 Бажаєте пройти консультацію або обстеження?
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+            <button class="btn btn--primary" data-blog-appointment style="flex: 1; min-width: 200px; justify-content: center; display: inline-flex; align-items: center; gap: 8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Записатися на прийом</span>
+            </button>
+            <a href="https://t.me/AppointmentEndoscopyBot" target="_blank" rel="noopener noreferrer" class="btn btn--outline" style="flex: 1; min-width: 200px; justify-content: center; display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.1); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <span>Записатися через Telegram-бот</span>
+            </a>
+          </div>
+        </div>
+      `;
+
+      body.innerHTML = contentHtml;
+
+      body.querySelector('[data-blog-appointment]')?.addEventListener('click', () => {
+        closeModal();
+        const appModal = document.getElementById('appointment-modal');
+        if (appModal) {
+          appModal.classList.add('modal--open');
+          appModal.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+          const selectSrv = document.getElementById('app-service');
+          if (selectSrv) {
+            if (post.title && post.title.toLowerCase().includes('колоно')) {
+              selectSrv.value = 'Колоноскопія (КС)';
+            } else if (post.title && post.title.toLowerCase().includes('гастро')) {
+              selectSrv.value = 'Гастроскопія (ВГДС)';
+            } else if (post.title && post.title.toLowerCase().includes('узд')) {
+              selectSrv.value = 'УЗД діагностика';
+            }
+          }
+        }
+      });
     }
 
     if (igLink) {
