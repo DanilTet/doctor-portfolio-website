@@ -69,6 +69,33 @@ function writePosts(posts) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), 'utf-8');
 }
 
+function ensureSeedPosts() {
+  const seedFile = path.join(__dirname, 'data', 'posts.seed.json');
+  if (!fs.existsSync(seedFile)) return;
+  try {
+    const seedPosts = JSON.parse(fs.readFileSync(seedFile, 'utf-8'));
+    let currentPosts = readPosts();
+    let updated = false;
+
+    seedPosts.forEach(sp => {
+      const exists = currentPosts.some(cp => cp.id === sp.id || cp.title === sp.title);
+      if (!exists) {
+        currentPosts.unshift(sp);
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      writePosts(currentPosts);
+      console.log('[Blog API] Seed posts auto-merged into posts.json');
+    }
+  } catch (e) {
+    console.warn('[Blog API] Could not auto-merge seed posts:', e.message);
+  }
+}
+
+ensureSeedPosts();
+
 function readAnalytics() {
   try {
     if (fs.existsSync(ANALYTICS_FILE)) {
