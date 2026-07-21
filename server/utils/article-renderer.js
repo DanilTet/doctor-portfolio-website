@@ -165,6 +165,13 @@ function renderArticleHtml(article, lang = 'uk') {
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal">${finalCtaLabel}</a>
         </div>` : '';
 
+  const hasRuTranslation = !!(article.translations && article.translations.ru && article.translations.ru.title);
+  const langSwitchHtml = hasRuTranslation ? `
+          <div class="lang-switch">
+            <a href="${ukUrl}" class="lang-switch__btn${isRu ? '' : ' active'}">UA</a>
+            <a href="${ruUrl}" class="lang-switch__btn${isRu ? ' active' : ''}">RU</a>
+          </div>` : '';
+
   const html = `<!DOCTYPE html>
 <html lang="${htmlLang}">
 <head>
@@ -210,10 +217,7 @@ function renderArticleHtml(article, lang = 'uk') {
       </a>
       <nav class="nav" id="nav" aria-label="${isRu ? 'Главное меню' : 'Головне меню'}">
         <div class="header__actions" style="margin-left: auto;">
-          <div class="lang-switch">
-            <a href="${ukUrl}" class="lang-switch__btn${isRu ? '' : ' active'}">UA</a>
-            <a href="${ruUrl}" class="lang-switch__btn${isRu ? ' active' : ''}">RU</a>
-          </div>
+          ${langSwitchHtml}
           <a href="/#appointment-section" class="btn btn--primary header__cta open-booking-modal">${recordLabel}</a>
         </div>
       </nav>

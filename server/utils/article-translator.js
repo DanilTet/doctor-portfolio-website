@@ -1,7 +1,6 @@
 /**
  * article-translator.js — Translates article fields from Ukrainian to Russian
- * Uses the free (no-key) Google Translate API endpoint.
- * Limit: ~100 requests/minute on the free tier.
+ * Uses single-batch HTTP request for instant translation without rate limits.
  */
 
 'use strict';
@@ -9,13 +8,15 @@
 const fetch = require('node-fetch');
 
 const GT_URL = 'https://translate.googleapis.com/translate_a/single';
+const SPLITTER = '\n\n===SPLIT===\n\n';
+const SPLITTER_REGEX = /\s*===\s*SPLIT\s*===\s*/i;
 
 /**
- * Translate a single text string from 'uk' to 'ru' using the free Google API.
+ * Translate a text chunk from 'uk' to 'ru' using the free Google API.
  * @param {string} text
  * @returns {Promise<string>}
  */
-async function translateText(text) {
+async function translateTextChunk(text) {
   if (!text || !text.trim()) return text;
 
   const params = new URLSearchParams({
@@ -27,19 +28,21 @@ async function translateText(text) {
   });
 
   const res = await fetch(`${GT_URL}?${params}`, {
-    headers: { 'User-Agent': 'Mozilla/5.0' },
-    timeout: 15000,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept-Language': 'ru,uk,en;q=0.9',
+    },
+    timeout: 30000,
   });
 
   if (!res.ok) {
-    throw new Error(`Google Translate HTTP ${res.status}`);
+    throw new Error(`Google Translate API error: HTTP ${res.status}`);
   }
 
   const data = await res.json();
 
-  // Response format: [ [ [translated, original, ...], ... ], ... ]
   if (!Array.isArray(data) || !Array.isArray(data[0])) {
-    throw new Error('Unexpected Google Translate response format');
+    throw new Error('Unexpected translation response format');
   }
 
   const translated = data[0]
@@ -48,22 +51,6 @@ async function translateText(text) {
     .join('');
 
   return translated;
-}
-
-/**
- * Translate an array of texts in a batch (sequential, with small delay to avoid rate limit).
- * @param {string[]} texts
- * @returns {Promise<string[]>}
- */
-async function translateBatch(texts) {
-  const results = [];
-  for (const text of texts) {
-    const t = await translateText(text);
-    results.push(t);
-    // small delay to avoid hitting rate limits
-    await new Promise(r => setTimeout(r, 120));
-  }
-  return results;
 }
 
 /**
@@ -99,10 +86,31 @@ async function translateArticle(article) {
     }
   });
 
-  console.log(`[Translator] Translating ${toTranslate.length} text chunks...`);
-  const translated = await translateBatch(toTranslate);
+  if (!toTranslate.length) {
+    return { title: article.title, subtitle: article.subtitle, seo_description: article.seo_description, sections: article.sections };
+  }
 
-  // Assemble result
+  console.log(`[Translator] Translating ${toTranslate.length} chunks for "${article.slug || 'article'}"...`);
+
+  // Join with delimiter for single-batch request
+  const combined = toTranslate.join(SPLITTER);
+  let translatedCombined = '';
+
+  try {
+    translatedCombined = await translateTextChunk(combined);
+  } catch (err) {
+    console.warn('[Translator] Batch translation failed, falling back to individual chunks:', err.message);
+    const fallbackResults = [];
+    for (const chunk of toTranslate) {
+      const res = await translateTextChunk(chunk);
+      fallbackResults.push(res);
+      await new Promise(r => setTimeout(r, 100));
+    }
+    translatedCombined = fallbackResults.join(SPLITTER);
+  }
+
+  const translatedArray = translatedCombined.split(SPLITTER_REGEX);
+
   const ruData = {
     title: article.title,
     subtitle: article.subtitle,
@@ -118,14 +126,15 @@ async function translateArticle(article) {
   };
 
   keys.forEach((key, idx) => {
+    const val = (translatedArray[idx] !== undefined) ? translatedArray[idx].trim() : toTranslate[idx];
     if (key.type === 'top') {
-      ruData[key.field] = translated[idx];
+      ruData[key.field] = val;
     } else {
-      ruData.sections[key.index][key.field] = translated[idx];
+      ruData.sections[key.index][key.field] = val;
     }
   });
 
   return ruData;
 }
 
-module.exports = { translateText, translateArticle };
+module.exports = { translateTextChunk, translateArticle };
