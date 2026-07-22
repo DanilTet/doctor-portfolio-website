@@ -793,14 +793,12 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
     article.translations.ru = ruTranslation;
     writeArticle(article);
 
-    // Generate RU HTML if article is published
-    let ruFile = null;
-    if (article.status === 'published') {
-      ruFile = writeArticleHtml(article, 'ru');
-    }
+    // Generate RU HTML & update UK HTML (so UA|RU switch appears immediately)
+    const ruFile = writeArticleHtml(article, 'ru');
+    const ukFile = writeArticleHtml(article, 'uk');
 
     console.log(`[Articles API] Translation done for "${article.slug}"`);
-    res.json({ ok: true, ru: ruTranslation, ruFile });
+    res.json({ ok: true, ru: ruTranslation, ruFile, ukFile });
   } catch (err) {
     console.error('[Articles API] Translation error:', err.message);
     res.status(500).json({ error: `Ошибка перевода: ${err.message}` });

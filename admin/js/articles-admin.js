@@ -753,7 +753,7 @@
 
       currentArticle.translations = currentArticle.translations || {};
       currentArticle.translations.ru = data.ru;
-      showFeedback('✅ Переклад готовий! Якщо стаття опублікована — RU версія вже доступна.', 'success');
+      showFeedback(`✅ Переклад готовий! <a href="/ru/articles/${escHtml(currentArticle.slug)}" target="_blank" style="color:var(--primary);font-weight:600;margin-left:6px">Переглянути RU версію ↗</a>`, 'success');
     } catch (err) {
       showFeedback(`❌ ${err.message}`, 'danger');
     } finally {
