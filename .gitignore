@@ -32,8 +32,10 @@ package-lock.json
 server/data/posts.json
 server/data/analytics.json
 server/data/articles/
-uploads/
-server/uploads/
+uploads/*
+!uploads/articles/
+server/uploads/*
+!server/uploads/articles/
 
 # Content drafts
 instagram_posts.txt
