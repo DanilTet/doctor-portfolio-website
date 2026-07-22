@@ -779,6 +779,36 @@ app.post('/api/articles/:id/publish', authGuard, async (req, res) => {
 });
 
 /**
+ * POST /api/articles/republish-all
+ * Regenerates HTML for ALL published articles (UK + RU if translation exists).
+ * Useful after renderer updates.
+ */
+app.post('/api/articles/republish-all', authGuard, (req, res) => {
+  const articles = readArticles();
+  const results = [];
+  let ok = 0, skipped = 0, errors = 0;
+
+  for (const article of articles) {
+    if (article.status !== 'published') { skipped++; continue; }
+    try {
+      const ukFile = writeArticleHtml(article, 'uk');
+      let ruFile = null;
+      if (article.translations && article.translations.ru && article.translations.ru.title) {
+        ruFile = writeArticleHtml(article, 'ru');
+      }
+      results.push({ slug: article.slug, uk: ukFile, ru: ruFile });
+      ok++;
+    } catch (err) {
+      results.push({ slug: article.slug, error: err.message });
+      errors++;
+    }
+  }
+
+  console.log(`[Articles API] Republish all: ${ok} ok, ${skipped} skipped (drafts), ${errors} errors`);
+  res.json({ ok: true, regenerated: ok, skipped, errors, results });
+});
+
+/**
  * POST /api/articles/:id/translate
  * Translate article from Ukrainian to Russian and generate RU HTML.
  */

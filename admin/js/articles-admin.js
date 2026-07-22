@@ -834,6 +834,28 @@
       .catch(err => alert('Помилка завантаження бекапу: ' + err.message));
   };
 
+  window.republishAllArticles = async function () {
+    if (!confirm('Переґенерувати HTML для ВСІХ опублікованих статей?\nЦе виправить відображення фотографій та інші оновлення шаблону.')) return;
+    try {
+      const btn = document.querySelector('[onclick="window.republishAllArticles()"]');
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Генерація...'; }
+
+      const res = await fetch('/api/articles/republish-all', {
+        method: 'POST',
+        headers: { 'X-Blog-Secret': SECRET() },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Помилка');
+
+      alert(`✅ Готово!\n\nПереґенеровано: ${data.regenerated} статей\nПропущено (чернетки): ${data.skipped}\nПомилок: ${data.errors}\n\nОновіть сторінку щоб переконатися.`);
+    } catch (err) {
+      alert('❌ Помилка: ' + err.message);
+    } finally {
+      const btn = document.querySelector('[onclick="window.republishAllArticles()"]');
+      if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Переґенерувати всі'; }
+    }
+  };
+
   /* ── Boot ────────────────────────────────────────────────── */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
