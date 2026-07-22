@@ -91,10 +91,10 @@ function renderSections(sections, lang) {
     let html = `<h3 id="section-${i + 1}" style="${mt}margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">${escHtml(s.heading || '')}</h3>`;
     html += textToHtml(s.text || '');
 
-    // Section image
+    // Section image — shown fully without crop or distortion
     if (s.image) {
-      html += `\n<div style="margin:24px 0;border-radius:12px;overflow:hidden;">
-        <img src="${escHtml(s.image)}" alt="${escHtml(s.heading || '')}" style="width:100%;height:auto;display:block;border-radius:12px;">
+      html += `\n<div style="margin:24px 0;border-radius:12px;overflow:hidden;background:transparent;text-align:center;">
+        <img src="${escHtml(s.image)}" alt="${escHtml(s.heading || '')}" style="max-width:100%;width:auto;height:auto;display:inline-block;border-radius:12px;object-fit:contain;">
       </div>`;
     }
 
@@ -154,11 +154,7 @@ function renderArticleHtml(article, lang = 'uk') {
   const sectionsHtml = renderSections(sections, lang);
 
   const ogImage = article.image_card ? `<meta property="og:image" content="${escHtml(article.image_card)}">` : '';
-  const heroImage = article.image_card
-    ? `<div style="margin-bottom:24px;border-radius:16px;overflow:hidden;max-height:400px;">
-        <img src="${escHtml(article.image_card)}" alt="${escHtml(title)}" style="width:100%;height:auto;object-fit:cover;display:block;">
-      </div>`
-    : '';
+  // NOTE: image_card is only for blog card previews (og:image) — it is NOT inserted into the article body.
 
   const finalCta = article.show_final_cta ? `
         <div style="margin-top:40px;text-align:center;">
@@ -238,7 +234,6 @@ function renderArticleHtml(article, lang = 'uk') {
   <section class="section" style="padding:60px 0;">
     <div class="container">
       <div class="card article-content" style="max-width:800px;margin:0 auto;line-height:1.8;">
-        ${heroImage}
         ${sectionsHtml}
         ${finalCta}
       </div>
