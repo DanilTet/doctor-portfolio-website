@@ -565,7 +565,62 @@ app.get('/api/database/tables/:tableName', authGuard, (req, res) => {
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Helpers ─────────────────────────────────────────────── */
+
+/**
+ * Merge articles from articles.seed.json into server/data/articles/ on first run.
+ * This runs once (seeds are skipped if the file already exists).
+ */
+function mergeArticleSeeds() {
+  const seedFile = path.join(__dirname, 'data', 'articles.seed.json');
+  if (!fs.existsSync(seedFile)) return;
+  try {
+    const seeds = JSON.parse(fs.readFileSync(seedFile, 'utf-8'));
+    let postsChanged = false;
+    seeds.forEach(article => {
+      const destFile = path.join(ARTICLES_DIR, `${article.slug}.json`);
+      // Only seed if this article JSON does not yet exist on the server
+      if (!fs.existsSync(destFile)) {
+        fs.writeFileSync(destFile, JSON.stringify(article, null, 2), 'utf-8');
+        console.log(`[Articles Seed] Created: ${article.slug}.json`);
+
+        // Also add blog card to posts.json if show_in_blog
+        if (article.show_in_blog && article.status === 'published') {
+          const posts = readPostsRaw();
+          const already = posts.some(p => p.article_id === article.id || (p.external_url && p.external_url.includes(article.slug)));
+          if (!already) {
+            posts.unshift({
+              id: article.id + '-post',
+              article_id: article.id,
+              title: article.title,
+              content: article.subtitle || '',
+              image_path: article.image_card || null,
+              external_url: `/articles/${article.slug}`,
+              date: article.date,
+              source: 'article',
+              tags: article.tags || [],
+            });
+            fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), 'utf-8');
+            postsChanged = true;
+            console.log(`[Articles Seed] Added blog card for: ${article.slug}`);
+          }
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('[Articles Seed] Merge error:', e.message);
+  }
+}
+
+/** Raw posts read (without seed merge, to avoid circular calls) */
+function readPostsRaw() {
+  try {
+    if (fs.existsSync(DATA_FILE)) return JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+  } catch (e) {}
+  return [];
+}
+
 function readArticles() {
+  mergeArticleSeeds();
   const files = fs.existsSync(ARTICLES_DIR) ? fs.readdirSync(ARTICLES_DIR).filter(f => f.endsWith('.json')) : [];
   return files.map(f => {
     try { return JSON.parse(fs.readFileSync(path.join(ARTICLES_DIR, f), 'utf-8')); }
