@@ -158,6 +158,27 @@ function writeAnalytics(data) {
   }
 }
 
+const LEADS_FILE = path.join(__dirname, 'data', 'leads.json');
+
+function readLeads() {
+  try {
+    if (fs.existsSync(LEADS_FILE)) {
+      return JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8'));
+    }
+  } catch (e) {
+    console.warn('[Leads API] Failed to read leads.json:', e.message);
+  }
+  return [];
+}
+
+function writeLeads(data) {
+  try {
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('[Leads API] Failed to write leads.json:', e.message);
+  }
+}
+
 function authGuard(req, res, next) {
   const secret = req.headers['x-blog-secret'];
   console.log(`[Blog Auth] Received secret: "${secret}", Expected: "${BLOG_SECRET}"`);
@@ -169,6 +190,80 @@ function authGuard(req, res, next) {
 }
 
 /* ── Routes ──────────────────────────────────────────────── */
+
+/**
+ * POST /api/leads
+ * Saves a new lead / question to server/data/leads.json
+ * Also notifies admins via Telegram if TG_BOT_TOKEN and TG_ADMIN_IDS are set in process.env
+ */
+app.post('/api/leads', async (req, res) => {
+  const { name, phone, service, comment } = req.body || {};
+
+  if (!name || !phone) {
+    return res.status(400).json({ ok: false, error: 'name and phone are required' });
+  }
+
+  const leads = readLeads();
+  const newLead = {
+    id: uuidv4(),
+    name,
+    phone,
+    service: service || 'Запит з сайту',
+    comment: comment || '',
+    status: 'pending',
+    created_at: new Date().toISOString()
+  };
+
+  leads.unshift(newLead);
+  writeLeads(leads);
+
+  // Send Telegram notification if BOT_TOKEN is configured in server .env
+  const botToken = process.env.TG_BOT_TOKEN;
+  const adminIds = process.env.TG_ADMIN_IDS ? process.env.TG_ADMIN_IDS.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  if (botToken && adminIds.length > 0) {
+    const isQuestion = (service && service.includes('питання'));
+    const headerText = isQuestion ? '❓ *Нове запитання з сайту*' : '📌 *Нова заявка з сайту*';
+    
+    const text = [
+      headerText,
+      '',
+      `👤 *Ім'я:* ${name}`,
+      `📞 *Телефон:* ${phone}`,
+      service ? `📋 *Послуга/Тема:* ${service}` : '',
+      comment ? `💬 *Коментар/Питання:* ${comment}` : '',
+      '',
+      `🕐 ${new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kiev' })}`
+    ].filter(Boolean).join('\n');
+
+    const tgUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const sends = adminIds.map(chatId =>
+      fetch(tgUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
+      }).catch(err => console.warn(`[Leads API] Telegram send to ${chatId} failed:`, err.message))
+    );
+
+    try {
+      await Promise.all(sends);
+    } catch (e) {
+      console.warn('[Leads API] Telegram error:', e.message);
+    }
+  }
+
+  res.json({ ok: true, lead: newLead });
+});
+
+/**
+ * GET /api/leads
+ * Get all stored leads from server/data/leads.json (Protected)
+ */
+app.get('/api/leads', authGuard, (req, res) => {
+  res.json(readLeads());
+});
+
+
 
 /**
  * GET /api/blog/posts

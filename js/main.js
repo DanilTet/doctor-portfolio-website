@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDiplomas();
   initCertsPagination();
   initTopicsAccordion();
+  initQuickQuestion();
 });
 
 
@@ -1341,3 +1342,113 @@ function initTopicsAccordion() {
 
 
 
+/* ============================================================
+   QUICK-QUESTION FLOATING BUTTON
+   ============================================================ */
+function initQuickQuestion() {
+  const floatBtn   = document.getElementById('faq-float-btn');
+  const floatLabel = document.getElementById('faq-float-label');
+  const modal      = document.getElementById('qq-modal');
+  if (!floatBtn || !modal) return;
+
+  const backdrop    = document.getElementById('qq-modal-backdrop');
+  const closeBtn    = document.getElementById('qq-modal-close');
+  const form        = document.getElementById('qq-form');
+  const phoneInput  = document.getElementById('qq-phone');
+  const submitBtn   = document.getElementById('qq-submit');
+  const formState   = document.getElementById('qq-form-state');
+  const successState = document.getElementById('qq-success-state');
+  const successClose = document.getElementById('qq-success-close');
+
+  // ── Open / Close ────────────────────────────────────────────
+  function openModal() {
+    modal.classList.add('qq-modal--open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    // reset to form state
+    if (formState)   formState.style.display   = '';
+    if (successState) successState.style.display = 'none';
+    if (form) form.reset();
+    if (phoneInput) phoneInput.value = '+380';
+    setTimeout(() => { if (phoneInput) phoneInput.focus(); }, 300);
+  }
+
+  function closeModal() {
+    modal.classList.remove('qq-modal--open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  floatBtn.addEventListener('click', openModal);
+  if (floatLabel) floatLabel.addEventListener('click', openModal);
+  if (backdrop)   backdrop.addEventListener('click', closeModal);
+  if (closeBtn)   closeBtn.addEventListener('click', closeModal);
+  if (successClose) successClose.addEventListener('click', closeModal);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('qq-modal--open')) closeModal();
+  });
+
+  // ── Phone mask ──────────────────────────────────────────────
+  if (phoneInput) {
+    phoneInput.addEventListener('focus', () => {
+      if (!phoneInput.value) phoneInput.value = '+380';
+    });
+    phoneInput.addEventListener('input', () => {
+      let v = phoneInput.value;
+      if (!v.startsWith('+380')) v = '+380' + v.replace(/^\+?3?8?0?/, '');
+      phoneInput.value = '+380' + v.slice(4).replace(/\D/g, '').slice(0, 9);
+    });
+  }
+
+  // ── Form submission ─────────────────────────────────────────
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name     = (document.getElementById('qq-name')?.value || '').trim();
+      const phone    = (phoneInput?.value || '').trim();
+      const question = (document.getElementById('qq-question')?.value || '').trim();
+
+      if (!name || name.length < 2) {
+        alert('Будь ласка, вкажіть ваше ім\'я');
+        return;
+      }
+      if (!phone || phone.length < 13) {
+        alert('Будь ласка, введіть коректний номер (+380XXXXXXXXX)');
+        return;
+      }
+      if (!question || question.length < 5) {
+        alert('Будь ласка, опишіть ваше питання');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Надсилання...';
+      }
+
+      try {
+        await submitAppointment({
+          name,
+          phone,
+          service: 'Швидке запитання з сайту',
+          comment: question
+        });
+
+        if (formState)    formState.style.display    = 'none';
+        if (successState) successState.style.display = '';
+
+      } catch (err) {
+        console.warn('[QuickQuestion] Submit error:', err);
+        if (formState)    formState.style.display    = 'none';
+        if (successState) successState.style.display = '';
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Надіслати питання';
+        }
+      }
+    });
+  }
+}
