@@ -1363,19 +1363,17 @@ function initQuickQuestion() {
   // ── Open / Close ────────────────────────────────────────────
   function openModal() {
     modal.classList.add('qq-modal--open');
-    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    // reset to form state
-    if (formState)   formState.style.display   = '';
+    if (formState)    formState.style.display    = '';
     if (successState) successState.style.display = 'none';
     if (form) form.reset();
     if (phoneInput) phoneInput.value = '+380';
-    setTimeout(() => { if (phoneInput) phoneInput.focus(); }, 300);
+    setTimeout(() => { if (phoneInput) phoneInput.focus(); }, 200);
   }
 
   function closeModal() {
+    if (document.activeElement) document.activeElement.blur();
     modal.classList.remove('qq-modal--open');
-    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
 

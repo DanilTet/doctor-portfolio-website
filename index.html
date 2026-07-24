@@ -1525,5 +1525,71 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       FLOATING QUESTION BUTTON & QUICK QUESTION MODAL
+       ============================================================ -->
+  <div class="faq-float" id="faq-float">
+    <span class="faq-float__label" id="faq-float-label">Залишились питання?</span>
+    <button class="faq-float__btn" id="faq-float-btn" aria-label="Залишити питання">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="qq-modal" id="qq-modal" role="dialog" aria-labelledby="qq-modal-title">
+    <div class="qq-modal__backdrop" id="qq-modal-backdrop"></div>
+    <div class="qq-modal__box">
+
+      <!-- Form State -->
+      <div id="qq-form-state">
+        <div class="qq-modal__head">
+          <div>
+            <h2 class="qq-modal__title" id="qq-modal-title">Залишіть своє питання</h2>
+            <p class="qq-modal__subtitle">Я відповім вам особисто</p>
+          </div>
+          <button class="qq-modal__close" id="qq-modal-close" aria-label="Закрити">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="qq-modal__body">
+          <form class="qq-form" id="qq-form">
+            <div class="form-group">
+              <label class="form-label" for="qq-name">Ваше ім'я</label>
+              <input class="form-input" id="qq-name" name="name" type="text" placeholder="Іванов Іван" required autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="qq-phone">Номер телефону</label>
+              <input class="form-input" id="qq-phone" name="phone" type="tel" placeholder="+380XXXXXXXXX" required autocomplete="tel">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="qq-question">Ваше питання</label>
+              <textarea class="form-textarea" id="qq-question" name="question" rows="3" placeholder="Опишіть ваше питання або симптоми..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full" id="qq-submit">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Надіслати питання
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div id="qq-success-state" style="display:none">
+        <div class="qq-success">
+          <div class="qq-success__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3 class="qq-success__title">Дякуємо!</h3>
+          <p class="qq-success__desc">Ваше питання прийнято. Лікар зв'яжеться з вами найближчим часом.</p>
+          <button class="btn btn--primary" id="qq-success-close">Зрозуміло</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </body>
 </html>
