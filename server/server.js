@@ -191,12 +191,11 @@ function authGuard(req, res, next) {
 
 /* ── Routes ──────────────────────────────────────────────── */
 
-/**
- * POST /api/leads
- * Saves a new lead / question to server/data/leads.json
- * Also notifies admins via Telegram if TG_BOT_TOKEN and TG_ADMIN_IDS are set in process.env
- */
 async function handleLeadRequest(req, res) {
+  console.log('=== [LEADS API] NEW REQUEST RECEIVED ===');
+  console.log('URL:', req.url);
+  console.log('Body:', req.body);
+
   const { name, phone, service, comment, question } = req.body || {};
 
   const leadName = name;
@@ -205,6 +204,7 @@ async function handleLeadRequest(req, res) {
   const leadComment = comment || question || '';
 
   if (!leadName || !leadPhone) {
+    console.warn('[LEADS API] Rejected: missing name or phone');
     return res.status(400).json({ ok: false, error: 'name and phone are required' });
   }
 
@@ -221,10 +221,13 @@ async function handleLeadRequest(req, res) {
 
   leads.unshift(newLead);
   writeLeads(leads);
+  console.log('[LEADS API] Lead saved to leads.json successfully. Lead ID:', newLead.id);
 
   // Send Telegram notification if BOT_TOKEN is configured in server .env
   const botToken = process.env.TG_BOT_TOKEN;
   const adminIds = process.env.TG_ADMIN_IDS ? process.env.TG_ADMIN_IDS.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  console.log(`[LEADS API] Telegram config: token present? ${Boolean(botToken)}, admins count: ${adminIds.length}`);
 
   if (botToken && adminIds.length > 0) {
     const isQuestion = (leadService && leadService.includes('питання'));
@@ -247,10 +250,39 @@ async function handleLeadRequest(req, res) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
-      }).catch(err => console.warn(`[Leads API] Telegram send to ${chatId} failed:`, err.message))
+      }).then(r => r.json()).then(res => {
+        console.log(`[LEADS API] TG response for ${chatId}:`, res);
+      }).catch(err => console.warn(`[LEADS API] Telegram send to ${chatId} failed:`, err.message))
     );
 
     try {
+      await Promise.all(sends);
+    } catch (e) {
+      console.warn('[LEADS API] Telegram error:', e.message);
+    }
+  } else {
+    console.warn('[LEADS API] TG_BOT_TOKEN or TG_ADMIN_IDS not set in environment!');
+  }
+
+  res.json({ ok: true, lead: newLead });
+}
+
+app.post('/api/leads', handleLeadRequest);
+app.post('/api/quick-question', handleLeadRequest);
+app.post('/api/blog/leads', handleLeadRequest);
+app.post('/api/blog/quick-question', handleLeadRequest);
+
+/**
+ * GET /api/leads
+ * Get all stored leads from server/data/leads.json (Protected)
+ */
+app.get('/api/leads', authGuard, (req, res) => {
+  res.json(readLeads());
+});
+app.get('/api/blog/leads', authGuard, (req, res) => {
+  res.json(readLeads());
+});
+
       await Promise.all(sends);
     } catch (e) {
       console.warn('[Leads API] Telegram error:', e.message);
