@@ -1006,19 +1006,85 @@ h1, h2, h3, h4, h5, h6 {
 /* ============================================================
    RESPONSIVE — MOBILE
    ============================================================ */
-/* ── 1200px: Nav starts to tighten — reduce gaps ── */
-@media (max-width: 1200px) {
+
+/* ── 1280px: начинаем уменьшать отступы в навигации ── */
+@media (max-width: 1280px) {
   .nav {
     gap: var(--space-lg);
   }
 
   .nav__link {
-    padding: var(--space-sm) 0.6rem;
+    padding: var(--space-sm) 0.65rem;
   }
 }
 
-/* ── 1024px: Hero collapses to single column ── */
+/* ── 1024px: бургер-меню включается, hero переходит в одну колонку ── */
 @media (max-width: 1024px) {
+  :root {
+    --header-height: 72px;
+  }
+
+  /* ---- Mobile Navigation (burger) ---- */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-bg-dark);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2xl);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    z-index: 5;
+    /* сбрасываем уплотнение, т.к. это полноэкранное меню */
+    gap: var(--space-2xl);
+  }
+
+  .nav.nav--open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav__list {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .nav__link {
+    font-size: var(--fs-body-lg);
+    padding: var(--space-md) var(--space-xl);
+    letter-spacing: 0.03em;
+  }
+
+  .header__actions {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  /* Восстанавливаем полный вид кнопки внутри мобильного меню */
+  .header .btn--sm span[data-i18n] {
+    display: inline;
+  }
+
+  .header .btn--sm {
+    padding: 0.625rem 1.5rem;
+  }
+
+  /* Показываем бургер */
+  .burger {
+    display: flex;
+  }
+
+  /* Скрываем кнопку-призыв в шапке (она есть в мобильном меню) */
+  .header .btn--primary {
+    display: none;
+  }
+
+  /* ---- Hero: одна колонка ---- */
   .hero__inner {
     grid-template-columns: 1fr;
     text-align: center;
@@ -1071,88 +1137,10 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* ── 900px: Nav shrinks further; hide CTA button to keep lang switcher visible ── */
-@media (max-width: 900px) {
-  .nav {
-    gap: var(--space-md);
-  }
-
-  .nav__link {
-    padding: var(--space-xs) 0.5rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.02em;
-  }
-
-  /* Hide text, keep icon visible in very tight space */
-  .header .btn--sm span[data-i18n] {
-    display: none;
-  }
-
-  .header .btn--sm {
-    padding: 0.625rem 0.75rem;
-    min-width: unset;
-  }
-}
-
+/* ── 768px ── */
 @media (max-width: 768px) {
   :root {
     --header-height: 68px;
-  }
-
-  /* Mobile Navigation */
-  .nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--color-bg-dark);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-2xl);
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition-base);
-    z-index: 5;
-  }
-
-  .nav.nav--open {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .nav__list {
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  .nav__link {
-    font-size: var(--fs-body-lg);
-    padding: var(--space-md) var(--space-xl);
-    letter-spacing: 0.03em;
-  }
-
-  .header__actions {
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  /* Restore the hidden text inside mobile menu */
-  .header .btn--sm span[data-i18n] {
-    display: inline;
-  }
-
-  .header .btn--sm {
-    padding: 0.625rem 1.5rem;
-  }
-
-  .burger {
-    display: flex;
-  }
-
-  .header .btn--primary {
-    display: none;
   }
 
   /* Hero Mobile */
