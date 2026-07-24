@@ -196,20 +196,25 @@ function authGuard(req, res, next) {
  * Saves a new lead / question to server/data/leads.json
  * Also notifies admins via Telegram if TG_BOT_TOKEN and TG_ADMIN_IDS are set in process.env
  */
-app.post('/api/leads', async (req, res) => {
-  const { name, phone, service, comment } = req.body || {};
+async function handleLeadRequest(req, res) {
+  const { name, phone, service, comment, question } = req.body || {};
 
-  if (!name || !phone) {
+  const leadName = name;
+  const leadPhone = phone;
+  const leadService = service || 'Швидке запитання з сайту';
+  const leadComment = comment || question || '';
+
+  if (!leadName || !leadPhone) {
     return res.status(400).json({ ok: false, error: 'name and phone are required' });
   }
 
   const leads = readLeads();
   const newLead = {
     id: uuidv4(),
-    name,
-    phone,
-    service: service || 'Запит з сайту',
-    comment: comment || '',
+    name: leadName,
+    phone: leadPhone,
+    service: leadService,
+    comment: leadComment,
     status: 'pending',
     created_at: new Date().toISOString()
   };
@@ -222,16 +227,16 @@ app.post('/api/leads', async (req, res) => {
   const adminIds = process.env.TG_ADMIN_IDS ? process.env.TG_ADMIN_IDS.split(',').map(s => s.trim()).filter(Boolean) : [];
 
   if (botToken && adminIds.length > 0) {
-    const isQuestion = (service && service.includes('питання'));
+    const isQuestion = (leadService && leadService.includes('питання'));
     const headerText = isQuestion ? '❓ *Нове запитання з сайту*' : '📌 *Нова заявка з сайту*';
     
     const text = [
       headerText,
       '',
-      `👤 *Ім'я:* ${name}`,
-      `📞 *Телефон:* ${phone}`,
-      service ? `📋 *Послуга/Тема:* ${service}` : '',
-      comment ? `💬 *Коментар/Питання:* ${comment}` : '',
+      `👤 *Ім'я:* ${leadName}`,
+      `📞 *Телефон:* ${leadPhone}`,
+      leadService ? `📋 *Послуга/Тема:* ${leadService}` : '',
+      leadComment ? `💬 *Коментар/Питання:* ${leadComment}` : '',
       '',
       `🕐 ${new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kiev' })}`
     ].filter(Boolean).join('\n');
@@ -253,7 +258,11 @@ app.post('/api/leads', async (req, res) => {
   }
 
   res.json({ ok: true, lead: newLead });
-});
+}
+
+app.post('/api/leads', handleLeadRequest);
+app.post('/api/quick-question', handleLeadRequest);
+
 
 /**
  * GET /api/leads
