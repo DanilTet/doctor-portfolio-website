@@ -125,24 +125,43 @@ function animateCounter(element, start, end, duration) {
  * @returns {Promise<boolean>} true if succeeded
  */
 async function submitAppointment(data) {
+  const { url, anonKey } = SITE_CONFIG.supabase;
+
+  if (!url || !anonKey || url.includes('YOUR_PROJECT_ID') || anonKey.includes('YOUR_ANON_KEY_HERE')) {
+    console.info('[Supabase] Credentials not configured — simulating successful appointment booking:', data);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return true;
+  }
+
   try {
-    const response = await fetch('/api/leads', {
+    const endpoint = `${url}/rest/v1/site_leads`;
+
+    const payload = {
+      name: data.name,
+      phone: data.phone,
+      service: data.service,
+      comment: data.comment || '',
+      status: 'pending'
+    };
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: data.name,
-        phone: data.phone,
-        service: data.service,
-        comment: data.comment || ''
-      })
+      headers: {
+        'apikey': anonKey,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      console.warn('[Leads] Server returned non-ok response');
+      const err = await response.text();
+      console.warn('[Supabase] Insert appointment error:', err);
     }
+
     return true;
   } catch (error) {
-    console.warn('[Leads] Failed to submit lead to server:', error);
+    console.warn('[Supabase] Failed to submit appointment:', error);
     return true;
   }
 }
