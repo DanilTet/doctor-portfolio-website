@@ -283,18 +283,6 @@ app.get('/api/blog/leads', authGuard, (req, res) => {
   res.json(readLeads());
 });
 
-      await Promise.all(sends);
-    } catch (e) {
-      console.warn('[Leads API] Telegram error:', e.message);
-    }
-  }
-
-  res.json({ ok: true, lead: newLead });
-}
-
-app.post('/api/leads', handleLeadRequest);
-app.post('/api/quick-question', handleLeadRequest);
-
 
 /**
  * GET /api/leads
