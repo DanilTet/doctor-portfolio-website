@@ -1010,16 +1010,17 @@ h1, h2, h3, h4, h5, h6 {
 /* ── 1280px: начинаем уменьшать отступы в навигации ── */
 @media (max-width: 1280px) {
   .nav {
-    gap: var(--space-lg);
+    gap: var(--space-md);
   }
 
   .nav__link {
-    padding: var(--space-sm) 0.65rem;
+    padding: var(--space-sm) 0.5rem;
+    font-size: 0.8rem;
   }
 }
 
-/* ── 1024px: бургер-меню включается, hero переходит в одну колонку ── */
-@media (max-width: 1024px) {
+/* ── 1200px: бургер-меню включается ── */
+@media (max-width: 1200px) {
   :root {
     --header-height: 72px;
   }
@@ -1238,9 +1239,8 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  overflow: hidden;
 }
 
 /* Vertical divider between cards */
@@ -1388,6 +1388,8 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-primary-light);
   margin-bottom: var(--space-xs);
   font-family: var(--font-heading);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Sub-label */
