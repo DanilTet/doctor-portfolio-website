@@ -409,6 +409,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  flex-shrink: 0;
 }
 
 /* Language Switcher */
@@ -1005,6 +1006,18 @@ h1, h2, h3, h4, h5, h6 {
 /* ============================================================
    RESPONSIVE — MOBILE
    ============================================================ */
+/* ── 1200px: Nav starts to tighten — reduce gaps ── */
+@media (max-width: 1200px) {
+  .nav {
+    gap: var(--space-lg);
+  }
+
+  .nav__link {
+    padding: var(--space-sm) 0.6rem;
+  }
+}
+
+/* ── 1024px: Hero collapses to single column ── */
 @media (max-width: 1024px) {
   .hero__inner {
     grid-template-columns: 1fr;
@@ -1058,6 +1071,29 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* ── 900px: Nav shrinks further; hide CTA button to keep lang switcher visible ── */
+@media (max-width: 900px) {
+  .nav {
+    gap: var(--space-md);
+  }
+
+  .nav__link {
+    padding: var(--space-xs) 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* Hide text, keep icon visible in very tight space */
+  .header .btn--sm span[data-i18n] {
+    display: none;
+  }
+
+  .header .btn--sm {
+    padding: 0.625rem 0.75rem;
+    min-width: unset;
+  }
+}
+
 @media (max-width: 768px) {
   :root {
     --header-height: 68px;
@@ -1094,11 +1130,21 @@ h1, h2, h3, h4, h5, h6 {
   .nav__link {
     font-size: var(--fs-body-lg);
     padding: var(--space-md) var(--space-xl);
+    letter-spacing: 0.03em;
   }
 
   .header__actions {
     flex-direction: column;
     gap: var(--space-md);
+  }
+
+  /* Restore the hidden text inside mobile menu */
+  .header .btn--sm span[data-i18n] {
+    display: inline;
+  }
+
+  .header .btn--sm {
+    padding: 0.625rem 1.5rem;
   }
 
   .burger {
@@ -1206,6 +1252,7 @@ h1, h2, h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
+  overflow: hidden;
 }
 
 /* Vertical divider between cards */
@@ -1390,7 +1437,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .stats__inner {
     grid-template-columns: 1fr;
   }
@@ -1400,6 +1447,12 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1px solid rgba(78, 205, 196, 0.1);
   }
 
+  .stats__label {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+  }
+}
+
+@media (max-width: 768px) {
   .stats__item {
     padding: var(--space-xl);
   }
