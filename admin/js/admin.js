@@ -562,6 +562,12 @@ async function loadMarketingAnalytics(rangeDays) {
       };
     }
 
+    // Save reference for re-rendering when custom links change
+    window._lastMarketingCurrent = current;
+    window._lastMarketingPrevious = previous;
+    initUtmGeneratorUI(current);
+    syncServerTrackingLinks(current);
+
     // 3. Traffic Sources Doughnut Chart
     renderTrafficSourcesChart(current.sourceCounts);
 
@@ -952,6 +958,277 @@ function openDailyDetailModal(dateStr) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// CUSTOM UTM TRACKING LINKS MANAGER
+// ─────────────────────────────────────────────────────────────
+function getSavedTrackingLinks() {
+  let links = [];
+  try {
+    const raw = localStorage.getItem('custom_utm_links');
+    if (raw) links = JSON.parse(raw);
+  } catch (e) { console.error('Error loading custom_utm_links:', e); }
+
+  if (!links || links.length === 0) {
+    links = [
+      { id: 'default-1', title: 'Профіль Інстаграм', source: 'instagram_profile', medium: 'bio', campaign: 'profile', url: 'https://endo.kh.ua/' },
+      { id: 'default-2', title: 'Телеграм Бот', source: 'telegram_bot', medium: 'button', campaign: 'faq_menu', url: 'https://endo.kh.ua/' }
+    ];
+    try { localStorage.setItem('custom_utm_links', JSON.stringify(links)); } catch (e) {}
+  }
+  return links;
+}
+
+function saveTrackingLinksList(links) {
+  try { localStorage.setItem('custom_utm_links', JSON.stringify(links)); } catch (e) {}
+  try {
+    const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+    fetch('/api/tracking-links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Blog-Secret': secret },
+      body: JSON.stringify({ links })
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+async function syncServerTrackingLinks(current) {
+  try {
+    const secret = (window.ADMIN_ENV || window.ENV || {}).BLOG_SECRET || 'super-secret-key-123';
+    const res = await fetch('/api/tracking-links', { headers: { 'X-Blog-Secret': secret } });
+    if (res.ok) {
+      const serverLinks = await res.json();
+      if (Array.isArray(serverLinks) && serverLinks.length > 0) {
+        const local = getSavedTrackingLinks();
+        const map = new Map();
+        local.forEach(l => map.set(l.source, l));
+        serverLinks.forEach(l => map.set(l.source, l));
+        const merged = Array.from(map.values());
+        try { localStorage.setItem('custom_utm_links', JSON.stringify(merged)); } catch(e) {}
+        if (current) renderSavedTrackingLinksTable(current);
+      }
+    }
+  } catch (e) {}
+}
+
+function buildUtmUrl(url, source, medium, campaign) {
+  let target = url || 'https://endo.kh.ua/';
+  if (!target.startsWith('http')) target = 'https://endo.kh.ua/' + target.replace(/^\//, '');
+  const u = new URL(target);
+  if (source) u.searchParams.set('utm_source', source);
+  if (medium) u.searchParams.set('utm_medium', medium);
+  if (campaign) u.searchParams.set('utm_campaign', campaign);
+  return u.toString();
+}
+
+function slugifySource(text) {
+  if (!text) return '';
+  const cyr = {
+    'а':'a','б':'b','в':'v','г':'h','ґ':'g','д':'d','е':'e','є':'ye','ж':'zh','з':'z','и':'y','і':'i','ї':'yi','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'kh','ц':'ts','ч':'ch','ш':'sh','щ':'shch','ь':'','ю':'yu','я':'ya',
+    'ы':'y','э':'e','ъ':''
+  };
+  return text.toLowerCase()
+    .split('')
+    .map(c => cyr[c] !== undefined ? cyr[c] : c)
+    .join('')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function formatSourceName(sourceCode) {
+  if (!sourceCode) return 'direct / невідомо';
+  const code = sourceCode.toString().trim().toLowerCase();
+  const links = getSavedTrackingLinks();
+  const found = links.find(l => l.source.toLowerCase() === code);
+  if (found) {
+    return `${found.title} (${code})`;
+  }
+  const presets = {
+    'telegram_bot': 'Телеграм Бот (telegram_bot)',
+    'instagram_profile': 'Профіль Інстаграм (instagram_profile)',
+    'instagram': 'Інстаграм (instagram)',
+    'google': 'Google Пошук (google)',
+    'direct': 'Прямий перехід (direct)',
+    'telegram': 'Телеграм (telegram)',
+    'facebook': 'Facebook (facebook)'
+  };
+  return presets[code] || sourceCode;
+}
+
+function initUtmGeneratorUI(current) {
+  const form = document.getElementById('form-utm-generator');
+  if (!form) return;
+
+  const titleIn = document.getElementById('utm-gen-title');
+  const sourceIn = document.getElementById('utm-gen-source');
+  const urlSel = document.getElementById('utm-gen-url');
+  const customUrlWrap = document.getElementById('utm-gen-custom-url-wrap');
+  const customUrlIn = document.getElementById('utm-gen-custom-url');
+  const btnToggleAdv = document.getElementById('btn-toggle-utm-advanced');
+  const advWrap = document.getElementById('utm-advanced-wrap');
+  const mediumIn = document.getElementById('utm-gen-medium');
+  const campaignIn = document.getElementById('utm-gen-campaign');
+  const resultBox = document.getElementById('utm-generated-result-box');
+  const outputUrl = document.getElementById('utm-generated-url-output');
+  const btnCopy = document.getElementById('btn-copy-generated-utm');
+  const toastMsg = document.getElementById('utm-copy-toast-msg');
+
+  let sourceManuallyEdited = false;
+  if (sourceIn && !sourceIn._boundInput) {
+    sourceIn._boundInput = true;
+    sourceIn.addEventListener('input', () => { sourceManuallyEdited = true; });
+  }
+  if (titleIn && sourceIn && !titleIn._boundInput) {
+    titleIn._boundInput = true;
+    titleIn.addEventListener('input', () => {
+      if (!sourceManuallyEdited) {
+        sourceIn.value = slugifySource(titleIn.value);
+      }
+    });
+  }
+
+  if (urlSel && customUrlWrap) {
+    urlSel.onchange = () => {
+      customUrlWrap.style.display = urlSel.value === 'custom' ? 'block' : 'none';
+    };
+  }
+
+  if (btnToggleAdv && advWrap) {
+    btnToggleAdv.onclick = () => {
+      const isHidden = advWrap.style.display === 'none';
+      advWrap.style.display = isHidden ? 'flex' : 'none';
+      btnToggleAdv.textContent = isHidden ? '− Сховати додаткові мітки' : '+ Додаткові UTM-мітки (опціонально)';
+    };
+  }
+
+  if (btnCopy && outputUrl) {
+    btnCopy.onclick = () => {
+      navigator.clipboard.writeText(outputUrl.value).then(() => {
+        if (toastMsg) {
+          toastMsg.style.display = 'block';
+          setTimeout(() => { toastMsg.style.display = 'none'; }, 3000);
+        }
+      });
+    };
+  }
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const title = titleIn?.value.trim();
+    let source = sourceIn?.value.trim() || slugifySource(title);
+    if (!title || !source) return;
+
+    let targetUrl = urlSel?.value === 'custom' ? customUrlIn?.value.trim() : urlSel?.value;
+    if (!targetUrl) targetUrl = 'https://endo.kh.ua/';
+
+    const medium = mediumIn?.value.trim() || '';
+    const campaign = campaignIn?.value.trim() || '';
+
+    const fullUrl = buildUtmUrl(targetUrl, source, medium, campaign);
+    if (outputUrl && resultBox) {
+      outputUrl.value = fullUrl;
+      resultBox.style.display = 'block';
+    }
+
+    const links = getSavedTrackingLinks();
+    const existingIdx = links.findIndex(l => l.source === source);
+    const newLink = {
+      id: existingIdx >= 0 ? links[existingIdx].id : 'link_' + Date.now(),
+      title,
+      source,
+      medium,
+      campaign,
+      url: targetUrl,
+      created_at: new Date().toISOString()
+    };
+
+    if (existingIdx >= 0) {
+      links[existingIdx] = newLink;
+    } else {
+      links.unshift(newLink);
+    }
+
+    saveTrackingLinksList(links);
+    renderSavedTrackingLinksTable(current);
+    if (window._lastMarketingCurrent && window._lastMarketingPrevious) {
+      renderSourcesList(window._lastMarketingCurrent, window._lastMarketingPrevious);
+      renderTrafficSourcesChart(window._lastMarketingCurrent.sourceCounts);
+    }
+  };
+
+  renderSavedTrackingLinksTable(current);
+}
+
+function renderSavedTrackingLinksTable(current) {
+  const tbody = document.getElementById('saved-tracking-links-tbody');
+  if (!tbody) return;
+
+  const links = getSavedTrackingLinks();
+  if (!links || links.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Немає збережених посилань. Створіть перше посилання вище!</td></tr>`;
+    return;
+  }
+
+  const sourceCounts = current?.sourceCounts || {};
+
+  tbody.innerHTML = links.map(l => {
+    const visits = sourceCounts[l.source] || 0;
+    const fullUrl = buildUtmUrl(l.url, l.source, l.medium, l.campaign);
+    const badgeStyle = visits > 0 
+      ? 'background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); font-weight: 600;' 
+      : 'background: rgba(100,116,139,0.1); color: var(--text-muted);';
+
+    return `
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 12px 14px;">
+          <div style="font-weight: 600; color: var(--text-primary); font-size: 13px;">${escapeHtml(l.title)}</div>
+          <div style="font-size: 11px; color: var(--primary); font-family: monospace; margin-top: 2px;">utm_source: ${escapeHtml(l.source)}</div>
+        </td>
+        <td style="padding: 12px 14px; max-width: 250px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: monospace;" title="${escapeHtml(fullUrl)}">${escapeHtml(fullUrl)}</span>
+            <button class="btn btn--ghost btn--sm btn-copy-link-item" data-url="${escapeHtml(fullUrl)}" title="Копіювати" style="padding: 2px 6px; font-size: 12px; flex-shrink: 0;">📋</button>
+          </div>
+        </td>
+        <td style="padding: 12px 14px; text-align: center;">
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; ${badgeStyle}">
+            ${visits} візитів
+          </span>
+        </td>
+        <td style="padding: 12px 14px; text-align: right;">
+          <button class="btn btn--ghost btn--sm btn-del-link-item" data-id="${escapeHtml(l.id)}" title="Видалити" style="padding: 4px 8px; font-size: 12px; color: var(--danger);">🗑️</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  tbody.querySelectorAll('.btn-copy-link-item').forEach(btn => {
+    btn.onclick = () => {
+      const u = btn.getAttribute('data-url');
+      navigator.clipboard.writeText(u).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✓';
+        btn.style.color = '#22c55e';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.color = ''; }, 1500);
+      });
+    };
+  });
+
+  tbody.querySelectorAll('.btn-del-link-item').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      if (confirm('Видалити це посилання?')) {
+        let links = getSavedTrackingLinks();
+        links = links.filter(x => x.id !== id);
+        saveTrackingLinksList(links);
+        renderSavedTrackingLinksTable(current);
+        if (window._lastMarketingCurrent && window._lastMarketingPrevious) {
+          renderSourcesList(window._lastMarketingCurrent, window._lastMarketingPrevious);
+          renderTrafficSourcesChart(window._lastMarketingCurrent.sourceCounts);
+        }
+      }
+    };
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
 // SOURCES LIST (WITH PROGRESS BARS & EXPAND TOGGLE)
 // ─────────────────────────────────────────────────────────────
 function renderSourcesList(current, previous) {
@@ -980,7 +1257,7 @@ function renderSourcesList(current, previous) {
     else if (diff < 0) diffBadge = `<span class="trend-down" style="font-size:11px; margin-left: 4px;">(${diff})</span>`;
 
     const tempNode = document.createElement('div');
-    tempNode.textContent = item.name;
+    tempNode.textContent = formatSourceName(item.name);
 
     return `
       <div class="action-item">
@@ -1113,7 +1390,7 @@ function renderCitiesList(current, previous) {
 // TRAFFIC SOURCES DOUGHNUT CHART
 // ─────────────────────────────────────────────────────────────
 function renderTrafficSourcesChart(sourceCounts) {
-  const labels = Object.keys(sourceCounts);
+  const labels = Object.keys(sourceCounts).map(k => formatSourceName(k));
   const chartValues = Object.values(sourceCounts);
 
   const premiumColors = [

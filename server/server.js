@@ -30,6 +30,7 @@ const INSTAGRAM_USERNAME = process.env.INSTAGRAM_USERNAME || '';
 const ROOT_DIR = path.join(__dirname, '..');            // Project root
 const DATA_FILE = path.join(__dirname, 'data', 'posts.json');
 const ANALYTICS_FILE = path.join(__dirname, 'data', 'analytics.json');
+const TRACKING_LINKS_FILE = path.join(__dirname, 'data', 'tracking_links.json');
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
 const ARTICLES_DIR = path.join(__dirname, 'data', 'articles');
 const ARTICLES_UPLOADS_DIR = path.join(ROOT_DIR, 'uploads', 'articles');
@@ -164,6 +165,25 @@ function writeAnalytics(data) {
 }
 
 const LEADS_FILE = path.join(__dirname, 'data', 'leads.json');
+
+function readTrackingLinks() {
+  try {
+    if (fs.existsSync(TRACKING_LINKS_FILE)) {
+      return JSON.parse(fs.readFileSync(TRACKING_LINKS_FILE, 'utf-8'));
+    }
+  } catch (e) {
+    console.warn('[Tracking Links API] Failed to read tracking_links.json:', e.message);
+  }
+  return [];
+}
+
+function writeTrackingLinks(data) {
+  try {
+    fs.writeFileSync(TRACKING_LINKS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('[Tracking Links API] Failed to write tracking_links.json:', e.message);
+  }
+}
 
 function readLeads() {
   try {
@@ -630,6 +650,33 @@ app.get('/api/analytics/backup', authGuard, (_req, res) => {
     res.download(ANALYTICS_FILE, `analytics_backup_${new Date().toISOString().split('T')[0]}.json`);
   } else {
     res.status(404).json({ error: 'Файл аналитики не найден' });
+  }
+});
+
+/**
+ * GET /api/tracking-links
+ * Returns saved tracking links array (requires admin secret).
+ */
+app.get('/api/tracking-links', authGuard, (_req, res) => {
+  const data = readTrackingLinks();
+  res.json(data);
+});
+
+/**
+ * POST /api/tracking-links
+ * Save tracking links array (requires admin secret).
+ */
+app.post('/api/tracking-links', authGuard, (req, res) => {
+  try {
+    const { links } = req.body;
+    if (Array.isArray(links)) {
+      writeTrackingLinks(links);
+      res.json({ success: true, count: links.length });
+    } else {
+      res.status(400).json({ error: 'Expected links array' });
+    }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 

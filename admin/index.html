@@ -743,6 +743,122 @@
         </div>
       </div>
 
+      <!-- Section: Custom UTM Link Builder & Tracker -->
+      <div class="marketing-section-header" style="margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px; margin: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <span>Генератор та відстеження посилань (UTM)</span>
+        </h3>
+      </div>
+
+      <div class="marketing-row" style="margin-bottom: 36px; grid-template-columns: 1fr 1.2fr; gap: 24px;">
+        <!-- Link Builder Form -->
+        <div class="marketing-list-card" style="margin-bottom: 0;">
+          <div class="marketing-list-title" style="margin-bottom: 16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Створити нове посилання</span>
+          </div>
+
+          <form id="form-utm-generator" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="utm-gen-title" style="font-size: 13px;">Назва кампанії / джерела <span style="color:var(--danger)">*</span></label>
+              <input type="text" id="utm-gen-title" class="form-input" placeholder="Наприклад: Профіль Інстаграм, Банер на клініці" required style="font-size: 13px; padding: 8px 12px;">
+              <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Ця назва буде відображатися в таблицях аналітики</span>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="utm-gen-source" style="font-size: 13px;">Код джерела (utm_source) <span style="color:var(--danger)">*</span></label>
+              <input type="text" id="utm-gen-source" class="form-input" placeholder="instagram_profile" required style="font-size: 13px; padding: 8px 12px; font-family: monospace;">
+              <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Генерується автоматично англійськими літерами</span>
+            </div>
+
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="utm-gen-url" style="font-size: 13px;">Цільова сторінка</label>
+              <select id="utm-gen-url" class="form-select" style="font-size: 13px; padding: 8px 12px;">
+                <option value="https://endo.kh.ua/">Головна сторінка (endo.kh.ua)</option>
+                <option value="https://endo.kh.ua/gastroscopy/">Гастроскопія (endo.kh.ua/gastroscopy/)</option>
+                <option value="https://endo.kh.ua/colonoscopy/">Колоноскопія (endo.kh.ua/colonoscopy/)</option>
+                <option value="https://endo.kh.ua/uzd/">УЗД (endo.kh.ua/uzd/)</option>
+                <option value="https://endo.kh.ua/surgery/">Хірургія (endo.kh.ua/surgery/)</option>
+                <option value="custom">Ввести інше посилання...</option>
+              </select>
+            </div>
+
+            <div id="utm-gen-custom-url-wrap" class="form-group" style="margin: 0; display: none;">
+              <label class="form-label" for="utm-gen-custom-url" style="font-size: 13px;">Власне посилання URL</label>
+              <input type="url" id="utm-gen-custom-url" class="form-input" placeholder="https://endo.kh.ua/..." style="font-size: 13px; padding: 8px 12px;">
+            </div>
+
+            <div style="border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px;">
+              <button type="button" id="btn-toggle-utm-advanced" class="btn btn--ghost btn--sm" style="font-size: 12px; padding: 0; color: var(--primary);">
+                + Додаткові UTM-мітки (опціонально)
+              </button>
+              <div id="utm-advanced-wrap" style="display: none; margin-top: 12px; flex-direction: column; gap: 12px;">
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" for="utm-gen-medium" style="font-size: 12px;">Канал (utm_medium)</label>
+                  <input type="text" id="utm-gen-medium" class="form-input" placeholder="bio, story, banner, button" style="font-size: 12px; padding: 6px 10px;">
+                </div>
+                <div class="form-group" style="margin: 0;">
+                  <label class="form-label" for="utm-gen-campaign" style="font-size: 12px;">Кампанія (utm_campaign)</label>
+                  <input type="text" id="utm-gen-campaign" class="form-input" placeholder="summer_2026, discount_10" style="font-size: 12px; padding: 6px 10px;">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="btn-create-utm-link" class="btn btn--primary" style="margin-top: 8px; width: 100%; justify-content: center; font-size: 13px; padding: 10px;">
+              ⚡ Створити та зберегти посилання
+            </button>
+          </form>
+
+          <!-- Generated Link Toast / Preview Box -->
+          <div id="utm-generated-result-box" style="display: none; margin-top: 16px; padding: 14px; background: rgba(99, 102, 241, 0.08); border: 1px dashed var(--primary); border-radius: 10px;">
+            <div style="font-size: 12px; font-weight: 600; color: var(--primary); margin-bottom: 6px;">🎉 Посилання успішно створено:</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" id="utm-generated-url-output" readonly class="form-input" style="font-size: 12px; padding: 6px 10px; font-family: monospace; background: var(--bg-card);">
+              <button type="button" id="btn-copy-generated-utm" class="btn btn--primary btn--sm" style="white-space: nowrap; font-size: 12px; padding: 6px 12px;">
+                📋 Копіювати
+              </button>
+            </div>
+            <div id="utm-copy-toast-msg" style="font-size: 11px; color: #22c55e; margin-top: 6px; display: none;">✓ Скопійовано в буфер обміну!</div>
+          </div>
+        </div>
+
+        <!-- Saved Links Tracker Table -->
+        <div class="marketing-list-card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+          <div class="marketing-list-title" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Збережені посилання та переходи</span>
+            </div>
+            <span style="font-size: 11px; color: var(--text-secondary); font-weight: normal;">Трафік за обраний період</span>
+          </div>
+
+          <div class="table-responsive-wrapper" style="overflow-x: auto; flex: 1;">
+            <table class="daily-visits-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; text-transform: uppercase;">
+                  <th style="padding: 10px 12px; font-weight: 600;">Назва / Джерело</th>
+                  <th style="padding: 10px 12px; font-weight: 600;">Посилання</th>
+                  <th style="padding: 10px 12px; font-weight: 600; text-align: center;">Візити</th>
+                  <th style="padding: 10px 12px; text-align: right; font-weight: 600;">Дія</th>
+                </tr>
+              </thead>
+              <tbody id="saved-tracking-links-tbody">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Завантаження збережених посилань...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- Section: Traffic Sources -->
       <div class="marketing-section-header" style="margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
         <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em;">Джерела трафіку</h3>
