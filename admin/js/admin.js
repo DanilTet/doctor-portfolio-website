@@ -960,6 +960,16 @@ function openDailyDetailModal(dateStr) {
 // ─────────────────────────────────────────────────────────────
 // CUSTOM UTM TRACKING LINKS MANAGER
 // ─────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function getSavedTrackingLinks() {
   let links = [];
   try {
