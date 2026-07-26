@@ -359,7 +359,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-2xl);
+  gap: var(--space-xl);
 }
 
 .nav__list {
@@ -370,7 +370,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .nav__link {
   position: relative;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) 0.75rem;
   font-size: var(--fs-small);
   font-weight: var(--fw-medium);
   color: var(--color-text-light-muted);
@@ -410,6 +410,10 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: var(--space-md);
   flex-shrink: 0;
+}
+
+.header .btn--sm {
+  padding: 0.625rem 1.125rem;
 }
 
 /* Language Switcher */
@@ -1007,8 +1011,8 @@ h1, h2, h3, h4, h5, h6 {
    RESPONSIVE — MOBILE
    ============================================================ */
 
-/* ── 1280px: начинаем уменьшать отступы в навигации ── */
-@media (max-width: 1280px) {
+/* ── 1440px: уменьшаем отступы в навигации чтобы кнопка не обрезалась ── */
+@media (max-width: 1440px) {
   .nav {
     gap: var(--space-md);
   }
@@ -1016,6 +1020,10 @@ h1, h2, h3, h4, h5, h6 {
   .nav__link {
     padding: var(--space-sm) 0.5rem;
     font-size: 0.8rem;
+  }
+
+  .header .btn--sm {
+    padding: 0.625rem 0.875rem;
   }
 }
 
