@@ -39,11 +39,13 @@ async function compressImageInPlace(filePath) {
     const tmp = filePath + '.tmp';
     if (ext === '.jpg' || ext === '.jpeg') {
       await sharp(filePath)
+        .rotate()
         .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
         .jpeg({ quality: 80, mozjpeg: true })
         .toFile(tmp);
     } else if (ext === '.png') {
       await sharp(filePath)
+        .rotate()
         .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
         .png({ quality: 80, compressionLevel: 9 })
         .toFile(tmp);
