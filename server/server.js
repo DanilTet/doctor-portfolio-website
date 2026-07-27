@@ -997,6 +997,14 @@ app.post('/api/articles/:id/publish', authGuard, async (req, res) => {
   if (!article) return res.status(404).json({ error: 'Статья не найдена' });
 
   try {
+    const isFuture = article.date && new Date(article.date) > new Date();
+    if (isFuture || article.status === 'scheduled') {
+      article.status = 'scheduled';
+      writeArticle(article);
+      console.log(`[Articles API] Scheduled "${article.slug}" for ${article.date}`);
+      return res.json({ ok: true, scheduled: true, date: article.date });
+    }
+
     // Generate Ukrainian HTML
     const ukFile = writeArticleHtml(article, 'uk');
 
@@ -1175,6 +1183,56 @@ try {
 } catch (err) {
   console.warn('[AutoRender] Ошибка при авто-рендере:', err.message);
 }
+
+/* ── Scheduled Articles Scanner ──────────────────────────── */
+function checkScheduledArticles() {
+  try {
+    const allArticles = readArticles();
+    const now = new Date();
+    let publishedCount = 0;
+
+    for (const art of allArticles) {
+      if (art.status === 'scheduled' && new Date(art.date) <= now) {
+        art.status = 'published';
+        writeArticle(art);
+
+        // Generate static HTML
+        const ukFile = writeArticleHtml(art, 'uk', allArticles);
+        if (art.translations && art.translations.ru && art.translations.ru.title) {
+          writeArticleHtml(art, 'ru', allArticles);
+        }
+
+        // Upsert into posts.json (blog card)
+        if (art.show_in_blog) {
+          const posts = readPosts();
+          const existing = posts.findIndex(p => p.article_id === art.id);
+          const blogPost = {
+            id: existing >= 0 ? posts[existing].id : uuidv4(),
+            article_id: art.id,
+            title: art.title,
+            content: art.subtitle || '',
+            image_path: art.image_card || null,
+            external_url: `/articles/${art.slug}`,
+            date: art.date,
+            source: 'article',
+            tags: art.tags || [],
+          };
+          if (existing >= 0) { posts[existing] = blogPost; } else { posts.unshift(blogPost); }
+          writePosts(posts);
+        }
+
+        console.log(`⏰ [AutoSchedule] Automatically published article "${art.slug}": ${ukFile}`);
+        publishedCount++;
+      }
+    }
+  } catch (err) {
+    console.error('[AutoSchedule] Error checking scheduled articles:', err.message);
+  }
+}
+
+// Check immediately on startup, then every 60 seconds
+checkScheduledArticles();
+setInterval(checkScheduledArticles, 60000);
 
 app.listen(PORT, () => {
   console.log(`\n🚀 Сервер блога запущен: http://localhost:${PORT}`);

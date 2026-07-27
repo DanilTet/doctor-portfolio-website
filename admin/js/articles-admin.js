@@ -27,6 +27,21 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  function toLocalDatetimeInputString(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function fromLocalDatetimeInputString(localStr) {
+    if (!localStr) return new Date().toISOString();
+    const d = new Date(localStr);
+    if (isNaN(d.getTime())) return new Date().toISOString();
+    return d.toISOString();
+  }
+
   /* ── Init ────────────────────────────────────────────────── */
   function init() {
     const navArticles = getEl('nav-articles');
@@ -78,11 +93,16 @@
         ? `<img class="article-row__thumb" src="${escHtml(article.image_card)}" alt="">`
         : `<div class="article-row__thumb-placeholder">📄</div>`;
 
-      const status = article.status === 'published'
-        ? `<span class="article-row__status article-row__status--published">✓ Опубліковано</span>`
-        : `<span class="article-row__status article-row__status--draft">✎ Чернетка</span>`;
+      const isScheduled = article.status === 'scheduled' || (article.date && new Date(article.date) > new Date() && article.status !== 'published');
+      let status = `<span class="article-row__status article-row__status--draft">✎ Чернетка</span>`;
+      if (article.status === 'published') {
+        status = `<span class="article-row__status article-row__status--published">✓ Опубліковано</span>`;
+      } else if (isScheduled) {
+        status = `<span class="article-row__status article-row__status--scheduled">⏰ Заплановано</span>`;
+      }
 
-      const date = new Date(article.date).toLocaleDateString('uk-UA', { day:'numeric', month:'long', year:'numeric' });
+      const dateOpts = { day:'numeric', month:'long', year:'numeric', hour: isScheduled ? '2-digit' : undefined, minute: isScheduled ? '2-digit' : undefined };
+      const date = new Date(article.date).toLocaleDateString('uk-UA', dateOpts);
       const tags = (article.tags || []).map(t => `<span style="background:var(--bg-surface);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:10px">${escHtml(t)}</span>`).join('');
       const hasRu = article.translations && article.translations.ru && article.translations.ru.title;
       const ruBadge = hasRu ? `<span style="font-size:10px;background:rgba(59,130,246,0.12);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);padding:1px 6px;border-radius:4px;">🇷🇺 RU</span>` : '';
@@ -242,7 +262,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" for="art-date">Дата публікації</label>
-            <input id="art-date" type="datetime-local" class="form-input" value="${a.date ? a.date.slice(0,16) : ''}">
+            <input id="art-date" type="datetime-local" class="form-input" value="${toLocalDatetimeInputString(a.date)}">
           </div>
         </div>
 
@@ -467,6 +487,19 @@
     bindBtn('art-publish-btn2',    () => saveAndPublish());
     bindBtn('art-translate-btn',   () => translateArticleAction());
     bindBtn('art-translate-btn2',  () => translateArticleAction());
+
+    const updatePublishBtnLabel = () => {
+      const dateVal = (getEl('art-date') || {}).value || '';
+      const isFuture = dateVal && new Date(dateVal) > new Date(Date.now() + 60000);
+      const btn1 = getEl('art-publish-btn');
+      const btn2 = getEl('art-publish-btn2');
+      const text = isFuture ? '⏰ Запланувати публікацію' : (isNew ? '🚀 Опублікувати статтю' : '💾 Зберегти зміни');
+      if (btn1) btn1.innerHTML = text;
+      if (btn2) btn2.innerHTML = text;
+    };
+    const dateInputEl = getEl('art-date');
+    if (dateInputEl) dateInputEl.addEventListener('input', updatePublishBtnLabel);
+    updatePublishBtnLabel();
   }
 
 
@@ -1035,7 +1068,7 @@
     const faq = collectFaqData();
     const related_articles = collectRelatedArticles();
 
-    return { title, subtitle, seo_description: seo, slug, date: dateVal ? new Date(dateVal).toISOString() : undefined, image_card: imageCard || null, show_in_blog: showBlog, show_final_cta: showCta, tags, sections, faq, related_articles, internal_links };
+    return { title, subtitle, seo_description: seo, slug, date: dateVal ? fromLocalDatetimeInputString(dateVal) : undefined, image_card: imageCard || null, show_in_blog: showBlog, show_final_cta: showCta, tags, sections, faq, related_articles, internal_links };
   }
 
   /**
@@ -1097,11 +1130,21 @@
     }
   }
 
-  /* ── Publish ─────────────────────────────────────────────── */
+  /* ── Publish / Schedule ──────────────────────────────────── */
 
   async function saveAndPublish() {
-    const saved = await saveArticle('published');
+    const dateVal = (getEl('art-date') || {}).value || '';
+    const isFuture = dateVal && new Date(dateVal) > new Date(Date.now() + 60000);
+    const targetStatus = isFuture ? 'scheduled' : 'published';
+
+    const saved = await saveArticle(targetStatus);
     if (!saved) return;
+
+    if (isFuture || saved.status === 'scheduled') {
+      const formattedDate = new Date(saved.date).toLocaleString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      showFeedback(`⏰ Заплановано на ${formattedDate}! Стаття автоматично опублікується у вказаний час.`, 'success');
+      return;
+    }
 
     showFeedback('⏳ Генерація HTML...', 'muted');
     setAllBtnsLoading(true);
