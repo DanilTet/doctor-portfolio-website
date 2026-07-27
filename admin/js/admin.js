@@ -18,6 +18,68 @@ const CFG = (() => {
 })();
 
 /* ============================================================
+   TEXT EDITOR FORMATTING TOOLBAR HELPER
+   ============================================================ */
+window.EditorFormatting = {
+  apply(textarea, type) {
+    if (!textarea) return;
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const val = textarea.value;
+    const selected = val.slice(start, end);
+    let replacement = '';
+    let cursorOffset = 0;
+
+    if (type === 'bold') {
+      const text = selected || 'жирний текст';
+      replacement = `**${text}**`;
+      cursorOffset = selected ? replacement.length : 2 + text.length;
+    } else if (type === 'italic') {
+      const text = selected || 'курсив';
+      replacement = `*${text}*`;
+      cursorOffset = selected ? replacement.length : 1 + text.length;
+    } else if (type === 'url') {
+      const url = prompt('Введіть посилання (URL):', 'https://');
+      if (!url) return;
+      const text = selected || 'посилання';
+      replacement = `[${text}](${url})`;
+      cursorOffset = replacement.length;
+    }
+
+    textarea.value = val.slice(0, start) + replacement + val.slice(end);
+    textarea.selectionStart = textarea.selectionEnd = start + cursorOffset;
+    textarea.focus();
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  },
+
+  createToolbar(textarea) {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-formatting-toolbar';
+    wrap.style.cssText = 'display:inline-flex;gap:4px;margin-bottom:6px;';
+
+    const createBtn = (label, title, type, style = '') => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn--ghost btn--sm';
+      btn.title = title;
+      btn.innerHTML = label;
+      if (style) btn.style.cssText = style;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.apply(textarea, type);
+      });
+      return btn;
+    };
+
+    wrap.appendChild(createBtn('<b>B</b>', 'Зробити жирним (**текст**)', 'bold', 'font-weight:bold;padding:2px 8px;'));
+    wrap.appendChild(createBtn('<i>I</i>', 'Зробити курсивом (*текст*)', 'italic', 'font-style:italic;padding:2px 8px;'));
+    wrap.appendChild(createBtn('🔗 URL', 'Вставити зовнішнє посилання ([текст](url))', 'url', 'padding:2px 8px;color:var(--primary);'));
+
+    return wrap;
+  }
+};
+
+/* ============================================================
    SUPABASE CLIENT — thin REST wrapper
    ============================================================ */
 const Supabase = {

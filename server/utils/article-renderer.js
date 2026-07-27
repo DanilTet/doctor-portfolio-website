@@ -37,6 +37,20 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+function formatInline(str, isEscaped = false) {
+  if (!str) return '';
+  let res = isEscaped ? str : escHtml(str);
+  if (isEscaped) {
+    res = res.replace(/&lt;(b|i|strong|em)&gt;/gi, '<$1>').replace(/&lt;\/(b|i|strong|em)&gt;/gi, '</$1>');
+    res = res.replace(/&lt;a\s+href=&quot;([^&"]+)&quot;(?:[^&]*)&gt;/gi, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary);text-decoration:underline;">');
+    res = res.replace(/&lt;\/a&gt;/gi, '</a>');
+  }
+  res = res.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  res = res.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3');
+  res = res.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:var(--color-primary);text-decoration:underline;">$1</a>');
+  return res;
+}
+
 /**
  * Converts plain-text article text to HTML paragraphs.
  * Lines starting with "- " become list items; empty lines = paragraph break.
@@ -53,13 +67,13 @@ function textToHtml(text) {
     const line = rawLine.trimEnd();
     if (line.startsWith('- ') || line.startsWith('• ')) {
       if (!inList) { result.push('<ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">'); inList = true; }
-      result.push(`<li style="margin-bottom:8px;">${escHtml(line.slice(2))}</li>`);
+      result.push(`<li style="margin-bottom:8px;">${formatInline(escHtml(line.slice(2)), true)}</li>`);
     } else {
       if (inList) { result.push('</ul>'); inList = false; }
       if (line === '') {
         // paragraph break
       } else {
-        result.push(`<p style="margin-bottom:16px;">${escHtml(line)}</p>`);
+        result.push(`<p style="margin-bottom:16px;">${formatInline(escHtml(line), true)}</p>`);
       }
     }
   }
@@ -75,8 +89,10 @@ function textToHtml(text) {
  * @returns {string}
  */
 function resolveInternalLinks(text, allArticles) {
-  if (!text || !allArticles || !allArticles.length) return text;
-  return text.replace(/\[\[LINK:([\w-]+):([^\]]+)\]\]/g, (_match, id, linkText) => {
+  if (!text) return text;
+  let res = formatInline(text, false);
+  if (!allArticles || !allArticles.length) return res;
+  return res.replace(/\[\[LINK:([\w-]+):([^\]]+)\]\]/g, (_match, id, linkText) => {
     const target = allArticles.find(a => a.id === id);
     if (target) {
       return `<a href="/articles/${escHtml(target.slug)}" style="color:var(--color-primary);text-decoration:underline;">${escHtml(linkText)}</a>`;
@@ -90,9 +106,10 @@ function resolveInternalLinks(text, allArticles) {
  * Structured for easy Schema.org FAQPage migration later.
  * @param {object[]} faq - [{id, question, answer}]
  * @param {string} lang
+ * @param {object[]} [allArticles]
  * @returns {string}
  */
-function renderFaqBlock(faq, lang) {
+function renderFaqBlock(faq, lang, allArticles = []) {
   if (!faq || !faq.length) return '';
   const heading = lang === 'ru' ? 'Быстрые ответы' : 'Швидкі відповіді';
   const itemsHtml = faq.map((item, i) => `
@@ -101,7 +118,7 @@ function renderFaqBlock(faq, lang) {
         <span>${escHtml(item.question)}</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5" class="faq-chevron" style="flex-shrink:0;transition:transform .3s;"><polyline points="6 9 12 15 18 9"/></svg>
       </summary>
-      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${textToHtml(item.answer || '')}</div>
+      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${textToHtmlResolved(resolveInternalLinks(item.answer || '', allArticles))}</div>
     </details>`).join('');
 
   return `
@@ -275,7 +292,7 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   const recordLabel = isRu ? 'Записаться' : 'Записатися на прийом';
 
   const sectionsHtml = renderSections(sections, lang, allArticles);
-  const faqHtml = renderFaqBlock(faq, lang);
+  const faqHtml = renderFaqBlock(faq, lang, allArticles);
   const relatedHtml = renderRelatedArticles(article.related_articles || [], allArticles, lang);
 
   const ogImage = article.image_card ? `<meta property="og:image" content="${escHtml(article.image_card)}">` : '';

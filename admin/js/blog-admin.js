@@ -29,6 +29,13 @@
     const form = getEl('blog-post-form');
     if (form) form.addEventListener('submit', handleSubmit);
 
+    // Text formatting toolbar for blog-content
+    const blogContentEl = getEl('blog-content');
+    if (blogContentEl && window.EditorFormatting) {
+      const toolbar = window.EditorFormatting.createToolbar(blogContentEl);
+      blogContentEl.parentNode.insertBefore(toolbar, blogContentEl);
+    }
+
     // Image preview
     const imgInput = getEl('blog-image');
     if (imgInput) imgInput.addEventListener('change', handleImagePreview);

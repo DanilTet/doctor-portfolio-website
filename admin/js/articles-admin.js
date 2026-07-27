@@ -544,8 +544,11 @@
           <textarea class="form-input sec-text" rows="5" placeholder="Текст статті (кожен рядок — абзац; рядки з «- » або «• » стануть списком)..." style="resize:vertical">${escHtml(s.text)}</textarea>
         </div>
 
-        <!-- Extras: image, youtube, cta -->
-        <div class="section-extras">
+        <!-- Extras: image, youtube, cta, formatting -->
+        <div class="section-extras" style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+          <button type="button" class="btn btn--ghost btn--sm sec-bold-btn" title="Зробити жирним (**текст**)" style="font-weight:bold;padding:2px 8px;"><b>B</b></button>
+          <button type="button" class="btn btn--ghost btn--sm sec-italic-btn" title="Зробити курсивом (*текст*)" style="font-style:italic;padding:2px 8px;"><i>I</i></button>
+          <button type="button" class="btn btn--ghost btn--sm sec-url-btn" title="Вставити зовнішнє посилання URL ([текст](url))" style="padding:2px 8px;color:var(--primary);">🔗 URL</button>
           <button type="button" class="btn btn--ghost btn--sm sec-add-img-btn" title="Додати фото до розділу">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             + Фото
@@ -560,7 +563,7 @@
           </button>
           <button type="button" class="btn btn--ghost btn--sm sec-insert-link-btn" title="Вставити посилання на статтю" style="color:var(--primary)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            + Посилання
+            + Посилання (стаття)
           </button>
         </div>
 
@@ -643,13 +646,21 @@
       block.querySelector('.sec-cta-badge').style.display = 'none';
     });
 
+    // Text formatting buttons
+    const secTextarea = block.querySelector('.sec-text');
+    block.querySelector('.sec-bold-btn').addEventListener('click', () => window.EditorFormatting.apply(secTextarea, 'bold'));
+    block.querySelector('.sec-italic-btn').addEventListener('click', () => window.EditorFormatting.apply(secTextarea, 'italic'));
+    block.querySelector('.sec-url-btn').addEventListener('click', () => window.EditorFormatting.apply(secTextarea, 'url'));
+
     // Internal link insert
     block.querySelector('.sec-insert-link-btn').addEventListener('click', () => {
       openArticleSearchModal(({ id, title }) => {
         const textarea = block.querySelector('.sec-text');
-        const placeholder = `[[LINK:${id}:${title}]]`;
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
+        const start = textarea.selectionStart || 0;
+        const end = textarea.selectionEnd || 0;
+        const sel = textarea.value.slice(start, end).trim();
+        const linkLabel = sel || title;
+        const placeholder = `[[LINK:${id}:${linkLabel}]]`;
         const val = textarea.value;
         textarea.value = val.slice(0, start) + placeholder + val.slice(end);
         textarea.selectionStart = textarea.selectionEnd = start + placeholder.length;
@@ -657,7 +668,7 @@
         // Show visual hint
         const hint = document.createElement('div');
         hint.className = 'internal-link-inserted-hint';
-        hint.textContent = `✓ Посилання вставлено: ${title}`;
+        hint.textContent = `✓ Посилання вставлено: ${linkLabel}`;
         block.querySelector('.sec-insert-link-btn').after(hint);
         setTimeout(() => hint.remove(), 2500);
       });
@@ -727,9 +738,37 @@
         <div class="form-group" style="margin-bottom:0">
           <label class="form-label" style="font-size:12px">Відповідь</label>
           <textarea class="form-input faq-answer" rows="2" placeholder="Коротка, зрозуміла відповідь..." style="resize:vertical">${escHtml(item.answer)}</textarea>
+          <div class="faq-extras" style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+            <button type="button" class="btn btn--ghost btn--sm faq-bold-btn" title="Зробити жирним (**текст**)" style="font-weight:bold;padding:2px 8px;"><b>B</b></button>
+            <button type="button" class="btn btn--ghost btn--sm faq-italic-btn" title="Зробити курсивом (*текст*)" style="font-style:italic;padding:2px 8px;"><i>I</i></button>
+            <button type="button" class="btn btn--ghost btn--sm faq-url-btn" title="Вставити зовнішнє посилання URL ([текст](url))" style="padding:2px 8px;color:var(--primary);">🔗 URL</button>
+            <button type="button" class="btn btn--ghost btn--sm faq-insert-link-btn" title="Вставити посилання на статтю" style="color:var(--primary);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              + Посилання (стаття)
+            </button>
+          </div>
         </div>
       </div>
     `;
+
+    // Text formatting for FAQ
+    const answerTextarea = el.querySelector('.faq-answer');
+    el.querySelector('.faq-bold-btn').addEventListener('click', () => window.EditorFormatting.apply(answerTextarea, 'bold'));
+    el.querySelector('.faq-italic-btn').addEventListener('click', () => window.EditorFormatting.apply(answerTextarea, 'italic'));
+    el.querySelector('.faq-url-btn').addEventListener('click', () => window.EditorFormatting.apply(answerTextarea, 'url'));
+    el.querySelector('.faq-insert-link-btn').addEventListener('click', () => {
+      openArticleSearchModal(({ id, title }) => {
+        const start = answerTextarea.selectionStart || 0;
+        const end = answerTextarea.selectionEnd || 0;
+        const sel = answerTextarea.value.slice(start, end).trim();
+        const linkLabel = sel || title;
+        const placeholder = `[[LINK:${id}:${linkLabel}]]`;
+        const val = answerTextarea.value;
+        answerTextarea.value = val.slice(0, start) + placeholder + val.slice(end);
+        answerTextarea.selectionStart = answerTextarea.selectionEnd = start + placeholder.length;
+        answerTextarea.focus();
+      });
+    });
 
     // Update preview on question input
     el.querySelector('.faq-question').addEventListener('input', function() {
