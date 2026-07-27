@@ -446,9 +446,13 @@
   }
 }
 
-/* Load More Button Styling */
+/* Load More & Collapse Button Styling */
 #blog-load-more-wrap {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
   margin-top: 36px;
   margin-bottom: 12px;
 }
@@ -474,5 +478,29 @@
   color: #0b0f19;
   border-color: var(--color-primary, #2bd9b9);
   box-shadow: 0 6px 24px rgba(43, 217, 185, 0.4);
+  transform: translateY(-2px);
+}
+
+#blog-collapse-btn,
+.blog-collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 36px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #94a3b8);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+#blog-collapse-btn:hover,
+.blog-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
 }

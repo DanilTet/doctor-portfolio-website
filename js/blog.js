@@ -27,6 +27,7 @@
   const modalClose   = document.getElementById('blog-modal-close');
   const loadMoreWrap = document.getElementById('blog-load-more-wrap');
   const loadMoreBtn  = document.getElementById('blog-load-more-btn');
+  const collapseBtn  = document.getElementById('blog-collapse-btn');
 
   /* ── Fetch & Render ──────────────────────────────────────── */
   async function loadPosts() {
@@ -129,12 +130,25 @@
     const visiblePosts = filtered.slice(0, visibleCount);
     visiblePosts.forEach(post => gridEl.appendChild(createCard(post)));
 
+    const collapseBtnEl = collapseBtn || document.getElementById('blog-collapse-btn');
+
     if (wrapEl) {
-      if (filtered.length > visibleCount) {
-        wrapEl.style.display = 'block';
+      const hasMore = filtered.length > visibleCount;
+      const isExpanded = visibleCount > getInitialLimit();
+
+      if (hasMore || isExpanded) {
+        wrapEl.style.display = 'flex';
+
         if (btnEl) {
+          btnEl.style.display = hasMore ? 'inline-flex' : 'none';
           const lang = document.documentElement.lang || 'uk';
           btnEl.textContent = lang === 'ru' ? 'Показать больше' : (lang === 'en' ? 'Show more' : 'Показати більше');
+        }
+
+        if (collapseBtnEl) {
+          collapseBtnEl.style.display = isExpanded ? 'inline-flex' : 'none';
+          const lang = document.documentElement.lang || 'uk';
+          collapseBtnEl.textContent = lang === 'ru' ? 'Свернуть' : (lang === 'en' ? 'Collapse' : 'Згорнути');
         }
       } else {
         wrapEl.style.display = 'none';
@@ -348,6 +362,21 @@
     }
   }
 
+  function initCollapse() {
+    const btnEl = collapseBtn || document.getElementById('blog-collapse-btn');
+    if (btnEl && !btnEl.dataset.bound) {
+      btnEl.dataset.bound = 'true';
+      btnEl.addEventListener('click', () => {
+        visibleCount = getInitialLimit();
+        renderGrid();
+        const blogSection = document.getElementById('blog');
+        if (blogSection) {
+          blogSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  }
+
   /* ── Utils ───────────────────────────────────────────────── */
   function escHtml(str) {
     if (!str) return '';
@@ -360,6 +389,7 @@
   function boot() {
     loadPosts();
     initLoadMore();
+    initCollapse();
     initExternalFilters();
   }
 
