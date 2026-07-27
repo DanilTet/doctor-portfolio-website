@@ -11,6 +11,12 @@
   let allPosts = [];
   let activeFilter = 'Всі';
 
+  function getInitialLimit() {
+    return window.innerWidth < 768 ? 3 : 6;
+  }
+
+  let visibleCount = getInitialLimit();
+
   /* ── DOM Refs ─────────────────────────────────────────────── */
   const grid         = document.getElementById('blog-posts-grid');
   const loading      = document.getElementById('blog-loading');
@@ -19,6 +25,8 @@
   const modal        = document.getElementById('blog-modal');
   const modalOver    = document.getElementById('blog-modal-overlay');
   const modalClose   = document.getElementById('blog-modal-close');
+  const loadMoreWrap = document.getElementById('blog-load-more-wrap');
+  const loadMoreBtn  = document.getElementById('blog-load-more-btn');
 
   /* ── Fetch & Render ──────────────────────────────────────── */
   async function loadPosts() {
@@ -71,6 +79,7 @@
       btn.textContent = tag === 'Всі' ? 'Всі статті' : `#${tag}`;
       btn.addEventListener('click', () => {
         activeFilter = tag;
+        visibleCount = getInitialLimit();
         updateFilterUI();
         renderGrid();
       });
@@ -95,23 +104,42 @@
 
   /* ── Grid Renderer ───────────────────────────────────────── */
   function renderGrid() {
-    if (!grid) return;
-    grid.innerHTML = '';
+    const gridEl = grid || document.getElementById('blog-posts-grid');
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    const emptyEl = empty || document.getElementById('blog-empty');
+    const wrapEl = loadMoreWrap || document.getElementById('blog-load-more-wrap');
+    const btnEl = loadMoreBtn || document.getElementById('blog-load-more-btn');
 
     const filtered = activeFilter === 'Всі' 
       ? allPosts 
       : allPosts.filter(p => Array.isArray(p.tags) && p.tags.includes(activeFilter));
 
     if (!filtered.length) {
-      grid.style.display = 'none';
-      if (empty) empty.style.display = 'flex';
+      gridEl.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = 'flex';
+      if (wrapEl) wrapEl.style.display = 'none';
       return;
     }
 
-    if (empty) empty.style.display = 'none';
-    grid.style.display = '';
+    if (emptyEl) emptyEl.style.display = 'none';
+    gridEl.style.display = '';
 
-    filtered.forEach(post => grid.appendChild(createCard(post)));
+    const visiblePosts = filtered.slice(0, visibleCount);
+    visiblePosts.forEach(post => gridEl.appendChild(createCard(post)));
+
+    if (wrapEl) {
+      if (filtered.length > visibleCount) {
+        wrapEl.style.display = 'block';
+        if (btnEl) {
+          const lang = document.documentElement.lang || 'uk';
+          btnEl.textContent = lang === 'ru' ? 'Показать больше' : (lang === 'en' ? 'Show more' : 'Показати більше');
+        }
+      } else {
+        wrapEl.style.display = 'none';
+      }
+    }
   }
 
   /* ── Card Builder ────────────────────────────────────────── */
@@ -301,10 +329,23 @@
 
         // 2. Set filter
         activeFilter = tag;
+        visibleCount = getInitialLimit();
         updateFilterUI();
         renderGrid();
       });
     });
+  }
+
+  function initLoadMore() {
+    const btnEl = loadMoreBtn || document.getElementById('blog-load-more-btn');
+    if (btnEl && !btnEl.dataset.bound) {
+      btnEl.dataset.bound = 'true';
+      btnEl.addEventListener('click', () => {
+        const step = window.innerWidth < 768 ? 3 : 6;
+        visibleCount += step;
+        renderGrid();
+      });
+    }
   }
 
   /* ── Utils ───────────────────────────────────────────────── */
@@ -318,6 +359,7 @@
   /* ── Boot ────────────────────────────────────────────────── */
   function boot() {
     loadPosts();
+    initLoadMore();
     initExternalFilters();
   }
 
