@@ -17,6 +17,8 @@
   let articlesCache = [];
   let currentArticle = null;   // article being edited
   let sectionCounter = 0;
+  let faqCounter = 0;          // FAQ item counter for unique IDs
+  let articleSearchCallback = null; // callback for article search modal
 
   /* ── DOM helpers ─────────────────────────────────────────── */
   const getEl = id => document.getElementById(id);
@@ -157,12 +159,18 @@
         slug: '', tags: [], image_card: null,
         sections: [], show_final_cta: true, show_in_blog: true,
         date: new Date().toISOString(),
+        faq: [], related_articles: [], internal_links: [],
         isNew: true
       };
     } else {
       currentArticle = JSON.parse(JSON.stringify(article));
+      // Ensure new fields exist on old articles
+      currentArticle.faq = currentArticle.faq || [];
+      currentArticle.related_articles = currentArticle.related_articles || [];
+      currentArticle.internal_links = currentArticle.internal_links || [];
     }
     sectionCounter = 0;
+    faqCounter = 0;
     showView('editor');
     buildEditorForm(currentArticle);
   }
@@ -279,6 +287,20 @@
         </div>
       </div>
 
+      <!-- FAQ -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="art-block-header">
+          <span class="art-block-icon">❓</span>
+          <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">FAQ (Швидкі відповіді)</h3>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Показується перед блоками статті</span>
+        </div>
+        <div id="art-faq-container" class="faq-admin-container"></div>
+        <button id="art-add-faq-btn" class="add-section-btn" style="margin-top:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Додати питання
+        </button>
+      </div>
+
       <!-- Sections -->
       <div class="card" style="margin-bottom:16px">
         <h3 style="margin:0 0 20px;font-size:15px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">📦 Блоки статті</h3>
@@ -288,6 +310,31 @@
           Додати розділ
         </button>
       </div>
+
+      <!-- Related Articles -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="art-block-header">
+          <span class="art-block-icon">🔗</span>
+          <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Пов'язані статті</h3>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Блок «Читайте також» після статті</span>
+        </div>
+        <div id="art-related-container" class="related-admin-container"></div>
+        <button id="art-add-related-btn" class="add-section-btn" style="margin-top:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Пошук та додавання статті
+        </button>
+      </div>
+
+      ${!isNew ? `
+      <!-- Backlinks (auto) -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="art-block-header">
+          <span class="art-block-icon">↩️</span>
+          <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Зворотні зв'язки</h3>
+          <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Автоматично</span>
+        </div>
+        <div id="art-backlinks-container"><span style="color:var(--text-muted);font-size:13px">Завантаження...</span></div>
+      </div>` : ''}
 
       <!-- Bottom action bar -->
       <div class="card">
@@ -303,6 +350,19 @@
     // Render existing sections
     const sectionsContainer = getEl('art-sections-container');
     (a.sections || []).forEach(s => appendSection(sectionsContainer, s));
+
+    // Render existing FAQ items
+    const faqContainer = getEl('art-faq-container');
+    (a.faq || []).forEach(item => appendFaqItem(faqContainer, item));
+
+    // Render existing related articles
+    const relatedContainer = getEl('art-related-container');
+    (a.related_articles || []).forEach(id => appendRelatedArticle(id, relatedContainer));
+
+    // Load backlinks for existing articles
+    if (!isNew && currentArticle.id) {
+      loadBacklinks(currentArticle.id);
+    }
 
     // SEO description character counter
     const seoEl = getEl('art-seo');
@@ -376,6 +436,24 @@
       appendSection(sectionsContainer, null);
     });
 
+    // Add FAQ item
+    const addFaqBtn = getEl('art-add-faq-btn');
+    if (addFaqBtn) addFaqBtn.addEventListener('click', () => {
+      appendFaqItem(getEl('art-faq-container'), null);
+    });
+
+    // Add related article (opens search modal)
+    const addRelatedBtn = getEl('art-add-related-btn');
+    if (addRelatedBtn) addRelatedBtn.addEventListener('click', () => {
+      openArticleSearchModal(({ id, title }) => {
+        const container = getEl('art-related-container');
+        // Avoid duplicates
+        const alreadyAdded = [...container.querySelectorAll('.related-admin-item')].some(el => el.dataset.articleId === id);
+        if (alreadyAdded) { showFeedback('⚠️ Ця стаття вже додана', 'muted'); return; }
+        appendRelatedArticle(id, container, title);
+      });
+    });
+
     // Cover image upload/remove
     getEl('art-cover-input').addEventListener('change', handleCoverUpload);
     const removeCoverBtn = getEl('art-remove-cover');
@@ -390,6 +468,7 @@
     bindBtn('art-translate-btn',   () => translateArticleAction());
     bindBtn('art-translate-btn2',  () => translateArticleAction());
   }
+
 
   /* ── Sections ────────────────────────────────────────────── */
 
@@ -445,6 +524,10 @@
           <button type="button" class="btn btn--ghost btn--sm sec-toggle-cta" title="Кнопка запису після розділу">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
             + CTA
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm sec-insert-link-btn" title="Вставити посилання на статтю" style="color:var(--primary)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            + Посилання
           </button>
         </div>
 
@@ -527,6 +610,26 @@
       block.querySelector('.sec-cta-badge').style.display = 'none';
     });
 
+    // Internal link insert
+    block.querySelector('.sec-insert-link-btn').addEventListener('click', () => {
+      openArticleSearchModal(({ id, title }) => {
+        const textarea = block.querySelector('.sec-text');
+        const placeholder = `[[LINK:${id}:${title}]]`;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const val = textarea.value;
+        textarea.value = val.slice(0, start) + placeholder + val.slice(end);
+        textarea.selectionStart = textarea.selectionEnd = start + placeholder.length;
+        textarea.focus();
+        // Show visual hint
+        const hint = document.createElement('div');
+        hint.className = 'internal-link-inserted-hint';
+        hint.textContent = `✓ Посилання вставлено: ${title}`;
+        block.querySelector('.sec-insert-link-btn').after(hint);
+        setTimeout(() => hint.remove(), 2500);
+      });
+    });
+
     container.appendChild(block);
     renumberSections();
   }
@@ -555,6 +658,273 @@
       if (num) num.textContent = `№${i + 1}`;
     });
   }
+
+  /* ── FAQ Block ───────────────────────────────────────────── */
+
+  function appendFaqItem(container, data) {
+    if (!container) return;
+    const idx = ++faqCounter;
+    const item = data || { id: `faq-${idx}`, question: '', answer: '' };
+
+    const el = document.createElement('div');
+    el.className = 'faq-admin-item';
+    el.dataset.faqId = item.id || `faq-${idx}`;
+
+    el.innerHTML = `
+      <div class="faq-admin-item__header">
+        <span class="faq-admin-item__num">❓${idx}</span>
+        <span class="faq-admin-item__preview">${escHtml(item.question) || 'Нове питання...'}</span>
+        <div class="faq-admin-item__controls">
+          <button class="btn btn--ghost btn--sm" title="Вгору" data-faq-move="up">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <button class="btn btn--ghost btn--sm" title="Вниз" data-faq-move="down">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="btn btn--ghost btn--sm" title="Видалити питання" style="color:var(--danger)" data-faq-remove>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="faq-admin-item__body">
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label" style="font-size:12px">Питання</label>
+          <input type="text" class="form-input faq-question" placeholder="Яке питання ставить пацієнт?" value="${escHtml(item.question)}">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" style="font-size:12px">Відповідь</label>
+          <textarea class="form-input faq-answer" rows="2" placeholder="Коротка, зрозуміла відповідь..." style="resize:vertical">${escHtml(item.answer)}</textarea>
+        </div>
+      </div>
+    `;
+
+    // Update preview on question input
+    el.querySelector('.faq-question').addEventListener('input', function() {
+      el.querySelector('.faq-admin-item__preview').textContent = this.value || 'Нове питання...';
+    });
+
+    // Move up/down
+    el.querySelector('[data-faq-move="up"]').addEventListener('click', () => moveFaqItem(el, -1));
+    el.querySelector('[data-faq-move="down"]').addEventListener('click', () => moveFaqItem(el, 1));
+
+    // Remove
+    el.querySelector('[data-faq-remove]').addEventListener('click', () => {
+      el.style.transition = 'opacity 0.2s';
+      el.style.opacity = '0';
+      setTimeout(() => { el.remove(); renumberFaqItems(); }, 200);
+    });
+
+    container.appendChild(el);
+    renumberFaqItems();
+  }
+
+  function moveFaqItem(el, dir) {
+    const container = el.parentElement;
+    const items = [...container.querySelectorAll('.faq-admin-item')];
+    const idx = items.indexOf(el);
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= items.length) return;
+    if (dir === -1) container.insertBefore(el, items[targetIdx]);
+    else container.insertBefore(items[targetIdx], el);
+    renumberFaqItems();
+  }
+
+  function renumberFaqItems() {
+    const container = getEl('art-faq-container');
+    if (!container) return;
+    container.querySelectorAll('.faq-admin-item').forEach((el, i) => {
+      const num = el.querySelector('.faq-admin-item__num');
+      if (num) num.textContent = `❓${i + 1}`;
+    });
+  }
+
+  function collectFaqData() {
+    const container = getEl('art-faq-container');
+    if (!container) return [];
+    return [...container.querySelectorAll('.faq-admin-item')].map((el, i) => ({
+      id: el.dataset.faqId || `faq-${i + 1}`,
+      question: el.querySelector('.faq-question').value.trim(),
+      answer: el.querySelector('.faq-answer').value.trim(),
+    })).filter(item => item.question || item.answer);
+  }
+
+  /* ── Related Articles Block ──────────────────────────────── */
+
+  function appendRelatedArticle(articleId, container, knownTitle) {
+    if (!container || !articleId) return;
+
+    // Try to get title from cache
+    const cached = articlesCache.find(a => a.id === articleId);
+    const title = knownTitle || (cached && cached.title) || articleId;
+
+    const el = document.createElement('div');
+    el.className = 'related-admin-item';
+    el.dataset.articleId = articleId;
+
+    el.innerHTML = `
+      <div class="related-admin-item__info">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span class="related-admin-item__title">${escHtml(title)}</span>
+      </div>
+      <div class="related-admin-item__controls">
+        <button class="btn btn--ghost btn--sm" title="Вгору" data-rel-move="up">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <button class="btn btn--ghost btn--sm" title="Вниз" data-rel-move="down">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <button class="btn btn--ghost btn--sm" title="Видалити" style="color:var(--danger)" data-rel-remove>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    `;
+
+    el.querySelector('[data-rel-move="up"]').addEventListener('click', () => moveRelatedItem(el, -1));
+    el.querySelector('[data-rel-move="down"]').addEventListener('click', () => moveRelatedItem(el, 1));
+    el.querySelector('[data-rel-remove]').addEventListener('click', () => {
+      el.style.transition = 'opacity 0.2s';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 200);
+    });
+
+    container.appendChild(el);
+  }
+
+  function moveRelatedItem(el, dir) {
+    const container = el.parentElement;
+    const items = [...container.querySelectorAll('.related-admin-item')];
+    const idx = items.indexOf(el);
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= items.length) return;
+    if (dir === -1) container.insertBefore(el, items[targetIdx]);
+    else container.insertBefore(items[targetIdx], el);
+  }
+
+  function collectRelatedArticles() {
+    const container = getEl('art-related-container');
+    if (!container) return [];
+    return [...container.querySelectorAll('.related-admin-item')].map(el => el.dataset.articleId).filter(Boolean);
+  }
+
+  /* ── Article Search Modal ────────────────────────────────── */
+
+  /**
+   * Opens a search modal to find and select an existing article.
+   * @param {function} onSelect - Callback({id, title, slug}) when article is selected
+   */
+  function openArticleSearchModal(onSelect) {
+    articleSearchCallback = onSelect;
+
+    // Remove any existing modal
+    const existing = document.getElementById('article-search-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'article-search-modal';
+    modal.className = 'article-search-modal';
+    modal.innerHTML = `
+      <div class="article-search-modal__overlay"></div>
+      <div class="article-search-modal__window">
+        <div class="article-search-modal__header">
+          <span style="font-weight:700;font-size:15px">🔍 Пошук статті</span>
+          <button class="article-search-modal__close btn btn--ghost btn--sm" title="Закрити">✕</button>
+        </div>
+        <div style="padding:0 16px 8px">
+          <input id="article-search-input" type="text" class="form-input" placeholder="Введіть назву статті..." autocomplete="off" style="margin-bottom:0">
+        </div>
+        <div id="article-search-results" class="article-search-results"></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const input = modal.querySelector('#article-search-input');
+    const results = modal.querySelector('#article-search-results');
+
+    function renderResults(query) {
+      const q = query.toLowerCase().trim();
+      const filtered = articlesCache.filter(a =>
+        a.id !== (currentArticle && currentArticle.id) &&
+        (!q || a.title.toLowerCase().includes(q))
+      ).slice(0, 20);
+
+      if (!filtered.length) {
+        results.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">${q ? 'Статей не знайдено' : 'Немає доступних статей'}</div>`;
+        return;
+      }
+      results.innerHTML = filtered.map(a => `
+        <div class="article-search-result-item" data-id="${escHtml(a.id)}" data-title="${escHtml(a.title)}" data-slug="${escHtml(a.slug || '')}">
+          <span class="article-search-result-item__title">${escHtml(a.title)}</span>
+          <span class="article-search-result-item__slug">/articles/${escHtml(a.slug || '')}</span>
+        </div>
+      `).join('');
+
+      results.querySelectorAll('.article-search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+          if (articleSearchCallback) {
+            articleSearchCallback({ id: item.dataset.id, title: item.dataset.title, slug: item.dataset.slug });
+          }
+          closeArticleSearchModal();
+        });
+      });
+    }
+
+    renderResults('');
+    input.addEventListener('input', () => renderResults(input.value));
+    input.focus();
+
+    modal.querySelector('.article-search-modal__close').addEventListener('click', closeArticleSearchModal);
+    modal.querySelector('.article-search-modal__overlay').addEventListener('click', closeArticleSearchModal);
+
+    // ESC to close
+    function onKeydown(e) {
+      if (e.key === 'Escape') { closeArticleSearchModal(); document.removeEventListener('keydown', onKeydown); }
+    }
+    document.addEventListener('keydown', onKeydown);
+
+    // Animate in
+    requestAnimationFrame(() => modal.classList.add('article-search-modal--open'));
+  }
+
+  function closeArticleSearchModal() {
+    const modal = document.getElementById('article-search-modal');
+    if (modal) {
+      modal.classList.remove('article-search-modal--open');
+      setTimeout(() => modal.remove(), 200);
+    }
+    articleSearchCallback = null;
+  }
+
+  /* ── Backlinks Block ─────────────────────────────────────── */
+
+  async function loadBacklinks(articleId) {
+    const container = getEl('art-backlinks-container');
+    if (!container) return;
+    try {
+      const res = await fetch(`${API}/${articleId}/backlinks`, { headers: { 'X-Blog-Secret': SECRET() } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const backlinks = await res.json();
+
+      if (!backlinks.length) {
+        container.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:4px 0">Жодна стаття ще не посилається на цю.</div>`;
+        return;
+      }
+
+      container.innerHTML = backlinks.map(a => `
+        <div class="backlink-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span class="backlink-item__title">${escHtml(a.title)}</span>
+          <a href="/articles/${escHtml(a.slug || '')}" target="_blank" class="backlink-item__link" title="Переглянути">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <span class="backlink-item__status ${a.status === 'published' ? 'backlink-item__status--pub' : 'backlink-item__status--draft'}">${a.status === 'published' ? 'опубл.' : 'чернетка'}</span>
+        </div>
+      `).join('');
+    } catch (err) {
+      container.innerHTML = `<div style="color:var(--danger);font-size:13px">Помилка завантаження: ${escHtml(err.message)}</div>`;
+    }
+  }
+
 
   /* ── Cover Image Upload ──────────────────────────────────── */
 
@@ -660,8 +1030,30 @@
       };
     });
 
-    return { title, subtitle, seo_description: seo, slug, date: dateVal ? new Date(dateVal).toISOString() : undefined, image_card: imageCard || null, show_in_blog: showBlog, show_final_cta: showCta, tags, sections };
+    // Collect all internal link IDs from section texts [[LINK:uuid:text]]
+    const internal_links = extractInternalLinks(sections);
+    const faq = collectFaqData();
+    const related_articles = collectRelatedArticles();
+
+    return { title, subtitle, seo_description: seo, slug, date: dateVal ? new Date(dateVal).toISOString() : undefined, image_card: imageCard || null, show_in_blog: showBlog, show_final_cta: showCta, tags, sections, faq, related_articles, internal_links };
   }
+
+  /**
+   * Extracts unique article IDs from [[LINK:uuid:text]] placeholders in section texts.
+   */
+  function extractInternalLinks(sections) {
+    const ids = new Set();
+    const rx = /\[\[LINK:([\w-]+):[^\]]+\]\]/g;
+    for (const s of sections) {
+      let m;
+      rx.lastIndex = 0;
+      while ((m = rx.exec(s.text || '')) !== null) {
+        ids.add(m[1]);
+      }
+    }
+    return [...ids];
+  }
+
 
   /* ── Save (draft) ────────────────────────────────────────── */
 

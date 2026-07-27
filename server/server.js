@@ -822,10 +822,32 @@ function deleteArticleFile(article) {
 /**
  * GET /api/articles
  * Returns list of all articles (sorted newest first).
+ * If ?summary=true — returns only {id, title, slug} for lightweight search.
  */
-app.get('/api/articles', authGuard, (_req, res) => {
+app.get('/api/articles', authGuard, (req, res) => {
   const articles = readArticles().sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (req.query.summary === 'true') {
+    return res.json(articles.map(a => ({ id: a.id, title: a.title, slug: a.slug })));
+  }
   res.json(articles);
+});
+
+/**
+ * GET /api/articles/:id/backlinks
+ * Returns all articles that reference the given article via internal_links or related_articles.
+ */
+app.get('/api/articles/:id/backlinks', authGuard, (req, res) => {
+  const targetId = req.params.id;
+  const all = readArticles();
+  const backlinks = all
+    .filter(a => a.id !== targetId)
+    .filter(a => {
+      const inLinks = Array.isArray(a.internal_links) && a.internal_links.includes(targetId);
+      const inRelated = Array.isArray(a.related_articles) && a.related_articles.includes(targetId);
+      return inLinks || inRelated;
+    })
+    .map(a => ({ id: a.id, title: a.title, slug: a.slug, status: a.status }));
+  res.json(backlinks);
 });
 
 /**
@@ -871,6 +893,9 @@ app.post('/api/articles', authGuard, (req, res) => {
     sections: Array.isArray(body.sections) ? body.sections : [],
     show_final_cta: body.show_final_cta !== false,
     translations: body.translations || {},
+    faq: Array.isArray(body.faq) ? body.faq : [],
+    related_articles: Array.isArray(body.related_articles) ? body.related_articles : [],
+    internal_links: Array.isArray(body.internal_links) ? body.internal_links : [],
   };
 
   writeArticle(article);
@@ -899,6 +924,9 @@ app.put('/api/articles/:id', authGuard, (req, res) => {
   if (body.show_in_blog !== undefined) article.show_in_blog = body.show_in_blog;
   if (Array.isArray(body.sections)) article.sections = body.sections;
   if (body.show_final_cta !== undefined) article.show_final_cta = body.show_final_cta;
+  if (Array.isArray(body.faq)) article.faq = body.faq;
+  if (Array.isArray(body.related_articles)) article.related_articles = body.related_articles;
+  if (Array.isArray(body.internal_links)) article.internal_links = body.internal_links;
   if (body.slug !== undefined && body.slug !== article.slug) {
     const existingArticles = readArticles();
     if (existingArticles.some(a => a.slug === body.slug && a.id !== article.id)) {

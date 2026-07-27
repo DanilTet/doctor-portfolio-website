@@ -88,6 +88,19 @@ async function translateArticle(article) {
     }
   });
 
+  // FAQ
+  const faqItems = article.faq || [];
+  faqItems.forEach((item, i) => {
+    if (item.question) {
+      keys.push({ type: 'faq', index: i, field: 'question' });
+      toTranslate.push(item.question);
+    }
+    if (item.answer) {
+      keys.push({ type: 'faq', index: i, field: 'answer' });
+      toTranslate.push(item.answer);
+    }
+  });
+
   if (!toTranslate.length) {
     return { title: article.title, subtitle: article.subtitle, seo_description: article.seo_description, sections: article.sections };
   }
@@ -125,14 +138,21 @@ async function translateArticle(article) {
       youtube_url: s.youtube_url,
       show_cta_button: s.show_cta_button,
     })),
+    faq: faqItems.map(item => ({
+      id: item.id,
+      question: item.question,
+      answer: item.answer,
+    })),
   };
 
   keys.forEach((key, idx) => {
     const val = (translatedArray[idx] !== undefined) ? translatedArray[idx].trim() : toTranslate[idx];
     if (key.type === 'top') {
       ruData[key.field] = val;
-    } else {
+    } else if (key.type === 'section') {
       ruData.sections[key.index][key.field] = val;
+    } else if (key.type === 'faq') {
+      ruData.faq[key.index][key.field] = val;
     }
   });
 

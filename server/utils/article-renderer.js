@@ -66,9 +66,93 @@ function textToHtml(text) {
 }
 
 /**
- * Renders the <section> blocks (TOC + sections content)
+ * Resolves internal link placeholders [[LINK:uuid:link text]] to real <a> tags.
+ * Falls back to plain text if the referenced article is not found.
+ * @param {string} text
+ * @param {object[]} allArticles
+ * @returns {string}
  */
-function renderSections(sections, lang) {
+function resolveInternalLinks(text, allArticles) {
+  if (!text || !allArticles || !allArticles.length) return text;
+  return text.replace(/\[\[LINK:([\w-]+):([^\]]+)\]\]/g, (_match, id, linkText) => {
+    const target = allArticles.find(a => a.id === id);
+    if (target) {
+      return `<a href="/articles/${escHtml(target.slug)}" style="color:var(--color-primary);text-decoration:underline;">${escHtml(linkText)}</a>`;
+    }
+    return escHtml(linkText);
+  });
+}
+
+/**
+ * Renders the FAQ block (quick answers) before sections content.
+ * Structured for easy Schema.org FAQPage migration later.
+ * @param {object[]} faq - [{id, question, answer}]
+ * @param {string} lang
+ * @returns {string}
+ */
+function renderFaqBlock(faq, lang) {
+  if (!faq || !faq.length) return '';
+  const heading = lang === 'ru' ? 'Быстрые ответы' : 'Швидкі відповіді';
+  const itemsHtml = faq.map((item, i) => `
+    <details class="faq-item" style="border:1px solid rgba(43,217,185,0.2);border-radius:10px;margin-bottom:10px;overflow:hidden;" ${i === 0 ? 'open' : ''}>
+      <summary style="padding:16px 20px;cursor:pointer;font-weight:600;font-size:1rem;color:var(--color-text-light);display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;-webkit-appearance:none;">
+        <span>${escHtml(item.question)}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5" class="faq-chevron" style="flex-shrink:0;transition:transform .3s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${escHtml(item.answer)}</div>
+    </details>`).join('');
+
+  return `
+    <div class="article-faq" style="margin-bottom:40px;" itemscope itemtype="https://schema.org/FAQPage">
+      <h2 style="font-size:1.4rem;font-weight:700;margin-bottom:16px;color:var(--color-primary);">${heading}</h2>
+      ${itemsHtml}
+    </div>
+    <style>.faq-item[open] .faq-chevron{transform:rotate(180deg)}.faq-item summary::-webkit-details-marker{display:none}</style>`;
+}
+
+/**
+ * Renders the "Читайте також" block at the end of the article.
+ * Resolves article IDs to real slugs at render time — slug changes don't break links.
+ * @param {string[]} relatedIds
+ * @param {object[]} allArticles
+ * @param {string} lang
+ * @returns {string}
+ */
+function renderRelatedArticles(relatedIds, allArticles, lang) {
+  if (!relatedIds || !relatedIds.length || !allArticles) return '';
+  const resolved = relatedIds
+    .map(id => allArticles.find(a => a.id === id))
+    .filter(Boolean);
+  if (!resolved.length) return '';
+
+  const heading = lang === 'ru' ? 'Читайте также' : 'Читайте також';
+  const itemsHtml = resolved.map(a => {
+    const thumb = a.image_card
+      ? `<img src="${escHtml(a.image_card)}" alt="${escHtml(a.title)}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
+      : `<div style="width:80px;height:60px;border-radius:8px;background:rgba(43,217,185,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;">📄</div>`;
+    return `
+      <a href="/articles/${escHtml(a.slug)}" style="display:flex;gap:14px;align-items:center;padding:12px 16px;border:1px solid rgba(43,217,185,0.15);border-radius:12px;text-decoration:none;color:var(--color-text-light);background:transparent;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='rgba(43,217,185,0.6)';this.style.background='rgba(43,217,185,0.05)'" onmouseout="this.style.borderColor='rgba(43,217,185,0.15)';this.style.background='transparent'">
+        ${thumb}
+        <span style="font-weight:600;font-size:.95rem;">${escHtml(a.title)}</span>
+      </a>`;
+  }).join('\n');
+
+  return `
+    <div class="article-related" style="margin-top:48px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);">
+      <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--color-text-light);">${heading}</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${itemsHtml}
+      </div>
+    </div>`;
+}
+
+/**
+ * Renders the <section> blocks (TOC + sections content)
+ * @param {object[]} sections
+ * @param {string} lang
+ * @param {object[]} [allArticles]
+ */
+function renderSections(sections, lang, allArticles = []) {
   if (!sections || !sections.length) return '';
 
   // Table of Contents
@@ -89,7 +173,9 @@ function renderSections(sections, lang) {
   const sectionsHtml = sections.map((s, i) => {
     const mt = i === 0 ? 'margin-top:0;' : 'margin-top:32px;';
     let html = `<h3 id="section-${i + 1}" style="${mt}margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">${escHtml(s.heading || '')}</h3>`;
-    html += textToHtml(s.text || '');
+    // Resolve internal link placeholders in section text
+    const resolvedText = resolveInternalLinks(s.text || '', allArticles);
+    html += textToHtmlResolved(resolvedText);
 
     // Section image — shown fully without crop or distortion
     if (s.image) {
@@ -120,12 +206,44 @@ function renderSections(sections, lang) {
 }
 
 /**
+ * Like textToHtml but accepts pre-rendered HTML (for resolved internal links).
+ * Wraps lines that are not already HTML tags in <p>.
+ */
+function textToHtmlResolved(text) {
+  if (!text) return '';
+  // If it looks like resolved HTML (contains <a> tags), pass through without re-escaping
+  // Split on newlines, wrap non-HTML, non-list lines in <p>
+  const lines = text.split('\n');
+  const result = [];
+  let inList = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+    if (line.startsWith('- ') || line.startsWith('\u2022 ')) {
+      if (!inList) { result.push('<ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">'); inList = true; }
+      // resolve links inside list items too (already done by resolveInternalLinks on full text)
+      result.push(`<li style="margin-bottom:8px;">${line.slice(2)}</li>`);
+    } else {
+      if (inList) { result.push('</ul>'); inList = false; }
+      if (line === '') {
+        // paragraph break
+      } else {
+        result.push(`<p style="margin-bottom:16px;">${line}</p>`);
+      }
+    }
+  }
+  if (inList) result.push('</ul>');
+  return result.join('\n');
+}
+
+/**
  * Generates a complete HTML page for an article.
  * @param {object} article - The article JSON object
  * @param {string} lang - 'uk' or 'ru'
+ * @param {object[]} [allArticles] - All articles for resolving links and related (optional)
  * @returns {string} - Full HTML string
  */
-function renderArticleHtml(article, lang = 'uk') {
+function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   const isRu = lang === 'ru';
 
   // Pick language-specific content
@@ -133,6 +251,7 @@ function renderArticleHtml(article, lang = 'uk') {
   let subtitle = article.subtitle || '';
   let seoDesc = article.seo_description || subtitle || '';
   let sections = article.sections || [];
+  let faq = article.faq || [];
 
   if (isRu && article.translations && article.translations.ru) {
     const ru = article.translations.ru;
@@ -140,6 +259,7 @@ function renderArticleHtml(article, lang = 'uk') {
     if (ru.subtitle) subtitle = ru.subtitle;
     if (ru.seo_description) seoDesc = ru.seo_description;
     if (ru.sections) sections = ru.sections;
+    if (ru.faq) faq = ru.faq;
   }
 
   const slug = article.slug || 'article';
@@ -151,7 +271,9 @@ function renderArticleHtml(article, lang = 'uk') {
   const finalCtaLabel = isRu ? 'Записаться на приём' : 'Записатися на прийом';
   const recordLabel = isRu ? 'Записаться' : 'Записатися на прийом';
 
-  const sectionsHtml = renderSections(sections, lang);
+  const sectionsHtml = renderSections(sections, lang, allArticles);
+  const faqHtml = renderFaqBlock(faq, lang);
+  const relatedHtml = renderRelatedArticles(article.related_articles || [], allArticles, lang);
 
   const ogImage = article.image_card ? `<meta property="og:image" content="${escHtml(article.image_card)}">` : '';
   // NOTE: image_card is only for blog card previews (og:image) — it is NOT inserted into the article body.
@@ -234,8 +356,10 @@ function renderArticleHtml(article, lang = 'uk') {
   <section class="section" style="padding:60px 0;">
     <div class="container">
       <div class="card article-content" style="max-width:800px;margin:0 auto;line-height:1.8;">
+        ${faqHtml}
         ${sectionsHtml}
         ${finalCta}
+        ${relatedHtml}
       </div>
     </div>
   </section>
@@ -306,6 +430,7 @@ function renderArticleHtml(article, lang = 'uk') {
 
 /**
  * Write the rendered HTML to disk.
+ * Loads all articles to resolve internal links and related at render time.
  * @param {object} article
  * @param {string} lang - 'uk' or 'ru'
  */
@@ -313,7 +438,22 @@ function writeArticleHtml(article, lang = 'uk') {
   const slug = article.slug;
   if (!slug) throw new Error('Article has no slug');
 
-  const html = renderArticleHtml(article, lang);
+  // Load all articles for link resolution — reads from disk each publish
+  let allArticles = [];
+  try {
+    const ARTICLES_DIR = path.join(ROOT_DIR, 'server', 'data', 'articles');
+    if (fs.existsSync(ARTICLES_DIR)) {
+      const files = fs.readdirSync(ARTICLES_DIR).filter(f => f.endsWith('.json'));
+      allArticles = files.map(f => {
+        try { return JSON.parse(fs.readFileSync(path.join(ARTICLES_DIR, f), 'utf-8')); }
+        catch (e) { return null; }
+      }).filter(Boolean);
+    }
+  } catch (e) {
+    console.warn('[ArticleRenderer] Could not load articles for link resolution:', e.message);
+  }
+
+  const html = renderArticleHtml(article, lang, allArticles);
 
   let dir;
   if (lang === 'ru') {
@@ -329,4 +469,4 @@ function writeArticleHtml(article, lang = 'uk') {
   return outFile;
 }
 
-module.exports = { renderArticleHtml, writeArticleHtml };
+module.exports = { renderArticleHtml, writeArticleHtml, resolveInternalLinks };
