@@ -18,6 +18,7 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 const archiver = require('archiver');
+const sharp = require('sharp');
 const { writeArticleHtml } = require('./utils/article-renderer');
 const { translateArticle } = require('./utils/article-translator');
 
@@ -25,6 +26,31 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const BLOG_SECRET = process.env.BLOG_SECRET || 'super-secret-key-123';
 const INSTAGRAM_USERNAME = process.env.INSTAGRAM_USERNAME || '';
+
+/* ── Image Optimization Helper ───────────────────────────── */
+async function compressImageInPlace(filePath) {
+  if (!filePath || !fs.existsSync(filePath)) return;
+  try {
+    const ext = path.extname(filePath).toLowerCase();
+    const tmp = filePath + '.tmp';
+    if (ext === '.jpg' || ext === '.jpeg') {
+      await sharp(filePath)
+        .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 80, mozjpeg: true })
+        .toFile(tmp);
+    } else if (ext === '.png') {
+      await sharp(filePath)
+        .resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true })
+        .png({ quality: 80, compressionLevel: 9 })
+        .toFile(tmp);
+    }
+    if (fs.existsSync(tmp)) {
+      fs.renameSync(tmp, filePath);
+    }
+  } catch (err) {
+    console.error('[ImageOptimizer] Could not compress image in place:', err.message);
+  }
+}
 
 /* ── Paths ───────────────────────────────────────────────── */
 const ROOT_DIR = path.join(__dirname, '..');            // Project root
@@ -345,13 +371,17 @@ app.get('/api/blog/posts', (req, res) => {
  * Requires header: X-Blog-Secret
  * Body: multipart/form-data with fields: title, content, image (optional file)
  */
-app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
+app.post('/api/blog/posts', authGuard, upload.single('image'), async (req, res) => {
   const { title, content, date } = req.body;
 
   if (!title || title.trim().length < 3)
     return res.status(400).json({ error: 'Заголовок должен быть не менее 3 символов' });
   if (!content || content.trim().length < 10)
     return res.status(400).json({ error: 'Текст поста должен быть не менее 10 символов' });
+
+  if (req.file) {
+    await compressImageInPlace(req.file.path);
+  }
 
   const posts = readPosts();
 
@@ -386,7 +416,7 @@ app.post('/api/blog/posts', authGuard, upload.single('image'), (req, res) => {
  * Requires header: X-Blog-Secret
  * Body: multipart/form-data with fields: title, content, image (optional file), remove_image (optional boolean)
  */
-app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => {
+app.put('/api/blog/posts/:id', authGuard, upload.single('image'), async (req, res) => {
   const { id } = req.params;
   const { title, content, remove_image, date } = req.body;
 
@@ -404,7 +434,6 @@ app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => 
 
   const post = posts[idx];
 
-  // Only manual posts can be fully edited this way. We might allow editing instagram posts' text too, but mainly manual.
   if (title) post.title = title.trim();
   if (content) post.content = content.trim();
   if (date) post.date = new Date(date).toISOString();
@@ -419,6 +448,7 @@ app.put('/api/blog/posts/:id', authGuard, upload.single('image'), (req, res) => 
 
   // Handle new image upload or removing image
   if (req.file) {
+    await compressImageInPlace(req.file.path);
     // Delete old local image if it exists
     if (post.image_path && post.image_path.startsWith('/uploads/blog/')) {
       const oldPath = path.join(__dirname, post.image_path);
@@ -982,8 +1012,9 @@ app.post('/api/articles/:id/upload-image', authGuard, (req, res, next) => {
   const article = readArticle(req.params.id);
   req.params.slug = (article && article.slug) ? article.slug : (req.body.slug || req.params.id);
   next();
-}, uploadArticle.single('image'), (req, res) => {
+}, uploadArticle.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Файл не загружен' });
+  await compressImageInPlace(req.file.path);
   const url = `/uploads/articles/${req.params.slug}/${req.file.filename}`;
   res.json({ ok: true, url });
 });
