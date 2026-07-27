@@ -43,7 +43,9 @@ function escHtml(str) {
  */
 function textToHtml(text) {
   if (!text) return '';
-  const lines = text.split('\n');
+  // Normalize literal \n strings (from AI-generated content) to real newlines
+  const normalized = text.replace(/\\n/g, '\n');
+  const lines = normalized.split('\n');
   const result = [];
   let inList = false;
 
@@ -99,7 +101,7 @@ function renderFaqBlock(faq, lang) {
         <span>${escHtml(item.question)}</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5" class="faq-chevron" style="flex-shrink:0;transition:transform .3s;"><polyline points="6 9 12 15 18 9"/></svg>
       </summary>
-      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${escHtml(item.answer)}</div>
+      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${textToHtml(item.answer || '')}</div>
     </details>`).join('');
 
   return `
@@ -211,9 +213,10 @@ function renderSections(sections, lang, allArticles = []) {
  */
 function textToHtmlResolved(text) {
   if (!text) return '';
-  // If it looks like resolved HTML (contains <a> tags), pass through without re-escaping
+  // Normalize literal \n strings (from AI-generated content) to real newlines
+  const normalized = text.replace(/\\n/g, '\n');
   // Split on newlines, wrap non-HTML, non-list lines in <p>
-  const lines = text.split('\n');
+  const lines = normalized.split('\n');
   const result = [];
   let inList = false;
 

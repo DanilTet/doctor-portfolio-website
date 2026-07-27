@@ -1156,6 +1156,26 @@ app.get('*', (req, res) => {
 });
 
 /* ── Start ───────────────────────────────────────────────── */
+// Auto-render published articles on startup to apply latest formatting rules (like \n normalization)
+try {
+  const allArticles = readArticles();
+  let renderedCount = 0;
+  for (const art of allArticles) {
+    if (art.status === 'published') {
+      writeArticleHtml(art, 'uk', allArticles);
+      if (art.translations && art.translations.ru && art.translations.ru.title) {
+        writeArticleHtml(art, 'ru', allArticles);
+      }
+      renderedCount++;
+    }
+  }
+  if (renderedCount > 0) {
+    console.log(`🔄 [AutoRender] Обновлено HTML для ${renderedCount} опубликованных статей.`);
+  }
+} catch (err) {
+  console.warn('[AutoRender] Ошибка при авто-рендере:', err.message);
+}
+
 app.listen(PORT, () => {
   console.log(`\n🚀 Сервер блога запущен: http://localhost:${PORT}`);
   console.log(`📝 Блог: http://localhost:${PORT}/`);
@@ -1163,3 +1183,4 @@ app.listen(PORT, () => {
   console.log(`📦 Посты хранятся в: server/data/posts.json`);
   console.log(`🖼️  Картинки хранятся в: server/uploads/blog/\n`);
 });
+
