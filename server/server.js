@@ -15,10 +15,14 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const fs = require('fs');
-const fetch = require('node-fetch');
-const { v4: uuidv4 } = require('uuid');
 const archiver = require('archiver');
-const sharp = require('sharp');
+let sharp = null;
+try {
+  sharp = require('sharp');
+} catch (e) {
+  console.warn('[ImageOptimizer] sharp native module not loaded:', e.message);
+}
+
 const { writeArticleHtml } = require('./utils/article-renderer');
 const { translateArticle } = require('./utils/article-translator');
 
@@ -29,7 +33,7 @@ const INSTAGRAM_USERNAME = process.env.INSTAGRAM_USERNAME || '';
 
 /* ── Image Optimization Helper ───────────────────────────── */
 async function compressImageInPlace(filePath) {
-  if (!filePath || !fs.existsSync(filePath)) return;
+  if (!sharp || !filePath || !fs.existsSync(filePath)) return;
   try {
     const ext = path.extname(filePath).toLowerCase();
     const tmp = filePath + '.tmp';
