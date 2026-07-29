@@ -610,6 +610,9 @@ async function loadMarketingAnalytics(rangeDays) {
     document.getElementById('m-trend-scroll').innerHTML = formatTrend(current.avgScroll, previous.avgScroll, false, '%') + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
     document.getElementById('m-trend-time').innerHTML = formatTrend(current.avgSeconds, previous.avgSeconds, true) + ' <span style="color:var(--text-muted)">пор. з мин. пер.</span>';
 
+    // 0. Render Hourly Visits Chart (Last 24 Hours)
+    renderHourlyVisitsChart(cachedDailyDays);
+
     // 1. Render Daily Visits Dynamic Chart
     renderDailyVisitsChart(cachedDailyDays);
 
@@ -679,8 +682,125 @@ async function loadMarketingAnalytics(rangeDays) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // DAILY VISITS CHART (Line & Bar Dual Chart with Yellow Update Line Marker)
 // ─────────────────────────────────────────────────────────────
+function renderHourlyVisitsChart(dailyDays) {
+  const canvas = document.getElementById('chart-hourly-visits');
+  if (!canvas) return;
+
+  if (hourlyVisitsChart) {
+    hourlyVisitsChart.destroy();
+    hourlyVisitsChart = null;
+  }
+
+  // Calculate the last 24 hours based on the current time
+  const now = new Date();
+  const currentHour = now.getHours();
+  
+  const labels = [];
+  const uniqueData = [];
+  const pageviewData = [];
+
+  // dailyDays is sorted by date descending (today is [0], yesterday is [1])
+  const todayEntry = dailyDays[0];
+  const yesterdayEntry = dailyDays[1];
+
+  for (let i = 23; i >= 0; i--) {
+    const h = new Date(now.getTime() - i * 60 * 60 * 1000).getHours();
+    labels.push(`${h.toString().padStart(2, '0')}:00`);
+
+    let sourceEntry = (h > currentHour) ? yesterdayEntry : todayEntry;
+    
+    let u = 0;
+    let p = 0;
+    
+    if (sourceEntry && sourceEntry.hours && sourceEntry.hours[h.toString()]) {
+      u = sourceEntry.hours[h.toString()].unique_visitors || 0;
+      p = sourceEntry.hours[h.toString()].pageviews || 0;
+    }
+    
+    uniqueData.push(u);
+    pageviewData.push(p);
+  }
+
+  const ctx = canvas.getContext('2d');
+
+  const gradientPurple = ctx.createLinearGradient(0, 0, 0, 300);
+  gradientPurple.addColorStop(0, 'rgba(129, 140, 248, 0.4)');
+  gradientPurple.addColorStop(1, 'rgba(129, 140, 248, 0.0)');
+
+  const gradientCyan = ctx.createLinearGradient(0, 0, 0, 300);
+  gradientCyan.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
+  gradientCyan.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+  hourlyVisitsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'Унікальні відвідувачі',
+          data: uniqueData,
+          backgroundColor: '#818cf8',
+          borderRadius: 4,
+          barPercentage: 0.6,
+          order: 2
+        },
+        {
+          type: 'line',
+          label: 'Перегляди сторінок',
+          data: pageviewData,
+          borderColor: '#38bdf8',
+          borderWidth: 2,
+          backgroundColor: gradientCyan,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#0f172a',
+          pointBorderColor: '#38bdf8',
+          pointBorderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(15, 23, 42, 0.9)',
+          titleColor: '#fff',
+          bodyColor: '#cbd5e1',
+          borderColor: '#334155',
+          borderWidth: 1,
+          padding: 10,
+          boxPadding: 4,
+          usePointStyle: true,
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false, drawBorder: false },
+          ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, maxTicksLimit: 12 }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#334155', borderDash: [4, 4], drawBorder: false },
+          ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, precision: 0 }
+        }
+      }
+    }
+  });
+}
+
 function renderDailyVisitsChart(dailyDays) {
   const canvas = document.getElementById('chart-daily-visits');
   if (!canvas) return;

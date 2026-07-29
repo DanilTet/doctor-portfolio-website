@@ -692,6 +692,22 @@
       <div class="marketing-chart-card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
           <div>
+            <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Трафік за останні 24 години</span>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Погодинний розподіл відвідувань</div>
+          </div>
+          <div class="chart-legend-custom" style="display: flex; gap: 16px; font-size: 12px;">
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #818cf8; border-radius: 50%; display: inline-block;"></span> Унікальні відвідувачі</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #38bdf8; border-radius: 50%; display: inline-block;"></span> Перегляди</span>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height: 250px; position: relative;">
+          <canvas id="chart-hourly-visits"></canvas>
+        </div>
+      </div>
+
+      <div class="marketing-chart-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <div>
             <span style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Графік відвідуваності сайту</span>
             <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Подобовий розподіл унікальних відвідувачів та переглядів</div>
           </div>

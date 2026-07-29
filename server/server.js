@@ -631,6 +631,7 @@ app.post('/api/analytics/track', (req, res) => {
     if (!dayEntry) {
       dayEntry = {
         date: today,
+        hours: {},
         pageviews: 0,
         unique_visitors: 0,
         returning_visitors: 0,
@@ -673,6 +674,28 @@ app.post('/api/analytics/track', (req, res) => {
       dayEntry.total_time_on_site += parseInt(event.p_time_on_site, 10) || 0;
       dayEntry.time_events += 1;
     }
+
+    // --- Hourly Tracking ---
+    const currentHour = new Date().getHours().toString();
+    if (!dayEntry.hours) dayEntry.hours = {};
+    if (!dayEntry.hours[currentHour]) {
+      dayEntry.hours[currentHour] = { pageviews: 0, unique_visitors: 0, returning_visitors: 0, time_on_site: 0, time_events: 0 };
+    }
+    const hourEntry = dayEntry.hours[currentHour];
+    if (event.p_event_type === 'pageview') {
+      hourEntry.pageviews += 1;
+    }
+    if (event.p_is_new_visitor) {
+      hourEntry.unique_visitors += 1;
+    }
+    if (event.p_is_returning) {
+      hourEntry.returning_visitors += 1;
+    }
+    if (event.p_time_on_site !== null && event.p_time_on_site !== undefined) {
+      hourEntry.time_on_site += parseInt(event.p_time_on_site, 10) || 0;
+      hourEntry.time_events += 1;
+    }
+    // -----------------------
 
     // Incrementor helper
     const incrementObjKey = (obj, key) => {
