@@ -346,7 +346,6 @@ async function loadAnalytics() {
       rangeSelect.addEventListener('change', handleTimeRangeChange);
       updateAttendanceChart(rangeSelect.value);
     } else {
-    } else {
       updateAttendanceChart('all_time');
     }
 
