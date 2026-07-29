@@ -350,7 +350,7 @@ async function loadAnalytics() {
     }
 
     // Render Insights
-    renderInsights(cachedActiveAppts);
+    renderInsights(cachedActiveAppts, allAppts);
 
   } catch (err) {
     console.error(err);
@@ -358,7 +358,7 @@ async function loadAnalytics() {
   }
 }
 
-function renderInsights(appts) {
+function renderInsights(appts, allApptsRaw) {
   const container = document.getElementById('dashboard-insights');
   if (!container) return;
 
@@ -367,45 +367,48 @@ function renderInsights(appts) {
     return;
   }
 
-  // Helper to group by and find max
+  // 1. Unique Patients (using name as proxy)
+  const uniquePatients = new Set(appts.map(a => a.name ? a.name.trim().toLowerCase() : '')).size;
+
+  // 2. Cancellation Rate
+  const totalRaw = allApptsRaw.length;
+  const cancelledAppts = allApptsRaw.filter(a => a.status === 'cancelled').length;
+  const cancelRate = totalRaw > 0 ? Math.round((cancelledAppts / totalRaw) * 100) : 0;
+
+  // 3. Top procedure by doctor
   const getMostFrequent = (arr) => {
     const counts = arr.reduce((acc, val) => {
       if (!val) return acc;
       acc[val] = (acc[val] || 0) + 1;
       return acc;
     }, {});
-    let max = 0;
-    let mostFreq = null;
+    let max = 0, mostFreq = null;
     for (const key in counts) {
-      if (counts[key] > max) {
-        max = counts[key];
-        mostFreq = key;
-      }
+      if (counts[key] > max) { max = counts[key]; mostFreq = key; }
     }
     return mostFreq ? { name: mostFreq, count: max } : null;
   };
 
-  // 1. Most popular procedure overall
-  const topService = getMostFrequent(appts.map(a => a.service));
+  const daniloAppts = appts.filter(a => a.doctor && a.doctor.toLowerCase().includes('данило'));
+  const olegAppts = appts.filter(a => a.doctor && a.doctor.toLowerCase().includes('тетерник'));
 
-  // 2. Busiest day of the week
-  // parsedDate is a Date object. getDay() 0=Sun, 1=Mon
+  const daniloTop = getMostFrequent(daniloAppts.map(a => a.service));
+  const olegTop = getMostFrequent(olegAppts.map(a => a.service));
+
+  const topService = getMostFrequent(appts.map(a => a.service));
+  
   const daysOfWeek = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'];
   const busiestDay = getMostFrequent(appts.map(a => daysOfWeek[a.parsedDate.getDay()]));
 
-  // 3. Most popular day for Colonoscopy
   const colonoAppts = appts.filter(a => a.service && a.service.toLowerCase().includes('колоно'));
   const colonoDay = getMostFrequent(colonoAppts.map(a => daysOfWeek[a.parsedDate.getDay()]));
 
-  // 4. Peak time of day
-  // a.time is usually "HH:MM". We can group by hour.
   const peakTimeRaw = getMostFrequent(appts.map(a => {
     if (!a.time) return null;
     const hour = a.time.split(':')[0];
     return `${hour}:00 - ${String(parseInt(hour) + 1).padStart(2, '0')}:00`;
   }));
 
-  // Generate cards HTML
   const generateCard = (icon, title, value, subtext, bgColor) => `
     <div style="background: var(--surface-hover); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 12px;">
       <div style="background: ${bgColor}; padding: 10px; border-radius: 8px; color: #fff; display: flex; align-items: center; justify-content: center;">
@@ -423,13 +426,156 @@ function renderInsights(appts) {
   const svgCalendar = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
   const svgClock = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
   const svgActivity = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>';
+  const svgUsers = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  const svgAlert = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+  const svgMed = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>';
 
   container.innerHTML = `
-    ${generateCard(svgActivity, 'Найпопулярніша процедура', topService?.name, `Виконано ${topService?.count || 0} разів`, '#38bdf8')}
+    ${generateCard(svgActivity, 'Топ процедура загалом', topService?.name, `Виконано ${topService?.count || 0} разів`, '#38bdf8')}
     ${generateCard(svgCalendar, 'Найбільш завантажений день', busiestDay?.name, `У середньому найбільше записів`, '#818cf8')}
-    ${generateCard(svgTrophy, 'Популярний день для Колоно', colonoDay?.name, `Записано ${colonoDay?.count || 0} пацієнтів`, '#f43f5e')}
+    ${generateCard(svgTrophy, 'Популярний день (Колоно)', colonoDay?.name, `Записано ${colonoDay?.count || 0} пацієнтів`, '#f43f5e')}
     ${generateCard(svgClock, 'Пікові години (Час)', peakTimeRaw?.name, `Найвищий попит`, '#10b981')}
+    ${generateCard(svgUsers, 'Унікальних пацієнтів', uniquePatients, `Всього записів: ${appts.length}`, '#a855f7')}
+    ${generateCard(svgAlert, 'Відсоток скасувань (No-show)', `${cancelRate}%`, `З усіх створених записів`, '#ef4444')}
+    ${generateCard(svgMed, 'Топ процедура: Олег', olegTop?.name, `Виконано ${olegTop?.count || 0} разів`, '#f59e0b')}
+    ${generateCard(svgMed, 'Топ процедура: Данило', daniloTop?.name, `Виконано ${daniloTop?.count || 0} разів`, '#6366f1')}
   `;
+
+  // Render Charts
+  renderBusiestDaysChart(appts);
+  renderTimeDistributionChart(appts);
+  renderBusiestMonthsChart(appts);
+}
+
+let chartBusiestDays = null;
+let chartTimeDistribution = null;
+let chartBusiestMonths = null;
+
+function renderBusiestDaysChart(appts) {
+  const canvas = document.getElementById('chart-busiest-days');
+  if (!canvas) return;
+  if (chartBusiestDays) chartBusiestDays.destroy();
+
+  const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+  // JS getDay(): 0=Sun, 1=Mon... we map to 0=Mon, 6=Sun
+  const counts = [0,0,0,0,0,0,0]; 
+  
+  appts.forEach(a => {
+    const d = a.parsedDate.getDay();
+    const idx = d === 0 ? 6 : d - 1;
+    counts[idx]++;
+  });
+
+  const ctx = canvas.getContext('2d');
+  chartBusiestDays = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [{
+        label: 'Кількість записів',
+        data: counts,
+        backgroundColor: '#818cf8',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: '#334155', borderDash: [4, 4] } }
+      }
+    }
+  });
+}
+
+function renderTimeDistributionChart(appts) {
+  const canvas = document.getElementById('chart-time-distribution');
+  if (!canvas) return;
+  if (chartTimeDistribution) chartTimeDistribution.destroy();
+
+  // hours from 08 to 20
+  const hours = Array.from({length: 13}, (_, i) => i + 8);
+  const counts = Array(13).fill(0);
+
+  appts.forEach(a => {
+    if (!a.time) return;
+    const h = parseInt(a.time.split(':')[0]);
+    if (h >= 8 && h <= 20) {
+      counts[h - 8]++;
+    }
+  });
+
+  const labels = hours.map(h => `${h}:00`);
+
+  const ctx = canvas.getContext('2d');
+  chartTimeDistribution = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Записів',
+        data: counts,
+        backgroundColor: '#10b981',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: '#334155', borderDash: [4, 4] } }
+      }
+    }
+  });
+}
+
+function renderBusiestMonthsChart(appts) {
+  const canvas = document.getElementById('chart-busiest-months');
+  if (!canvas) return;
+  if (chartBusiestMonths) chartBusiestMonths.destroy();
+
+  const months = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
+  const counts = Array(12).fill(0);
+
+  appts.forEach(a => {
+    counts[a.parsedDate.getMonth()]++;
+  });
+
+  const ctx = canvas.getContext('2d');
+  
+  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient.addColorStop(0, 'rgba(244, 63, 94, 0.4)');
+  gradient.addColorStop(1, 'rgba(244, 63, 94, 0.0)');
+
+  chartBusiestMonths = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Всього записів',
+        data: counts,
+        borderColor: '#f43f5e',
+        backgroundColor: gradient,
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#0f172a',
+        pointBorderColor: '#f43f5e',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { beginAtZero: true, grid: { color: '#334155', borderDash: [4, 4] } }
+      }
+    }
+  });
 }
 
 let marketingSourcesChart = null;
