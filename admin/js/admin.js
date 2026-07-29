@@ -392,11 +392,11 @@ function renderInsights(appts, allApptsRaw) {
     return mostFreq ? { name: mostFreq, count: max } : null;
   };
 
-  const daniloAppts = appts.filter(a => a.doctor && a.doctor.toLowerCase().includes('данило'));
-  const olegAppts = appts.filter(a => a.doctor && a.doctor.toLowerCase().includes('тетерник'));
+  const romanDaniloAppts = appts.filter(a => a.doctor && a.doctor.toLowerCase().includes('данило'));
+  const olegTeternikAppts = appts.filter(a => a.doctor && a.doctor.toLowerCase().includes('тетерник'));
 
-  const daniloTop = getMostFrequent(daniloAppts.map(a => a.service));
-  const olegTop = getMostFrequent(olegAppts.map(a => a.service));
+  const romanDaniloTop = getMostFrequent(romanDaniloAppts.map(a => a.service));
+  const olegTeternikTop = getMostFrequent(olegTeternikAppts.map(a => a.service));
 
   const topService = getMostFrequent(appts.map(a => a.service));
   
@@ -440,8 +440,8 @@ function renderInsights(appts, allApptsRaw) {
     ${generateCard(svgClock, 'Пікові години (Час)', peakTimeRaw?.name, `Найвищий попит`, '#10b981')}
     ${generateCard(svgUsers, 'Середнє навантаження', `${avgPerDay} пац/день`, `В активні робочі дні`, '#a855f7')}
     ${generateCard(svgCombo, 'Комплексні процедури', `${comboRate}%`, `Від загальної кількості`, '#ef4444')}
-    ${generateCard(svgMed, 'Топ процедура: Олег', olegTop?.name, `Виконано ${olegTop?.count || 0} разів`, '#f59e0b')}
-    ${generateCard(svgMed, 'Топ процедура: Данило', daniloTop?.name, `Виконано ${daniloTop?.count || 0} разів`, '#6366f1')}
+    ${generateCard(svgMed, 'Топ процедура: Олег Т.', olegTeternikTop?.name, `Виконано ${olegTeternikTop?.count || 0} разів`, '#f59e0b')}
+    ${generateCard(svgMed, 'Топ процедура: Роман Д.', romanDaniloTop?.name, `Виконано ${romanDaniloTop?.count || 0} разів`, '#6366f1')}
   `;
 
   // Render Charts
@@ -590,22 +590,25 @@ function renderDoctorsChart(appts) {
   if (!canvas) return;
   if (chartDoctorsRatio) chartDoctorsRatio.destroy();
 
-  let daniloCount = 0;
   let olegCount = 0;
+  let romanDCount = 0;
+  let romanKCount = 0;
 
   appts.forEach(a => {
-    if (a.doctor && a.doctor.toLowerCase().includes('данило')) daniloCount++;
-    else if (a.doctor && a.doctor.toLowerCase().includes('тетерник')) olegCount++;
+    const doc = (a.doctor || '').toLowerCase();
+    if (doc.includes('тетерник')) olegCount++;
+    else if (doc.includes('данило')) romanDCount++;
+    else if (doc.includes('калашніков') || doc.includes('калашников')) romanKCount++;
   });
 
   const ctx = canvas.getContext('2d');
   chartDoctorsRatio = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Олег Тетернік', 'Данило Тетернік'],
+      labels: ['Олег Тетернік', 'Роман Данило', 'Роман Калашніков'],
       datasets: [{
-        data: [olegCount, daniloCount],
-        backgroundColor: ['#f59e0b', '#6366f1'],
+        data: [olegCount, romanDCount, romanKCount],
+        backgroundColor: ['#f59e0b', '#6366f1', '#10b981'],
         borderWidth: 0,
         hoverOffset: 4
       }]
