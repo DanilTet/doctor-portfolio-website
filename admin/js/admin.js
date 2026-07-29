@@ -357,6 +357,7 @@ async function loadAnalytics() {
 
 let marketingSourcesChart = null;
 let dailyVisitsChart = null;
+let hourlyVisitsChart = null;
 let cachedDailyDays = [];
 let cachedPreviousDailyDays = [];
 let activeTechTab = 'all';
