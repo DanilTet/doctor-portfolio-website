@@ -147,21 +147,4 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/surgery/"/>
   </url>
 
-
-  <url>
-    <loc>https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv</loc>
-    <lastmod>2026-07-29</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv</loc>
-    <lastmod>2026-07-29</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-  </url>
 </urlset>

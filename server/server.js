@@ -1043,6 +1043,7 @@ app.put('/api/articles/:id', authGuard, (req, res) => {
  * DELETE /api/articles/:id
  * Delete an article and its generated HTML files.
  */
+const { generateSitemap } = require('./utils/sitemap-generator');
 app.delete('/api/articles/:id', authGuard, (req, res) => {
   const article = readArticle(req.params.id);
   if (!article) return res.status(404).json({ error: 'Статья не найдена' });
@@ -1140,6 +1141,10 @@ app.post('/api/articles/:id/publish', authGuard, async (req, res) => {
     }
 
     console.log(`[Articles API] Published "${article.slug}": ${ukFile}`);
+
+    // Regenerate Sitemap
+    generateSitemap();
+
     res.json({ ok: true, uk: ukFile, ru: ruFile });
   } catch (err) {
     console.error('[Articles API] Publish error:', err.message);
@@ -1174,6 +1179,10 @@ app.post('/api/articles/republish-all', authGuard, (req, res) => {
   }
 
   console.log(`[Articles API] Republish all: ${ok} ok, ${skipped} skipped (drafts), ${errors} errors`);
+  
+  // Regenerate Sitemap
+  generateSitemap();
+
   res.json({ ok: true, regenerated: ok, skipped, errors, results });
 });
 
@@ -1195,6 +1204,9 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
     // Generate RU HTML & update UK HTML (so UA|RU switch appears immediately)
     const ruFile = writeArticleHtml(article, 'ru');
     const ukFile = writeArticleHtml(article, 'uk');
+
+    // Regenerate Sitemap
+    generateSitemap();
 
     console.log(`[Articles API] Translation done for "${article.slug}"`);
     res.json({ ok: true, ru: ruTranslation, ruFile, ukFile });
