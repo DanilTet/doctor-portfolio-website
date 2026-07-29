@@ -342,6 +342,29 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="canonical" href="${canonicalUrl}">
 
+  <!-- JSON-LD Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "${escHtml(title)}",
+    "author": {
+      "@type": "Person",
+      "name": "Олег Тетернік",
+      "url": "https://endo.kh.ua/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Лікар Тетернік О.О.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://endo.kh.ua/favicon.png"
+      }
+    },
+    "image": "${article.image_card ? escHtml(article.image_card) : 'https://endo.kh.ua/favicon.png'}"
+  }
+  </script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
