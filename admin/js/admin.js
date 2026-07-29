@@ -346,13 +346,91 @@ async function loadAnalytics() {
       rangeSelect.addEventListener('change', handleTimeRangeChange);
       updateAttendanceChart(rangeSelect.value);
     } else {
+    } else {
       updateAttendanceChart('all_time');
     }
+
+    // Render Insights
+    renderInsights(cachedActiveAppts);
 
   } catch (err) {
     console.error(err);
     toast('Помилка завантаження аналітики', 'error');
   }
+}
+
+function renderInsights(appts) {
+  const container = document.getElementById('dashboard-insights');
+  if (!container) return;
+
+  if (!appts || appts.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Недостатньо даних для аналізу.</div>';
+    return;
+  }
+
+  // Helper to group by and find max
+  const getMostFrequent = (arr) => {
+    const counts = arr.reduce((acc, val) => {
+      if (!val) return acc;
+      acc[val] = (acc[val] || 0) + 1;
+      return acc;
+    }, {});
+    let max = 0;
+    let mostFreq = null;
+    for (const key in counts) {
+      if (counts[key] > max) {
+        max = counts[key];
+        mostFreq = key;
+      }
+    }
+    return mostFreq ? { name: mostFreq, count: max } : null;
+  };
+
+  // 1. Most popular procedure overall
+  const topService = getMostFrequent(appts.map(a => a.service));
+
+  // 2. Busiest day of the week
+  // parsedDate is a Date object. getDay() 0=Sun, 1=Mon
+  const daysOfWeek = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'];
+  const busiestDay = getMostFrequent(appts.map(a => daysOfWeek[a.parsedDate.getDay()]));
+
+  // 3. Most popular day for Colonoscopy
+  const colonoAppts = appts.filter(a => a.service && a.service.toLowerCase().includes('колоно'));
+  const colonoDay = getMostFrequent(colonoAppts.map(a => daysOfWeek[a.parsedDate.getDay()]));
+
+  // 4. Peak time of day
+  // a.time is usually "HH:MM". We can group by hour.
+  const peakTimeRaw = getMostFrequent(appts.map(a => {
+    if (!a.time) return null;
+    const hour = a.time.split(':')[0];
+    return `${hour}:00 - ${String(parseInt(hour) + 1).padStart(2, '0')}:00`;
+  }));
+
+  // Generate cards HTML
+  const generateCard = (icon, title, value, subtext, bgColor) => `
+    <div style="background: var(--surface-hover); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 12px;">
+      <div style="background: ${bgColor}; padding: 10px; border-radius: 8px; color: #fff; display: flex; align-items: center; justify-content: center;">
+        ${icon}
+      </div>
+      <div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">${title}</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">${value || 'Немає даних'}</div>
+        ${subtext ? `<div style="font-size: 11px; color: var(--text-muted);">${subtext}</div>` : ''}
+      </div>
+    </div>
+  `;
+
+  const svgTrophy = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v6c0 2.76-2.24 5-5 5s-5-2.24-5-5V4z"/><path d="M7 4H3v3c0 2.21 1.79 4 4 4v0M17 4h4v3c0 2.21-1.79 4-4 4v0"/></svg>';
+  const svgCalendar = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  const svgClock = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+  const svgActivity = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>';
+
+  container.innerHTML = `
+    ${generateCard(svgActivity, 'Найпопулярніша процедура', topService?.name, `Виконано ${topService?.count || 0} разів`, '#38bdf8')}
+    ${generateCard(svgCalendar, 'Найбільш завантажений день', busiestDay?.name, `У середньому найбільше записів`, '#818cf8')}
+    ${generateCard(svgTrophy, 'Популярний день для Колоно', colonoDay?.name, `Записано ${colonoDay?.count || 0} пацієнтів`, '#f43f5e')}
+    ${generateCard(svgClock, 'Пікові години (Час)', peakTimeRaw?.name, `Найвищий попит`, '#10b981')}
+  `;
 }
 
 let marketingSourcesChart = null;
