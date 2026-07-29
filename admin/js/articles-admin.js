@@ -507,7 +507,7 @@
 
   function appendSection(container, data) {
     const idx = ++sectionCounter;
-    const s = data || { id: `section-${idx}`, heading: '', text: '', image: null, youtube_url: null, show_cta_button: false };
+    const s = data || { id: `section-${idx}`, heading: '', text: '', image: null, youtube_url: null, video_url: null, show_cta_button: false };
 
     const block = document.createElement('div');
     block.className = 'section-block';
@@ -553,6 +553,10 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             + Фото
           </button>
+          <button type="button" class="btn btn--ghost btn--sm sec-add-video-btn" title="Додати відео файл (mp4, webm)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="15" height="11" rx="2"/><path d="M17 9l5-3v12l-5-3"/></svg>
+            + Відео
+          </button>
           <button type="button" class="btn btn--ghost btn--sm sec-add-yt-btn" title="Вставити YouTube">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             + YouTube
@@ -582,6 +586,28 @@
           <div class="form-group">
             <label class="form-label" style="font-size:12px">YouTube URL</label>
             <input type="url" class="form-input sec-yt-url" placeholder="https://youtube.com/watch?v=..." value="${escHtml(s.youtube_url || '')}">
+          </div>
+        </div>
+
+        <!-- Video file area (hidden by default) -->
+        <div class="sec-video-area" style="${s.video_url ? '' : 'display:none'}">
+          <div class="form-group">
+            <label class="form-label" style="font-size:12px">
+              🎬 Відео файл
+              <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(підтримується mp4, webm, mov, avi &mdash; до 500 МБ)</span>
+            </label>
+            <input type="file" accept="video/*" class="form-input sec-video-input" style="padding:8px;margin-bottom:8px">
+            <input type="hidden" class="sec-video-url" value="${escHtml(s.video_url || '')}">
+            <div class="sec-video-status" style="font-size:12px;color:var(--text-muted);margin-bottom:8px">
+              ${s.video_url ? `<span style="color:var(--success, #22c55e);font-weight:500">✓ Відео завантажено</span>` : 'Файл не обрано'}
+            </div>
+            ${s.video_url ? `
+              <div class="sec-video-preview">
+                <video controls preload="metadata" style="max-width:100%;border-radius:8px;display:block;background:#000;">
+                  <source src="${escHtml(s.video_url)}">
+                </video>
+                <button class="btn btn--ghost btn--sm sec-remove-video" type="button" style="margin-top:6px;color:var(--danger)">✕ Видалити відео</button>
+              </div>` : ''}
           </div>
         </div>
 
@@ -635,6 +661,27 @@
     block.querySelector('.sec-add-yt-btn').addEventListener('click', () => {
       const area = block.querySelector('.sec-yt-area');
       area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Toggle video area
+    block.querySelector('.sec-add-video-btn').addEventListener('click', () => {
+      const area = block.querySelector('.sec-video-area');
+      area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Video upload
+    block.querySelector('.sec-video-input').addEventListener('change', function () {
+      handleSectionVideoUpload(this, block);
+    });
+
+    // Remove video
+    block.querySelector('.sec-video-area').addEventListener('click', e => {
+      if (e.target.closest('.sec-remove-video')) {
+        block.querySelector('.sec-video-url').value = '';
+        block.querySelector('.sec-video-status').innerHTML = 'Файл не обрано';
+        const prev = block.querySelector('.sec-video-preview');
+        if (prev) prev.remove();
+      }
     });
 
     // CTA toggle
@@ -1075,6 +1122,65 @@
     }
   }
 
+  /* ── Section Video Upload ────────────────────────────────── */
+
+  async function handleSectionVideoUpload(input, block) {
+    const file = input.files[0];
+    if (!file || !currentArticle || !currentArticle.id) return;
+
+    const statusEl = block.querySelector('.sec-video-status');
+    const urlInput = block.querySelector('.sec-video-url');
+
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    if (statusEl) statusEl.innerHTML = `⏳ Завантаження ${sizeMB} МБ...`;
+    showFeedback('⏳ Завантаження відео... (це може зайняти декілька хвилин)', 'muted');
+
+    const url = await uploadVideoToServer(currentArticle.id, file);
+    if (url) {
+      urlInput.value = url;
+      if (statusEl) statusEl.innerHTML = `<span style="color:var(--success, #22c55e);font-weight:500">✅ Відео завантажено (${sizeMB} МБ)</span>`;
+      showSectionVideoPreview(block, url);
+      showFeedback('✅ Відео завантажено!', 'success');
+    } else {
+      if (statusEl) statusEl.innerHTML = '❌ Помилка завантаження';
+    }
+  }
+
+  function showSectionVideoPreview(block, url) {
+    const area = block.querySelector('.sec-video-area .form-group');
+    const existing = area.querySelector('.sec-video-preview');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'sec-video-preview';
+    div.innerHTML = `
+      <video controls preload="metadata" style="max-width:100%;border-radius:8px;display:block;background:#000;margin-bottom:6px;">
+        <source src="${escHtml(url)}">
+      </video>
+      <button class="btn btn--ghost btn--sm sec-remove-video" type="button" style="color:var(--danger)">✕ Видалити відео</button>
+    `;
+    area.appendChild(div);
+  }
+
+  async function uploadVideoToServer(articleId, file) {
+    const formData = new FormData();
+    formData.append('video', file);
+    try {
+      const res = await fetch(`${API}/${articleId}/upload-video`, {
+        method: 'POST',
+        headers: { 'X-Blog-Secret': SECRET() },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Video upload failed');
+      return data.url;
+    } catch (err) {
+      showFeedback(`❌ Помилка завантаження відео: ${err.message}`, 'danger');
+      return null;
+    }
+  }
+
+
+
   /* ── Collect form data ───────────────────────────────────── */
 
   function collectFormData() {
@@ -1098,6 +1204,7 @@
         text:    block.querySelector('.sec-text').value || '',
         image:   block.querySelector('.sec-img-url').value || null,
         youtube_url: block.querySelector('.sec-yt-url').value || null,
+        video_url: block.querySelector('.sec-video-url').value || null,
         show_cta_button: ctaBadge ? ctaBadge.style.display !== 'none' : false,
       };
     });

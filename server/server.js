@@ -129,6 +129,31 @@ const uploadArticle = multer({
   },
 });
 
+/* ── Multer for article videos ───────────────────────────── */
+const videoAllowedExts = new Set(['.mp4', '.webm', '.ogv', '.mov', '.avi', '.mkv']);
+const articleVideoStorage = multer.diskStorage({
+  destination: (req, _file, cb) => {
+    const slug = req.params.slug || req.body.slug || 'tmp';
+    const dir = path.join(ARTICLES_UPLOADS_DIR, slug.replace(/[^a-z0-9-]/gi, '-'), 'video');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.mp4';
+    cb(null, `${require('crypto').randomUUID()}${ext}`);
+  },
+});
+const uploadArticleVideo = multer({
+  storage: articleVideoStorage,
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB max
+  fileFilter: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (/^video\//.test(file.mimetype) || videoAllowedExts.has(ext)) cb(null, true);
+    else cb(new Error('Дозволені тільки відео файли (mp4, webm, mov, avi)!'));
+  },
+});
+
+
 /* ── Helpers ─────────────────────────────────────────────── */
 function readPosts() {
   let posts = [];
@@ -1022,6 +1047,22 @@ app.post('/api/articles/:id/upload-image', authGuard, (req, res, next) => {
   if (!req.file) return res.status(400).json({ error: 'Файл не загружен' });
   await compressImageInPlace(req.file.path);
   const url = `/uploads/articles/${req.params.slug}/${req.file.filename}`;
+  res.json({ ok: true, url });
+});
+
+/**
+ * POST /api/articles/:id/upload-video
+ * Upload a video file for an article section.
+ */
+app.post('/api/articles/:id/upload-video', authGuard, (req, res, next) => {
+  const article = readArticle(req.params.id);
+  req.params.slug = (article && article.slug) ? article.slug : (req.body.slug || req.params.id);
+  next();
+}, uploadArticleVideo.single('video'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Відео файл не завантажено' });
+  const slug = req.params.slug;
+  const url = `/uploads/articles/${slug}/video/${req.file.filename}`;
+  console.log(`[Articles API] Video uploaded: ${url}`);
   res.json({ ok: true, url });
 });
 
