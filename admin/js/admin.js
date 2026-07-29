@@ -370,12 +370,15 @@ function renderInsights(appts, allApptsRaw) {
   // 1. Unique Patients (using name as proxy)
   const uniquePatients = new Set(appts.map(a => a.name ? a.name.trim().toLowerCase() : '')).size;
 
-  // 2. Cancellation Rate
-  const totalRaw = allApptsRaw.length;
-  const cancelledAppts = allApptsRaw.filter(a => a.status === 'cancelled').length;
-  const cancelRate = totalRaw > 0 ? Math.round((cancelledAppts / totalRaw) * 100) : 0;
+  // 2. Average patients per day
+  const uniqueDates = new Set(appts.map(a => a.date)).size;
+  const avgPerDay = uniqueDates > 0 ? Math.round(appts.length / uniqueDates) : 0;
 
-  // 3. Top procedure by doctor
+  // 3. Combo Procedures Rate
+  const comboAppts = appts.filter(a => a.service && (a.service.includes('+') || a.service.toLowerCase().includes('гастро + колоно')));
+  const comboRate = appts.length > 0 ? Math.round((comboAppts.length / appts.length) * 100) : 0;
+
+  // 4. Top procedure by doctor
   const getMostFrequent = (arr) => {
     const counts = arr.reduce((acc, val) => {
       if (!val) return acc;
@@ -426,8 +429,8 @@ function renderInsights(appts, allApptsRaw) {
   const svgCalendar = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
   const svgClock = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
   const svgActivity = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>';
+  const svgCombo = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>';
   const svgUsers = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
-  const svgAlert = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
   const svgMed = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>';
 
   container.innerHTML = `
@@ -435,8 +438,8 @@ function renderInsights(appts, allApptsRaw) {
     ${generateCard(svgCalendar, 'Найбільш завантажений день', busiestDay?.name, `У середньому найбільше записів`, '#818cf8')}
     ${generateCard(svgTrophy, 'Популярний день (Колоно)', colonoDay?.name, `Записано ${colonoDay?.count || 0} пацієнтів`, '#f43f5e')}
     ${generateCard(svgClock, 'Пікові години (Час)', peakTimeRaw?.name, `Найвищий попит`, '#10b981')}
-    ${generateCard(svgUsers, 'Унікальних пацієнтів', uniquePatients, `Всього записів: ${appts.length}`, '#a855f7')}
-    ${generateCard(svgAlert, 'Відсоток скасувань (No-show)', `${cancelRate}%`, `З усіх створених записів`, '#ef4444')}
+    ${generateCard(svgUsers, 'Середнє навантаження', `${avgPerDay} пац/день`, `В активні робочі дні`, '#a855f7')}
+    ${generateCard(svgCombo, 'Комплексні процедури', `${comboRate}%`, `Від загальної кількості`, '#ef4444')}
     ${generateCard(svgMed, 'Топ процедура: Олег', olegTop?.name, `Виконано ${olegTop?.count || 0} разів`, '#f59e0b')}
     ${generateCard(svgMed, 'Топ процедура: Данило', daniloTop?.name, `Виконано ${daniloTop?.count || 0} разів`, '#6366f1')}
   `;
@@ -445,11 +448,15 @@ function renderInsights(appts, allApptsRaw) {
   renderBusiestDaysChart(appts);
   renderTimeDistributionChart(appts);
   renderBusiestMonthsChart(appts);
+  renderDoctorsChart(appts);
+  renderAnesthesiaChart(appts);
 }
 
 let chartBusiestDays = null;
 let chartTimeDistribution = null;
 let chartBusiestMonths = null;
+let chartDoctorsRatio = null;
+let chartAnesthesiaRatio = null;
 
 function renderBusiestDaysChart(appts) {
   const canvas = document.getElementById('chart-busiest-days');
@@ -573,6 +580,81 @@ function renderBusiestMonthsChart(appts) {
       scales: {
         x: { grid: { display: false } },
         y: { beginAtZero: true, grid: { color: '#334155', borderDash: [4, 4] } }
+      }
+    }
+  });
+}
+
+function renderDoctorsChart(appts) {
+  const canvas = document.getElementById('chart-doctors-ratio');
+  if (!canvas) return;
+  if (chartDoctorsRatio) chartDoctorsRatio.destroy();
+
+  let daniloCount = 0;
+  let olegCount = 0;
+
+  appts.forEach(a => {
+    if (a.doctor && a.doctor.toLowerCase().includes('данило')) daniloCount++;
+    else if (a.doctor && a.doctor.toLowerCase().includes('тетерник')) olegCount++;
+  });
+
+  const ctx = canvas.getContext('2d');
+  chartDoctorsRatio = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Олег Тетернік', 'Данило Тетернік'],
+      datasets: [{
+        data: [olegCount, daniloCount],
+        backgroundColor: ['#f59e0b', '#6366f1'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#cbd5e1', padding: 20, font: { family: 'Inter', size: 12 } } },
+        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 12 }
+      }
+    }
+  });
+}
+
+function renderAnesthesiaChart(appts) {
+  const canvas = document.getElementById('chart-anesthesia-ratio');
+  if (!canvas) return;
+  if (chartAnesthesiaRatio) chartAnesthesiaRatio.destroy();
+
+  let withAnesthesia = 0;
+  let withoutAnesthesia = 0;
+
+  appts.forEach(a => {
+    if (a.anesthesia && a.anesthesia.toLowerCase().includes('наркоз')) {
+      withAnesthesia++;
+    } else {
+      withoutAnesthesia++;
+    }
+  });
+
+  const ctx = canvas.getContext('2d');
+  chartAnesthesiaRatio = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['З наркозом', 'Без наркозу'],
+      datasets: [{
+        data: [withAnesthesia, withoutAnesthesia],
+        backgroundColor: ['#10b981', '#ef4444'],
+        borderWidth: 0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#cbd5e1', padding: 20, font: { family: 'Inter', size: 12 } } },
+        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 12 }
       }
     }
   });
