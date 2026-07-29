@@ -216,8 +216,8 @@ function renderSections(sections, lang, allArticles = []) {
       const ext = s.video_url.split('.').pop().toLowerCase();
       const mimeMap = { mp4: 'video/mp4', webm: 'video/webm', ogv: 'video/ogg', mov: 'video/mp4', avi: 'video/x-msvideo', mkv: 'video/x-matroska' };
       const mime = mimeMap[ext] || 'video/mp4';
-      html += `\n<div style="margin:24px 0;border-radius:12px;overflow:hidden;">
-        <video controls preload="metadata" style="width:100%;display:block;border-radius:12px;background:#000;" playsinline>
+      html += `\n<div style="margin:24px auto; border-radius:12px; overflow:hidden; background:#000; display:flex; justify-content:center; align-items:center;">
+        <video controls preload="metadata" style="max-width:100%; max-height:70vh; display:block; border-radius:12px;" playsinline>
           <source src="${escHtml(s.video_url)}" type="${escHtml(mime)}">
           <p style="padding:16px;color:#999;">Ваш браузер не підтримує відтворення відео. <a href="${escHtml(s.video_url)}" download style="color:var(--color-primary);">Завантажити відео</a></p>
         </video>
