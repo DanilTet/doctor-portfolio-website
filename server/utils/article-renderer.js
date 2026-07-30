@@ -296,8 +296,9 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   }
 
   const slug = article.slug || 'article';
-  const ukUrl = `/articles/${slug}`;
-  const ruUrl = `/ru/articles/${slug}`;
+  const isCore = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'].includes(slug);
+  const ukUrl = isCore ? `/${slug}/` : `/articles/${slug}`;
+  const ruUrl = isCore ? `/ru/${slug}/` : `/ru/articles/${slug}`;
   const canonicalUrl = isRu ? ruUrl : ukUrl;
   const htmlLang = isRu ? 'ru' : 'uk';
   const backLabel = isRu ? 'Назад на главную' : 'Назад на головну';
