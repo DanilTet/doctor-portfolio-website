@@ -88,6 +88,25 @@ app.use('/uploads/articles', express.static(path.join(__dirname, 'uploads', 'art
 app.use('/uploads', express.static(path.join(ROOT_DIR, 'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// --- SEO Routing Fixes ---
+// Handle trailing slash requests for /ru/ and /en/
+app.get('/ru/?', (req, res, next) => {
+  if (req.path === '/ru' || req.path === '/ru/') return res.sendFile(path.join(ROOT_DIR, 'ru.html'));
+  next();
+});
+app.get('/en/?', (req, res, next) => {
+  if (req.path === '/en' || req.path === '/en/') return res.sendFile(path.join(ROOT_DIR, 'en.html'));
+  next();
+});
+
+// Alias static directories so relative links in ru.html / en.html work when served from /ru/
+const staticDirs = ['css', 'js', 'img', 'images'];
+staticDirs.forEach(dir => {
+  app.use(`/ru/${dir}`, express.static(path.join(ROOT_DIR, dir)));
+  app.use(`/en/${dir}`, express.static(path.join(ROOT_DIR, dir)));
+});
+// -------------------------
+
 // Serve the entire website from project root (index.html, css/, js/, admin/, img/, etc.)
 app.use(express.static(ROOT_DIR, { extensions: ['html'] }));
 
