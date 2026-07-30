@@ -17,3 +17,7 @@
 > 1. Use `git stash` -> `git pull` -> `git stash pop`.
 > 2. Or ask the user to commit their server-side changes first.
 > 3. Clearly warn the user about potential merge conflicts if they choose to stash/pop.
+
+
+> **Rule: Google Search Console Instructions**
+> When instructing users to submit a sitemap in Google Search Console, always explicitly provide the full absolute URL (e.g., `https://endo.kh.ua/sitemap.xml`) rather than just the relative filename (`sitemap.xml`). This prevents confusion across different GSC property types (Domain vs. URL prefix).
