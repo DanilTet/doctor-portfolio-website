@@ -10,3 +10,10 @@
 > 2. Ensure localized subpages (`/ru/`, `/en/`) have all meta-tags fully translated into their target language—never leave default-language meta tags on translated routes.
 > 3. Provide Schema.org `MedicalClinic` / `Physician` JSON-LD with complete address data on all service pages.
 
+
+> **Rule: Safe Production Git Operations**
+> NEVER recommend destructive Git commands like `git reset --hard`, `git clean -fd`, or `git checkout .` for production or staging servers. Assume the server might have uncommitted user-generated content (e.g., manually generated articles in `/articles`, database files, uploads). 
+> Always recommend safe synchronization methods:
+> 1. Use `git stash` -> `git pull` -> `git stash pop`.
+> 2. Or ask the user to commit their server-side changes first.
+> 3. Clearly warn the user about potential merge conflicts if they choose to stash/pop.
