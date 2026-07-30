@@ -1,5 +1,15 @@
 <!DOCTYPE html><html lang="ru"><head>
   <meta charset="UTF-8">
+  <script>
+    (function() {
+      var path = window.location.pathname;
+      var corePages = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
+      var match = path.match(/^\/(ru\/|en\/)?articles\/([^/]+)/);
+      if (match && corePages.includes(match[2])) {
+        window.location.replace('/' + (match[1] || '') + match[2] + '/');
+      }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" data-i18n-content="meta.desc" content="Тетерник Олег Александрович — врач-эндоскопист, хирург, УЗИ. Отзывы пациентов. Эндоскопия в Харькове.">
   <meta name="keywords" data-i18n-content="meta.keywords" content="ФГДС, зонд Харків, ковтнути кишку, гастроскопія Харків, колоноскопія Харків, видалення поліпів кишечника, УЗД черевної порожнини, седація, медикаментозний сон, Тетернік Олег, ендоскопія Харків, ВГДС">
