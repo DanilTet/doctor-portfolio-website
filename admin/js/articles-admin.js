@@ -13,7 +13,8 @@
 
   const TAGS = ['Гастроскопія', 'Колоноскопія', 'УЗД', 'ЕРХПГ', 'Підготовка', 'Хірургія', 'Поліпи', 'Онкологія'];
 
-  /* ── State ───────────────────────────────────────────────── */
+  const getArticleUrl = (slug, isRu = false) => { const isCore = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'].includes(slug); const base = isCore ? `/${slug}/` : `/articles/${slug}`; return isRu ? `/ru${base}` : base; };
+/* ── State ───────────────────────────────────────────────── */
   let articlesCache = [];
   let currentArticle = null;   // article being edited
   let sectionCounter = 0;
@@ -974,7 +975,7 @@
       results.innerHTML = filtered.map(a => `
         <div class="article-search-result-item" data-id="${escHtml(a.id)}" data-title="${escHtml(a.title)}" data-slug="${escHtml(a.slug || '')}">
           <span class="article-search-result-item__title">${escHtml(a.title)}</span>
-          <span class="article-search-result-item__slug">/articles/${escHtml(a.slug || '')}</span>
+          <span class="article-search-result-item__slug">${getArticleUrl(a.slug || '')}</span>
         </div>
       `).join('');
 
@@ -1033,7 +1034,7 @@
         <div class="backlink-item">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
           <span class="backlink-item__title">${escHtml(a.title)}</span>
-          <a href="/articles/${escHtml(a.slug || '')}" target="_blank" class="backlink-item__link" title="Переглянути">
+          <a href="${getArticleUrl(a.slug || '')}" target="_blank" class="backlink-item__link" title="Переглянути">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </a>
           <span class="backlink-item__status ${a.status === 'published' ? 'backlink-item__status--pub' : 'backlink-item__status--draft'}">${a.status === 'published' ? 'опубл.' : 'чернетка'}</span>
@@ -1303,7 +1304,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Помилка публікації');
 
-      showFeedback(`✅ Опубліковано! <a href="/articles/${escHtml(saved.slug)}" target="_blank" style="color:var(--primary)">Переглянути статтю ↗</a>`, 'success');
+      showFeedback(`✅ Опубліковано! <a href="${getArticleUrl(saved.slug)}" target="_blank" style="color:var(--primary)">Переглянути статтю ↗</a>`, 'success');
     } catch (err) {
       showFeedback(`❌ ${err.message}`, 'danger');
     } finally {
@@ -1334,7 +1335,7 @@
 
       currentArticle.translations = currentArticle.translations || {};
       currentArticle.translations.ru = data.ru;
-      showFeedback(`✅ Переклад готовий! <a href="/ru/articles/${escHtml(currentArticle.slug)}" target="_blank" style="color:var(--primary);font-weight:600;margin-left:6px">Переглянути RU версію ↗</a>`, 'success');
+      showFeedback(`✅ Переклад готовий! <a href="${getArticleUrl(currentArticle.slug, true)}" target="_blank" style="color:var(--primary);font-weight:600;margin-left:6px">Переглянути RU версію ↗</a>`, 'success');
     } catch (err) {
       showFeedback(`❌ ${err.message}`, 'danger');
     } finally {
