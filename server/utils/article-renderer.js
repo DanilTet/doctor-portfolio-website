@@ -533,11 +533,21 @@ function writeArticleHtml(article, lang = 'uk') {
 
   const html = renderArticleHtml(article, lang, allArticles);
 
+  const CORE_PAGES = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
   let dir;
-  if (lang === 'ru') {
-    dir = path.join(ROOT_DIR, 'ru', 'articles', slug);
+  
+  if (CORE_PAGES.includes(slug)) {
+    if (lang === 'ru') {
+      dir = path.join(ROOT_DIR, 'ru', slug);
+    } else {
+      dir = path.join(ROOT_DIR, slug);
+    }
   } else {
-    dir = path.join(ROOT_DIR, 'articles', slug);
+    if (lang === 'ru') {
+      dir = path.join(ROOT_DIR, 'ru', 'articles', slug);
+    } else {
+      dir = path.join(ROOT_DIR, 'articles', slug);
+    }
   }
 
   fs.mkdirSync(dir, { recursive: true });

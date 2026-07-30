@@ -727,45 +727,5 @@ function localizeLinks($, langCode) {
     });
 }
 
-// Generate subpages (Gastroscopy, Colonoscopy, UZD, Surgery)
-function generateSubpages() {
-    const subpages = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
-
-    subpages.forEach(page => {
-        const pageHtmlPath = `${page}.html`;
-        if (!fs.existsSync(pageHtmlPath)) {
-            console.warn(`Source page not found: ${pageHtmlPath}`);
-            return;
-        }
-
-        const baseHtml = fs.readFileSync(pageHtmlPath, 'utf8');
-
-        // 1. Generate UA (default) subpage: /page/index.html
-        fs.mkdirSync(path.join(__dirname, page), { recursive: true });
-        const $ua = cheerio.load(baseHtml, { decodeEntities: false });
-        fs.writeFileSync(path.join(__dirname, page, 'index.html'), $ua.html());
-        console.log(`Generated UA subpage: /${page}/index.html`);
-
-        // 2. Generate RU subpage: /ru/page/index.html
-        fs.mkdirSync(path.join(__dirname, 'ru', page), { recursive: true });
-        const $ru = compilePage(baseHtml, 'ru');
-        $ru('.lang-switch__btn').removeClass('active');
-        $ru(`.lang-switch a[href^="/ru/${page}/"]`).addClass('active');
-        localizeLinks($ru, 'ru');
-        fs.writeFileSync(path.join(__dirname, 'ru', page, 'index.html'), $ru.html());
-        console.log(`Generated RU subpage: /ru/${page}/index.html`);
-
-        // 3. Generate EN subpage: /en/page/index.html
-        fs.mkdirSync(path.join(__dirname, 'en', page), { recursive: true });
-        const $en = compilePage(baseHtml, 'en');
-        $en('.lang-switch__btn').removeClass('active');
-        $en(`.lang-switch a[href^="/en/${page}/"]`).addClass('active');
-        localizeLinks($en, 'en');
-        fs.writeFileSync(path.join(__dirname, 'en', page, 'index.html'), $en.html());
-        console.log(`Generated EN subpage: /en/${page}/index.html`);
-    });
-}
-
 // Build all
 generateMainLangs();
-generateSubpages();

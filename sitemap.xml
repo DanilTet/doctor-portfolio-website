@@ -5,7 +5,7 @@
   <!-- Main Pages -->
   <url>
     <loc>https://endo.kh.ua/</loc>
-    <lastmod>2026-07-30</lastmod>
+    <lastmod>2026-07-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/"/>
@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://endo.kh.ua/ru/</loc>
-    <lastmod>2026-07-30</lastmod>
+    <lastmod>2026-07-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/"/>
@@ -23,7 +23,7 @@
   </url>
   <url>
     <loc>https://endo.kh.ua/en/</loc>
-    <lastmod>2026-07-30</lastmod>
+    <lastmod>2026-07-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/"/>
@@ -31,65 +31,121 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/"/>
   </url>
 
-  <!-- Gastroscopy -->
+
+
+
+  <url>
+    <loc>https://endo.kh.ua/articles/age-colonoscopy</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/age-colonoscopy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/age-colonoscopy"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/ru/articles/age-colonoscopy</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/age-colonoscopy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/age-colonoscopy"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/articles/food-uzd</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/food-uzd"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/food-uzd"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/ru/articles/food-uzd</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/food-uzd"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/food-uzd"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/articles/kolonoskopiya-45</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/kolonoskopiya-45"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/kolonoskopiya-45"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/ru/articles/kolonoskopiya-45</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/kolonoskopiya-45"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/kolonoskopiya-45"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/articles/pechiya</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pechiya"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pechiya"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/ru/articles/pechiya</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pechiya"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pechiya"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv</loc>
+    <lastmod>2026-07-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
+  </url>
   <url>
     <loc>https://endo.kh.ua/gastroscopy/</loc>
     <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/gastroscopy/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/gastroscopy/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/gastroscopy/"/>
   </url>
   <url>
     <loc>https://endo.kh.ua/ru/gastroscopy/</loc>
     <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/gastroscopy/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/gastroscopy/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/gastroscopy/"/>
   </url>
-  <url>
-    <loc>https://endo.kh.ua/en/gastroscopy/</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/gastroscopy/"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/gastroscopy/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/gastroscopy/"/>
-  </url>
-
-  <!-- Colonoscopy -->
   <url>
     <loc>https://endo.kh.ua/colonoscopy/</loc>
     <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/colonoscopy/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/colonoscopy/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/colonoscopy/"/>
   </url>
   <url>
     <loc>https://endo.kh.ua/ru/colonoscopy/</loc>
     <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/colonoscopy/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/colonoscopy/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/colonoscopy/"/>
   </url>
-  <url>
-    <loc>https://endo.kh.ua/en/colonoscopy/</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/colonoscopy/"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/colonoscopy/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/colonoscopy/"/>
-  </url>
-
-  <!-- UZD -->
   <url>
     <loc>https://endo.kh.ua/uzd/</loc>
     <lastmod>2026-07-30</lastmod>
@@ -97,7 +153,6 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/uzd/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/uzd/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/uzd/"/>
   </url>
   <url>
     <loc>https://endo.kh.ua/ru/uzd/</loc>
@@ -106,19 +161,7 @@
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/uzd/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/uzd/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/uzd/"/>
   </url>
-  <url>
-    <loc>https://endo.kh.ua/en/uzd/</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/uzd/"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/uzd/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/uzd/"/>
-  </url>
-
-  <!-- Surgery -->
   <url>
     <loc>https://endo.kh.ua/surgery/</loc>
     <lastmod>2026-07-30</lastmod>
@@ -126,7 +169,6 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/surgery/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/surgery/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/surgery/"/>
   </url>
   <url>
     <loc>https://endo.kh.ua/ru/surgery/</loc>
@@ -135,97 +177,5 @@
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/surgery/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/surgery/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/surgery/"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/en/surgery/</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/surgery/"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/surgery/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/surgery/"/>
-  </url>
-
-  <!-- Articles -->
-  <url>
-    <loc>https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pidhotovka-do-kolonoskopiyi-iziklin-kharkiv"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/articles/age-colonoscopy</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/age-colonoscopy"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/age-colonoscopy"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/ru/articles/age-colonoscopy</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/age-colonoscopy"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/age-colonoscopy"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/articles/food-uzd</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/food-uzd"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/food-uzd"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/ru/articles/food-uzd</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/food-uzd"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/food-uzd"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/articles/kolonoskopiya-45</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/kolonoskopiya-45"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/kolonoskopiya-45"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/ru/articles/kolonoskopiya-45</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/kolonoskopiya-45"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/kolonoskopiya-45"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/articles/pechiya</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pechiya"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pechiya"/>
-  </url>
-  <url>
-    <loc>https://endo.kh.ua/ru/articles/pechiya</loc>
-    <lastmod>2026-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/pechiya"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/articles/pechiya"/>
   </url>
 </urlset>

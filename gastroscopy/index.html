@@ -1,291 +1,179 @@
-<!DOCTYPE html><html lang="uk"><head>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" data-i18n-content="service.gastro.meta.desc" content="Гастроскопія (ФГДС) в Харкові на базі 17-ї міської лікарні. Лікар-ендоскопіст Тетернік О.О. — відеогастроскопія під седацією (медикаментозний сон). Запис на прийом.">
-  <meta name="keywords" data-i18n-content="service.gastro.meta.keywords" content="гастроскопія Харків, ФГДС Харків, гастроскопія 17 лікарня, гастроскопія під наркозом, гастроскопія під седацією, зонд шлунка Харків, ковтнути кишку Харків, ВГДС Харків, Тетернік ендоскопіст">
+  <meta name="description" content="Сучасне ендоскопічне дослідження шлунка без страху, болю та дискомфорту.">
   <meta name="author" content="Тетернік О.О.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Гастроскопія (ФГДС) в Харкові — 17-а лікарня | Лікар Тетернік О.О.">
-  <meta property="og:description" content="Гастроскопія в Харкові на базі 17-ї міської лікарні. Відеогастроскопія під медикаментозним сном. Запис: +380994750967.">
-  <meta property="og:type" content="website">
+  <meta property="og:title" content="Гастроскопія | Лікар Тетернік О.О.">
+  <meta property="og:description" content="Сучасне ендоскопічне дослідження шлунка без страху, болю та дискомфорту.">
+  <meta property="og:type" content="article">
   <meta property="og:locale" content="uk_UA">
-  <meta property="og:url" content="https://endo.kh.ua/gastroscopy/">
+  <meta property="og:url" content="https://endo.kh.ua/articles/gastroscopy">
   <meta property="og:site_name" content="Лікар Тетернік О.О.">
+  
 
   <!-- Hreflang -->
-  <link rel="alternate" hreflang="uk" href="https://endo.kh.ua/gastroscopy/" />
-  <link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/gastroscopy/" />
-  <link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/gastroscopy/" />
-  <link rel="alternate" hreflang="x-default" href="https://endo.kh.ua/gastroscopy/" />
+  <link rel="alternate" hreflang="uk" href="https://endo.kh.ua/articles/gastroscopy" />
+  <link rel="alternate" hreflang="x-default" href="https://endo.kh.ua/articles/gastroscopy" />
 
-  <title data-i18n="service.gastro.meta.title">Гастроскопія (ФГДС) в Харкові — 17-а лікарня | Лікар Тетернік О.О.</title>
+  <title>Гастроскопія | Лікар Тетернік О.О.</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link rel="canonical" href="https://endo.kh.ua/gastroscopy/">
+  <link rel="canonical" href="https://endo.kh.ua/articles/gastroscopy">
 
-  <!-- JSON-LD: MedicalClinic -->
+  <!-- JSON-LD Schema Markup -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "MedicalClinic",
-    "name": "Лікар-ендоскопіст Тетернік О.О. — Гастроскопія в Харкові",
-    "url": "https://endo.kh.ua/gastroscopy/",
-    "telephone": "+380994750967",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "пр. Героїв Харкова, 195",
-      "addressLocality": "Харків",
-      "addressCountry": "UA"
+    "@type": "Article",
+    "headline": "Гастроскопія",
+    "url": "https://endo.kh.ua/articles/gastroscopy",
+    "datePublished": "2026-07-30T19:07:27.262Z",
+    "dateModified": "2026-07-30T19:07:27.262Z",
+    "author": {
+      "@type": "Person",
+      "name": "Олег Тетернік",
+      "url": "https://endo.kh.ua/"
     },
-    "medicalSpecialty": "Gastroenterology",
-    "availableService": {
-      "@type": "MedicalProcedure",
-      "name": "Гастроскопія (ФГДС)",
-      "procedureType": "https://schema.org/DiagnosticProcedure"
-    }
+    "publisher": {
+      "@type": "Organization",
+      "name": "Лікар Тетернік О.О.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://endo.kh.ua/favicon.png"
+      }
+    },
+    "image": "https://endo.kh.ua/favicon.png"
   }
   </script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/blog.css">
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .article-content h2, .article-content h3 { scroll-margin-top: 100px; }
+    .toc-link { color: var(--color-text); text-decoration: none; transition: color 0.3s; }
+    .toc-link:hover { color: var(--color-primary); }
+  </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       HEADER / NAVIGATION
-       ============================================================ -->
   <header class="header" id="header">
     <div class="container header__inner">
       <a href="/" class="header__logo" aria-label="На головну">
-        <span class="header__logo-text"><span data-i18n="logo.main">Ендоскопія</span> <span data-i18n="logo.accent">простими словами</span></span>
+        <span class="header__logo-text"><span>Ендоскопія</span> <span>простими словами</span></span>
       </a>
       <nav class="nav" id="nav" aria-label="Головне меню">
-        <ul class="nav__list">
-          <li><a href="/#about" class="nav__link" data-i18n="nav.about">Про лікаря</a></li>
-          <li><a href="/#blog" class="nav__link" data-i18n="nav.blog">Блог</a></li>
-          <li><a href="/#topics" class="nav__link" data-i18n="nav.topics">Теми</a></li>
-          <li><a href="/#diplomas" class="nav__link" data-i18n="nav.diplomas">Дипломи</a></li>
-          <li><a href="/#reviews" class="nav__link" data-i18n="nav.reviews">Відгуки</a></li>
-          <li><a href="/#contacts" class="nav__link" data-i18n="nav.contacts">Контакти</a></li>
-        </ul>
-        <div class="header__actions">
-          <div class="lang-switch">
-            <a href="/gastroscopy/" class="lang-switch__btn active">UA</a>
-            <a href="/ru/gastroscopy/" class="lang-switch__btn">RU</a>
-            <a href="/en/gastroscopy/" class="lang-switch__btn">EN</a>
-          </div>
-          <a href="/#appointment-section" class="btn btn--primary header__cta open-booking-modal" data-i18n="nav.appointment">Запис на прийом</a>
+        <div class="header__actions" style="margin-left: auto;">
+          
+          <a href="/#appointment-section" class="btn btn--primary header__cta open-booking-modal">Записатися на прийом</a>
         </div>
       </nav>
     </div>
   </header>
 
-  <!-- ============================================================
-       HERO SECTION
-       ============================================================ -->
-  <section class="section" style="padding-top: 140px; padding-bottom: 60px; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
+  <section class="section" style="padding-top:140px;padding-bottom:60px;background:radial-gradient(120% 120% at 50% 10%,#151a26 0%,#0a0d14 100%);">
     <div class="container">
-      <a href="/" class="btn btn--ghost" style="margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        <span data-i18n="service.back">Назад на головну</span>
+      <a href="/" class="btn btn--ghost" style="margin-bottom:24px;display:inline-flex;align-items:center;gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>← Назад на головну</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.gastro.title">Гастроскопія</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.gastro.subtitle">Сучасне ендоскопічне дослідження шлунка без страху, болю та дискомфорту.</p>
+      <h1 class="section-title" style="text-align:left;margin-bottom:16px;font-size:clamp(2rem,5vw,3.5rem);">Гастроскопія</h1>
+      <p class="section-subtitle" style="text-align:left;max-width:800px;">Сучасне ендоскопічне дослідження шлунка без страху, болю та дискомфорту.</p>
     </div>
   </section>
 
-  <!-- ============================================================
-       CONTENT SECTION
-       ============================================================ -->
-  <section class="section" style="padding: 60px 0;">
+  <section class="section" style="padding:60px 0;">
     <div class="container">
-      <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-        <!-- Table of Contents / Путівник по питанням -->
-        <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.gastro.toc.title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="8" y1="6" x2="21" y2="6"></line>
-              <line x1="8" y1="12" x2="21" y2="12"></line>
-              <line x1="8" y1="18" x2="21" y2="18"></line>
-              <line x1="3" y1="6" x2="3.01" y2="6"></line>
-              <line x1="3" y1="12" x2="3.01" y2="12"></line>
-              <line x1="3" y1="18" x2="3.01" y2="18"></line>
-            </svg>
-            Путівник з підготовки та проведення:
-          </h3>
-          <ul style="display: flex; flex-direction: column; gap: 12px; padding-left: 0; list-style-type: none; margin: 0;">
-            <li>
-              <a href="#why-important" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item1">
-                1. Чому правильна підготовка важлива?
-              </a>
-            </li>
-            <li>
-              <a href="#diet-1-day" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item2">
-                2. Рекомендації за 1 день до обстеження
-              </a>
-            </li>
-            <li>
-              <a href="#day-of-exam" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item3">
-                3. Що робити в день гастроскопії?
-              </a>
-            </li>
-            <li>
-              <a href="#medication" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item4">
-                4. Якщо ви постійно приймаєте ліки
-              </a>
-            </li>
-            <li>
-              <a href="#sedation" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item5">
-                5. Якщо гастроскопія під седацією (уві сні)
-              </a>
-            </li>
-            <li>
-              <a href="#before-exam" style="color: var(--color-primary); text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='var(--color-primary-light)'" onmouseout="this.style.color='var(--color-primary)'" data-i18n="service.gastro.toc.item6">
-                6. Що взяти з собою та як одягнутися?
-              </a>
-            </li>
-          </ul>
-        </div>
+      <div class="card article-content" style="max-width:800px;margin:0 auto;line-height:1.8;">
+        
+        
+    <div style="background:rgba(43,217,185,0.05);border-left:4px solid var(--color-primary);padding:24px;border-radius:0 8px 8px 0;margin-bottom:40px;">
+      <h4 style="margin-top:0;margin-bottom:16px;color:var(--color-primary);font-size:1.2rem;">Путівник по статті:</h4>
+      <ol style="margin:0;padding-left:20px;line-height:1.8;list-style-type:decimal;">
+        <li><a href="#section-1" class="toc-link">1. Чому правильна підготовка важлива?</a></li>
+            <li><a href="#section-2" class="toc-link">2. Рекомендації за 1 день до обстеження</a></li>
+            <li><a href="#section-3" class="toc-link">3. Що робити в день гастроскопії?</a></li>
+            <li><a href="#section-4" class="toc-link">4. Якщо ви постійно приймаєте ліки</a></li>
+            <li><a href="#section-5" class="toc-link">5. Якщо гастроскопія проводиться під седацією (уві сні)</a></li>
+            <li><a href="#section-6" class="toc-link">6. Що взяти з собою та як одягнутися?</a></li>
+      </ol>
+    </div><h3 id="section-1" style="margin-top:0;margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">1. Чому правильна підготовка важлива?</h3><p style="margin-bottom:16px;">Гастроскопія (ВГДС) — це точний метод обстеження стравоходу, шлунка та дванадцятипалої кишки. Щоб лікар зміг детально оглянути слизову оболонку, виявити навіть дрібні запалення, виразки, поліпи чи ранні форми раку, шлунок має бути абсолютно порожнім.</p>
+<p style="margin-bottom:16px;">            Навіть невелика кількість їжі або рідини в шлунку може значно погіршити огляд слизової оболонки, збільшити ризик виникнення блювотного рефлексу під час процедури та ускладнити точну діагностику.</p>
 
-        <!-- Section 1: Why Important -->
-        <div id="why-important" style="scroll-margin-top: 100px; margin-bottom: 40px;">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.why.title">1. Чому правильна підготовка важлива?</h3>
-          <p style="margin-bottom: 16px;" data-i18n="service.gastro.why.p1">
-            <strong>Гастроскопія (ВГДС)</strong> — це точний метод обстеження стравоходу, шлунка та дванадцятипалої кишки. Щоб лікар зміг детально оглянути слизову оболонку, виявити навіть дрібні запалення, виразки, поліпи чи ранні форми раку, шлунок має бути абсолютно порожнім.
-          </p>
-          <p style="margin-bottom: 16px;" data-i18n="service.gastro.why.p2">
-            Навіть невелика кількість їжі або рідини в шлунку може значно погіршити огляд слизової оболонки, збільшити ризик виникнення блювотного рефлексу під час процедури та ускладнити точну діагностику.
-          </p>
-        </div>
+<h3 id="section-2" style="margin-top:32px;margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">2. Рекомендації за 1 день до обстеження</h3><ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">
+<li style="margin-bottom:8px;">Харчуйтеся у звичному режимі, але уникайте переїдання та важкої їжі.</li>
+</ul>
+<p style="margin-bottom:16px;">              - Останній легкий прийом їжі — не пізніше 19:00–20:00 (якщо дослідження заплановане на ранок).</p>
+<p style="margin-bottom:16px;">              - Категорично не вживайте алкоголь напередодні процедури.</p>
 
-        <!-- Section 2: 1 Day Before -->
-        <div id="diet-1-day" style="scroll-margin-top: 100px; margin-bottom: 40px;">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.diet1.title">2. Рекомендації за 1 день до обстеження</h3>
-          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
-            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
-              <li style="margin-bottom: 10px;" data-i18n="service.gastro.diet1.li1">Харчуйтеся у звичному режимі, але уникайте переїдання та важкої їжі.</li>
-              <li style="margin-bottom: 10px;" data-i18n="service.gastro.diet1.li2">Останній легкий прийом їжі — не пізніше <strong>19:00–20:00</strong> (якщо дослідження заплановане на ранок).</li>
-              <li style="color: #ef4444; font-weight: 500;" data-i18n="service.gastro.diet1.li3">Категорично не вживайте алкоголь напередодні процедури.</li>
-            </ul>
-          </div>
-        </div>
+<h3 id="section-3" style="margin-top:32px;margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">3. Що робити в день гастроскопії?</h3><p style="margin-bottom:16px;">Якщо обстеження вранці:</p>
+<p style="margin-bottom:16px;">                - Не їжте щонайменше 6–8 годин до процедури.</p>
+<p style="margin-bottom:16px;">                - Не пийте молоко, каву, соки або газовані напої.</p>
+<p style="margin-bottom:16px;">                - Чисту негазовану воду можна пити невеликими ковтками не пізніше ніж за 2 години до початку процедури.</p>
+<p style="margin-bottom:16px;">              Якщо гастроскопія після обіду:</p>
+<p style="margin-bottom:16px;">                Дозволяється легкий сніданок не пізніше ніж за 6–8 годин до обстеження. Будь-який подальший прийом їжі після цього суворо заборонений.</p>
 
-        <!-- Section 3: Day of Exam -->
-        <div id="day-of-exam" style="scroll-margin-top: 100px; margin-bottom: 40px;">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.day.title">3. Що робити в день гастроскопії?</h3>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-width: 0;">
-            <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px; padding: 20px;">
-              <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--color-primary-light); font-weight: 600;" data-i18n="service.gastro.day.morning_title">Якщо обстеження вранці:</h4>
-              <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
-                <li style="margin-bottom: 8px;" data-i18n="service.gastro.day.morning_li1">Не їжте щонайменше <strong>6–8 годин</strong> до процедури.</li>
-                <li style="margin-bottom: 8px;" data-i18n="service.gastro.day.morning_li2">Не пийте молоко, каву, соки або газовані напої.</li>
-                <li data-i18n="service.gastro.day.morning_li3">Чисту негазовану воду можна пити невеликими ковтками не пізніше ніж за <strong>2 години</strong> до початку процедури.</li>
-              </ul>
-            </div>
-            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 20px;">
-              <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--color-text-light); font-weight: 600;" data-i18n="service.gastro.day.afternoon_title">Якщо гастроскопія після обіду:</h4>
-              <p style="margin: 0;" data-i18n="service.gastro.day.afternoon_p">
-                Дозволяється легкий сніданок не пізніше ніж за <strong>6–8 годин</strong> до обстеження. Будь-який подальший прийом їжі після цього суворо заборонений.
-              </p>
-            </div>
-          </div>
-        </div>
+<h3 id="section-4" style="margin-top:32px;margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">4. Якщо ви постійно приймаєте ліки</h3><ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">
+<li style="margin-bottom:8px;">Препарати від артеріального тиску та більшості серцевих захворювань можна прийняти вранці у звичному режимі, запивши мінімальною кількістю чистої води.</li>
+</ul>
+<p style="margin-bottom:16px;">            - Якщо ви приймаєте інсулін, цукрознижувальні препарати або засоби, що розріджують кров (антикоагулянти), обов’язково повідомте про це лікаря заздалегідь.</p>
+<p style="margin-bottom:16px;">            - Може знадобитися тимчасова корекція схеми прийому або скасування деяких ліків за погодженням з лікарем.</p>
 
-        <!-- Section 4: Medications -->
-        <div id="medication" style="scroll-margin-top: 100px; margin-bottom: 40px;">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.med.title">4. Якщо ви постійно приймаєте ліки</h3>
-          <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
-            <li style="margin-bottom: 10px;" data-i18n="service.gastro.med.li1">Препарати від артеріального тиску та більшості серцевих захворювань можна прийняти вранці у звичному режимі, запивши мінімальною кількістю чистої води.</li>
-            <li style="margin-bottom: 10px;" data-i18n="service.gastro.med.li2">Якщо ви приймаєте інсулін, цукрознижувальні препарати або засоби, що розріджують кров (антикоагулянти), обов’язково повідомте про це лікаря заздалегідь.</li>
-            <li style="font-weight: 500;" data-i18n="service.gastro.med.li3">Може знадобитися тимчасова корекція схеми прийому або скасування деяких ліків за погодженням з лікарем.</li>
-          </ul>
-        </div>
+<h3 id="section-5" style="margin-top:32px;margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">5. Якщо гастроскопія проводиться під седацією (уві сні)</h3><ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">
+<li style="margin-bottom:8px;">Не їжте щонайменше 6–8 годин до початку процедури.</li>
+</ul>
+<p style="margin-bottom:16px;">              - Не пийте жодної рідини протягом останніх 2 годин до процедури.</p>
+<p style="margin-bottom:16px;">              - Увага! Після седації категорично заборонено керувати автомобілем протягом доби. Будь ласка, заздалегідь подбайте про супровід додому.</p>
 
-        <!-- Section 5: Sedation -->
-        <div id="sedation" style="scroll-margin-top: 100px; margin-bottom: 40px;">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.sedation.title">5. Якщо гастроскопія проводиться під седацією (уві сні)</h3>
-          <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; padding: 20px;">
-            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
-              <li style="margin-bottom: 10px;" data-i18n="service.gastro.sedation.li1">Не їжте щонайменше <strong>6–8 годин</strong> до початку процедури.</li>
-              <li style="margin-bottom: 10px;" data-i18n="service.gastro.sedation.li2">Не пийте жодної рідини протягом останніх <strong>2 годин</strong> до процедури.</li>
-              <li style="color: #ef4444; font-weight: 500;" data-i18n="service.gastro.sedation.li3">Увага! Після седації категорично заборонено керувати автомобілем протягом доби. Будь ласка, заздалегідь подбайте про супровід додому.</li>
-            </ul>
-          </div>
+<h3 id="section-6" style="margin-top:32px;margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">6. Що взяти з собою та як одягнутися?</h3><ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">
+<li style="margin-bottom:8px;">Візьміть із собою результати попередніх гастроскопій, біопсій та інших медичних обстежень (за наявності), щоб лікар міг оцінити динаміку.</li>
+</ul>
+<p style="margin-bottom:16px;">            - Якщо ви носите знімні зубні протези — їх необхідно буде зняти безпосередньо перед дослідженням.</p>
+<p style="margin-bottom:16px;">            - Одягніть зручний, вільний одяг, який не стискає шию, грудну клітку та живіт.</p>
+        
+        <div style="margin-top:40px;text-align:center;">
+          <a href="/#appointment-section" class="btn btn--primary open-booking-modal">Записатися на прийом</a>
         </div>
-
-        <!-- Section 6: Before Exam -->
-        <div id="before-exam" style="scroll-margin-top: 100px; margin-bottom: 40px;">
-          <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.before.title">6. Що взяти з собою та як одягнутися?</h3>
-          <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
-            <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li1">Візьміть із собою результати попередніх гастроскопій, біопсій та інших медичних обстежень (за наявності), щоб лікар міг оцінити динаміку.</li>
-            <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li2">Якщо ви носите знімні зубні протези — їх необхідно буде зняти безпосередньо перед дослідженням.</li>
-            <li data-i18n="service.gastro.before.li3">Одягніть зручний, вільний одяг, який не стискає шию, грудну клітку та живіт.</li>
-          </ul>
-        </div>
-
-        <div style="margin-top: 40px; text-align: center;">
-          <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.gastro.btn">Записатися на гастроскопію</a>
-        </div>
-</div>
+        
+      </div>
     </div>
   </section>
 
-  <!-- ============================================================
-       FOOTER
-       ============================================================ -->
   <footer class="footer">
     <div class="container footer__inner" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-      <p class="footer__copy" data-i18n="footer.copy">© 2026 Тетернік О.О. Всі права захищені.</p>
+      <p class="footer__copy">© 2026 Тетернік О.О. Всі права захищені.</p>
       <p class="footer__copy" style="font-size:0.85rem;opacity:0.75;">Розробка: <a href="https://github.com/DanilTet" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;">DanilTet</a></p>
     </div>
   </footer>
 
-
-  <!-- ============================================================
-       APPOINTMENT BOOKING MODAL (Telegram + Main Form Link)
-       ============================================================ -->
   <div class="modal" id="appointment-modal" aria-hidden="true" role="dialog">
-    <div class="modal__overlay" data-modal-close=""></div>
-    <div class="modal__window modal__window--form" style="max-width: 480px;">
-      <button class="modal__close" data-modal-close="" aria-label="Close modal">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+    <div class="modal__overlay" data-modal-close></div>
+    <div class="modal__window modal__window--form" style="max-width:480px;">
+      <button class="modal__close" data-modal-close aria-label="Close modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
-
-      <div class="modal__header" style="text-align: center; margin-bottom: 24px;">
-        <h3 class="modal__title" data-i18n="appointment.modal.title">Запис на прийом</h3>
-        <p class="modal__subtitle" data-i18n="appointment.modal.subtitle" style="margin-top: 8px;">Оберіть зручний для вас спосіб запису</p>
+      <div class="modal__header" style="text-align:center;margin-bottom:24px;">
+        <h3 class="modal__title">Записатися на прийом</h3>
       </div>
-
-      <div class="modal__body" style="display: flex; flex-direction: column; gap: 16px;">
-        <!-- Option 1: Telegram Bot -->
-        <a href="https://t.me/AppointmentEndoscopyBot" class="btn btn--primary" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-          <span data-i18n="appointment.tg.btn">Записатися через Telegram-бот</span>
+      <div class="modal__body" style="display:flex;flex-direction:column;gap:16px;">
+        <a href="https://t.me/AppointmentEndoscopyBot" class="btn btn--primary" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          <span>Записатися через Telegram-бот</span>
         </a>
-
-        <!-- Option 2: Website Form Redirect -->
-        <a href="/#appointment-section" class="btn btn--outline" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span data-i18n="appointment.form.btn_redirect">Заповнити форму на сайті</span>
+        <a href="/#appointment-section" class="btn btn--outline" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span>Заповнити форму на сайті</span>
         </a>
       </div>
     </div>
@@ -293,32 +181,22 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Header scrolled state
       const header = document.getElementById('header');
       function checkScroll() {
-        if (window.scrollY > 20) {
-          header.classList.add('header--scrolled');
-        } else {
-          header.classList.remove('header--scrolled');
-        }
+        header.classList.toggle('header--scrolled', window.scrollY > 20);
       }
       window.addEventListener('scroll', checkScroll);
       checkScroll();
 
-      // Modal open/close logic
       const modal = document.getElementById('appointment-modal');
-      const openBtns = document.querySelectorAll('.open-booking-modal');
-      const closeBtns = document.querySelectorAll('[data-modal-close]');
-
-      openBtns.forEach(btn => {
+      document.querySelectorAll('.open-booking-modal').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           modal.classList.add('modal--active');
           modal.setAttribute('aria-hidden', 'false');
         });
       });
-
-      closeBtns.forEach(btn => {
+      document.querySelectorAll('[data-modal-close]').forEach(btn => {
         btn.addEventListener('click', () => {
           modal.classList.remove('modal--active');
           modal.setAttribute('aria-hidden', 'true');
@@ -331,8 +209,5 @@
   <script src="/js/env.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/tracker.js"></script>
-
-
-
-
-</body></html>
+</body>
+</html>
