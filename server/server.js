@@ -89,6 +89,21 @@ app.use('/uploads', express.static(path.join(ROOT_DIR, 'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- SEO Routing Fixes ---
+// 301 Redirect old /articles/:core_page to root /:core_page for SEO and backwards compatibility
+app.use((req, res, next) => {
+  const corePages = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
+  const matchUk = req.path.match(/^\/articles\/([^/]+)/);
+  const matchRu = req.path.match(/^\/ru\/articles\/([^/]+)/);
+  
+  if (matchUk && corePages.includes(matchUk[1])) {
+    return res.redirect(301, `/${matchUk[1]}/`);
+  }
+  if (matchRu && corePages.includes(matchRu[1])) {
+    return res.redirect(301, `/ru/${matchRu[1]}/`);
+  }
+  next();
+});
+
 // Handle trailing slash requests for /ru/ and /en/
 app.get('/ru/?', (req, res, next) => {
   if (req.path === '/ru' || req.path === '/ru/') return res.sendFile(path.join(ROOT_DIR, 'ru.html'));
