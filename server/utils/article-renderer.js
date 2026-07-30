@@ -323,6 +323,20 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
             <a href="${ruUrl}" class="lang-switch__btn${isRu ? ' active' : ''}">RU</a>
           </div>` : '';
 
+  const siteBase = 'https://endo.kh.ua';
+  const absoluteCanonical = `${siteBase}${canonicalUrl}`;
+  const absoluteUkUrl = `${siteBase}${ukUrl}`;
+  const absoluteRuUrl = `${siteBase}${ruUrl}`;
+  const datePublished = article.date ? article.date : '';
+  const dateModified = article.updated_at || article.date || '';
+
+  const hreflangHtml = hasRuTranslation ? `
+  <link rel="alternate" hreflang="uk" href="${absoluteUkUrl}" />
+  <link rel="alternate" hreflang="ru" href="${absoluteRuUrl}" />
+  <link rel="alternate" hreflang="x-default" href="${absoluteUkUrl}" />` : `
+  <link rel="alternate" hreflang="uk" href="${absoluteUkUrl}" />
+  <link rel="alternate" hreflang="x-default" href="${absoluteUkUrl}" />`;
+
   const html = `<!DOCTYPE html>
 <html lang="${htmlLang}">
 <head>
@@ -336,11 +350,15 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   <meta property="og:description" content="${escHtml(seoDesc)}">
   <meta property="og:type" content="article">
   <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}">
+  <meta property="og:url" content="${absoluteCanonical}">
+  <meta property="og:site_name" content="Лікар Тетернік О.О.">
   ${ogImage}
+
+  <!-- Hreflang -->${hreflangHtml}
 
   <title>${escHtml(title)} | Лікар Тетернік О.О.</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link rel="canonical" href="${canonicalUrl}">
+  <link rel="canonical" href="${absoluteCanonical}">
 
   <!-- JSON-LD Schema Markup -->
   <script type="application/ld+json">
@@ -348,6 +366,9 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "${escHtml(title)}",
+    "url": "${absoluteCanonical}",
+    ${datePublished ? `"datePublished": "${datePublished}",` : ''}
+    ${dateModified ? `"dateModified": "${dateModified}",` : ''}
     "author": {
       "@type": "Person",
       "name": "Олег Тетернік",
