@@ -251,7 +251,7 @@ function textToHtmlResolved(text) {
   let inList = false;
 
   for (const rawLine of lines) {
-    const line = rawLine.trimEnd();
+    const line = rawLine.trim();
     if (line.startsWith('- ') || line.startsWith('\u2022 ')) {
       if (!inList) { result.push('<ul style="margin:0 0 16px 0;padding-left:20px;list-style-type:disc;">'); inList = true; }
       // resolve links inside list items too (already done by resolveInternalLinks on full text)
@@ -300,7 +300,7 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   const ruUrl = `/ru/articles/${slug}`;
   const canonicalUrl = isRu ? ruUrl : ukUrl;
   const htmlLang = isRu ? 'ru' : 'uk';
-  const backLabel = isRu ? '← Назад на главную' : '← Назад на головну';
+  const backLabel = isRu ? 'Назад на главную' : 'Назад на головну';
   const finalCtaLabel = isRu ? 'Записаться на приём' : 'Записатися на прийом';
   const recordLabel = isRu ? 'Записаться' : 'Записатися на прийом';
 
