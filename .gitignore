@@ -41,3 +41,6 @@ server/uploads/*
 instagram_posts.txt
 
 ARTICLES_EDITOR_PLAN.md
+
+# Dynamically generated content
+sitemap.xml

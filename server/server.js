@@ -1380,6 +1380,9 @@ try {
   if (renderedCount > 0) {
     console.log(`🔄 [AutoRender] Обновлено HTML для ${renderedCount} опубликованных статей.`);
   }
+  
+  // Always regenerate sitemap on startup to ensure it matches the server's file system
+  generateSitemap();
 } catch (err) {
   console.warn('[AutoRender] Ошибка при авто-рендере:', err.message);
 }
