@@ -544,6 +544,12 @@ function writeArticleHtml(article, lang = 'uk') {
   const slug = article.slug;
   if (!slug) throw new Error('Article has no slug');
 
+  const CORE_PAGES = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
+  if (CORE_PAGES.includes(slug)) {
+    console.log(`[ArticleRenderer] Skipping auto-render for manual core page: ${slug}`);
+    return null;
+  }
+
   // Load all articles for link resolution — reads from disk each publish
   let allArticles = [];
   try {
