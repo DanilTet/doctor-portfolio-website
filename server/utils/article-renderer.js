@@ -567,7 +567,6 @@ function writeArticleHtml(article, lang = 'uk') {
 
   const html = renderArticleHtml(article, lang, allArticles);
 
-  const CORE_PAGES = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'];
   let dir;
   
   if (CORE_PAGES.includes(slug)) {
