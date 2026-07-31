@@ -5,7 +5,7 @@
 
 'use strict';
 
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 const ROOT_DIR = path.join(__dirname, '..', '..');
@@ -568,7 +568,7 @@ function writeArticleHtml(article, lang = 'uk') {
   const html = renderArticleHtml(article, lang, allArticles);
 
   let dir;
-  
+
   if (CORE_PAGES.includes(slug)) {
     if (lang === 'ru') {
       dir = path.join(ROOT_DIR, 'ru', slug);
