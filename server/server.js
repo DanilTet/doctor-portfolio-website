@@ -64,6 +64,7 @@ const ROOT_DIR = path.join(__dirname, '..');            // Project root
 const DATA_FILE = path.join(__dirname, 'data', 'posts.json');
 const ANALYTICS_FILE = path.join(__dirname, 'data', 'analytics.json');
 const TRACKING_LINKS_FILE = path.join(__dirname, 'data', 'tracking_links.json');
+const VIEWS_FILE = path.join(__dirname, 'data', 'views.json');
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads', 'blog');
 const ARTICLES_DIR = path.join(__dirname, 'data', 'articles');
 const ARTICLES_UPLOADS_DIR = path.join(ROOT_DIR, 'uploads', 'articles');
@@ -296,6 +297,25 @@ function writeLeads(data) {
   }
 }
 
+function readViews() {
+  try {
+    if (fs.existsSync(VIEWS_FILE)) {
+      return JSON.parse(fs.readFileSync(VIEWS_FILE, 'utf-8'));
+    }
+  } catch (e) {
+    console.warn('[Views API] Failed to read views.json:', e.message);
+  }
+  return {};
+}
+
+function writeViews(data) {
+  try {
+    fs.writeFileSync(VIEWS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('[Views API] Failed to write views.json:', e.message);
+  }
+}
+
 function authGuard(req, res, next) {
   const secret = req.headers['x-blog-secret'];
   console.log(`[Blog Auth] Received secret: "${secret}", Expected: "${BLOG_SECRET}"`);
@@ -412,6 +432,25 @@ app.get('/api/leads', authGuard, (req, res) => {
 
 
 /**
+ * POST /api/views/:id
+ * Increment view count for an article/post (Public endpoint).
+ * Ignores if { isAdmin: true } is passed in body.
+ */
+app.post('/api/views/:id', (req, res) => {
+  const { id } = req.params;
+  const { isAdmin } = req.body || {};
+
+  const views = readViews();
+
+  if (!isAdmin) {
+    views[id] = (views[id] || 0) + 1;
+    writeViews(views);
+  }
+
+  res.json({ views: views[id] || 0 });
+});
+
+/**
  * GET /api/blog/posts
  * Returns all posts (sorted newest first). Public — no auth required.
  * If ?all=true and valid X-Blog-Secret is provided, returns all posts including scheduled.
@@ -427,6 +466,19 @@ app.get('/api/blog/posts', (req, res) => {
     const now = new Date();
     posts = posts.filter(p => new Date(p.date) <= now);
   }
+
+  const views = readViews();
+  posts = posts.map(p => {
+    let viewKey = p.id;
+    if (p.external_url) {
+      const parts = p.external_url.split('/').filter(Boolean);
+      if (parts.length > 0) viewKey = parts[parts.length - 1]; // get slug
+    }
+    return {
+      ...p,
+      views: views[viewKey] || 0
+    };
+  });
 
   res.json(posts);
 });

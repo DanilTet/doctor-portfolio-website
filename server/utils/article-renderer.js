@@ -428,6 +428,16 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
       </a>
       <h1 class="section-title" style="text-align:left;margin-bottom:16px;font-size:clamp(2rem,5vw,3.5rem);">${escHtml(title)}</h1>
       ${subtitle ? `<p class="section-subtitle" style="text-align:left;max-width:800px;">${escHtml(subtitle)}</p>` : ''}
+      <div class="article-meta" style="display:flex;align-items:center;gap:16px;margin-top:16px;font-size:0.95rem;">
+        <span class="article-date" style="color:rgba(255,255,255,0.6);">${datePublished ? new Date(datePublished).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}</span>
+        <span id="article-view-count" style="display:inline-flex;align-items:center;gap:6px;color:var(--color-primary, #2bd9b9);opacity:0.9;" title="${isRu ? 'Просмотры' : 'Перегляди'}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span class="view-val"></span>
+        </span>
+      </div>
     </div>
   </section>
 
@@ -501,6 +511,23 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
   <script src="/js/env.js"></script>
   <script src="/js/config.js"></script>
   <script src="/js/tracker.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const isAdmin = !!localStorage.getItem('blogSecret');
+      fetch('/api/views/${escHtml(slug)}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isAdmin: isAdmin })
+      })
+      .then(r => r.json())
+      .then(data => {
+        const val = document.querySelector('#article-view-count .view-val');
+        if (val && data.views !== undefined) val.textContent = data.views;
+      })
+      .catch(e => console.error(e));
+    });
+  </script>
 </body>
 </html>`;
 

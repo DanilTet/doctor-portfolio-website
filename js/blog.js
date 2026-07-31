@@ -193,7 +193,16 @@
         : `<div class="blog-card__img-wrap blog-card__img-wrap--no-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>`
       }
       <div class="blog-card__body">
-        <div class="blog-card__meta">${igBadge}<span class="blog-card__date">${dateStr}</span></div>
+        <div class="blog-card__meta" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+          <div style="display:flex;align-items:center;gap:8px;">${igBadge}<span class="blog-card__date">${dateStr}</span></div>
+          <div class="blog-card__views" style="display:flex;align-items:center;gap:4px;color:var(--color-primary, #2bd9b9);opacity:0.8;font-size:0.9em;" title="Просмотры">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            ${post.views || 0}
+          </div>
+        </div>
         ${tagsHtml}
         <h3 class="blog-card__title">${escHtml(post.title)}</h3>
         <p class="blog-card__excerpt">${escHtml(excerpt)}</p>
@@ -227,6 +236,17 @@
     const source  = document.getElementById('blog-modal-source');
     const igLink  = document.getElementById('blog-modal-ig-link');
 
+    // Fetch and increment view count if not an external article and not admin
+    const isAdmin = !!localStorage.getItem('blogSecret');
+    if (!isAdmin && !post.external_url) {
+      let viewKey = post.id;
+      fetch(`/api/views/${viewKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isAdmin: false })
+      }).catch(() => {});
+    }
+
     const dateStr = new Date(post.date).toLocaleDateString('uk-UA', {
       day: 'numeric', month: 'long', year: 'numeric',
     });
@@ -244,7 +264,9 @@
     if (title)  title.textContent  = post.title;
     if (date)   date.textContent   = dateStr;
     if (source) {
-      source.textContent = post.source === 'instagram' ? '📸 Instagram' : '✍️ Блог';
+      const srcText = post.source === 'instagram' ? '📸 Instagram' : '✍️ Блог';
+      const viewsIcon = `<span style="margin-left:12px;opacity:0.8;color:var(--color-primary, #2bd9b9);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:text-bottom;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>${post.views || 0}</span>`;
+      source.innerHTML = srcText + viewsIcon;
     }
 
     if (body) {
