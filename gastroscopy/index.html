@@ -55,6 +55,40 @@
   <link rel="stylesheet" href="/css/styles.css?v=2.0">
   <link rel="stylesheet" href="/css/animations.css?v=2.0">
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
+
+  <!-- JSON-LD: FAQ -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Чи боляче робити гастроскопію?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "При проведенні гастроскопії у стані медикаментозного сну (седації) ви не відчуєте жодного болю чи дискомфорту. Ви просто спите, поки лікар проводить огляд. При звичайній процедурі використовується місцевий анестетик (спрей лідокаїну), що зводить неприємні відчуття до мінімуму."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Скільки часу займає саме обстеження?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Сама процедура огляду шлунка займає в середньому 5–10 хвилин. Якщо потрібне взяття біопсії або видалення поліпів, час може трохи збільшитися. З урахуванням підготовки та розмови з лікарем, розраховуйте провести в клініці близько 30–40 хвилин."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Чи можна пити воду перед ВГДС?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Вранці в день дослідження пити рідини вкрай небажано. Допускається зробити кілька ковтків чистої негазованої води (наприклад, щоб запити життєво важливі ліки) не пізніше, ніж за 2 години до початку процедури."
+      }
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -248,6 +282,72 @@
             <li style="margin-bottom: 10px;" data-i18n="service.gastro.before.li2">Якщо ви носите знімні зубні протези — їх необхідно буде зняти безпосередньо перед дослідженням.</li>
             <li data-i18n="service.gastro.before.li3">Одягніть зручний, вільний одяг, який не стискає шию, грудну клітку та живіт.</li>
           </ul>
+        </div>
+
+        
+        <!-- FAQ Section -->
+        
+        <style>
+          .faq-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: background 0.3s ease;
+          }
+          .faq-details:hover {
+            background: rgba(255, 255, 255, 0.04);
+          }
+          .faq-summary {
+            padding: 18px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--color-text-light);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .faq-summary::-webkit-details-marker {
+            display: none;
+          }
+          .faq-summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--color-primary);
+            transition: transform 0.3s ease;
+          }
+          .faq-details[open] .faq-summary::after {
+            content: '−';
+            transform: rotate(180deg);
+          }
+          .faq-content {
+            padding: 0 20px 20px 20px;
+            color: var(--color-text);
+            line-height: 1.6;
+          }
+        </style>
+
+        <div style="margin-bottom: 40px; margin-top: 60px;">
+          <h2 style="margin-top: 0; margin-bottom: 24px; font-weight: 700; font-size: 1.75rem; color: var(--color-text-light); text-align: center;">Поширені запитання (FAQ)</h2>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Чи боляче робити гастроскопію?</summary>
+            <div class="faq-content">При проведенні гастроскопії у стані медикаментозного сну (седації) ви не відчуєте жодного болю чи дискомфорту. Ви просто спите, поки лікар проводить огляд. При звичайній процедурі використовується місцевий анестетик (спрей лідокаїну), що зводить неприємні відчуття до мінімуму.</div>
+          </details>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Скільки часу займає саме обстеження?</summary>
+            <div class="faq-content">Сама процедура огляду шлунка займає в середньому 5–10 хвилин. Якщо потрібне взяття біопсії або видалення поліпів, час може трохи збільшитися. З урахуванням підготовки та розмови з лікарем, розраховуйте провести в клініці близько 30–40 хвилин.</div>
+          </details>
+
+          <details class="faq-details">
+            <summary class="faq-summary">Чи можна пити воду перед ВГДС?</summary>
+            <div class="faq-content">Вранці в день дослідження пити рідини вкрай небажано. Допускається зробити кілька ковтків чистої негазованої води (наприклад, щоб запити життєво важливі ліки) не пізніше, ніж за 2 години до початку процедури.</div>
+          </details>
         </div>
 
         <div style="margin-top: 40px; text-align: center;">
