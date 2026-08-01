@@ -161,6 +161,75 @@
             If you have any questions or want to consult before the examination, click the booking button at the bottom of the page!
           </p>
         </div>
+        
+
+        
+        <!-- FAQ Section -->
+        
+        <style>
+          .faq-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: background 0.3s ease;
+          }
+          .faq-details:hover {
+            background: rgba(255, 255, 255, 0.04);
+          }
+          .faq-summary {
+            padding: 14px 16px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--color-text-light);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .faq-summary::-webkit-details-marker {
+            display: none;
+          }
+          .faq-summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--color-primary);
+            transition: transform 0.3s ease;
+          }
+          .faq-details[open] .faq-summary::after {
+            content: '−';
+            transform: rotate(180deg);
+          }
+          .faq-content {
+            padding: 0 16px 16px 16px;
+            color: var(--color-text);
+            line-height: 1.6;
+          }
+        </style>
+
+        <div style="margin-bottom: 32px; margin-top: 16px;">
+          <h2 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light); text-align: center;">Frequently Asked Questions (FAQ)</h2>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Is gastroscopy painful?</summary>
+            <div class="faq-content">If gastroscopy is performed under medication-induced sleep (sedation), you will not feel any pain or discomfort. You simply sleep while the doctor performs the examination. During a standard procedure, a local anesthetic (lidocaine spray) is used, minimizing unpleasant sensations.</div>
+          </details>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">How long does the examination take?</summary>
+            <div class="faq-content">The actual stomach examination procedure takes an average of 5–10 minutes. If a biopsy or polyp removal is required, the time may increase slightly. Including preparation and consultation with the doctor, expect to spend about 30–40 minutes at the clinic.</div>
+          </details>
+
+          <details class="faq-details">
+            <summary class="faq-summary">Can I drink water before EGD?</summary>
+            <div class="faq-content">In the morning on the day of the examination, drinking liquids is highly undesirable. You are allowed to take a few sips of clean, still water (for example, to wash down vital medications) no later than 2 hours before the start of the procedure.</div>
+          </details>
+        </div>
+
+        
         <!-- Section 2: Why Important -->
         <div id="why-important" style="scroll-margin-top: 100px; margin-bottom: 40px;">
           <h3 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light);" data-i18n="service.gastro.why.title">2. Why is proper preparation important?</h3>
@@ -231,73 +300,6 @@
             <li data-i18n="service.gastro.before.li3">Wear comfortable, loose clothing that does not compress the neck, chest, or abdomen.</li>
           </ul>
         </div>
-
-        
-        <!-- FAQ Section -->
-        
-        <style>
-          .faq-details {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 8px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            transition: background 0.3s ease;
-          }
-          .faq-details:hover {
-            background: rgba(255, 255, 255, 0.04);
-          }
-          .faq-summary {
-            padding: 18px 20px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--color-text-light);
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          .faq-summary::-webkit-details-marker {
-            display: none;
-          }
-          .faq-summary::after {
-            content: '+';
-            font-size: 1.5rem;
-            line-height: 1;
-            color: var(--color-primary);
-            transition: transform 0.3s ease;
-          }
-          .faq-details[open] .faq-summary::after {
-            content: '−';
-            transform: rotate(180deg);
-          }
-          .faq-content {
-            padding: 0 20px 20px 20px;
-            color: var(--color-text);
-            line-height: 1.6;
-          }
-        </style>
-
-        <div style="margin-bottom: 40px; margin-top: 60px;">
-          <h2 style="margin-top: 0; margin-bottom: 24px; font-weight: 700; font-size: 1.75rem; color: var(--color-text-light); text-align: center;">Frequently Asked Questions (FAQ)</h2>
-          
-          <details class="faq-details">
-            <summary class="faq-summary">Is gastroscopy painful?</summary>
-            <div class="faq-content">If gastroscopy is performed under medication-induced sleep (sedation), you will not feel any pain or discomfort. You simply sleep while the doctor performs the examination. During a standard procedure, a local anesthetic (lidocaine spray) is used, minimizing unpleasant sensations.</div>
-          </details>
-          
-          <details class="faq-details">
-            <summary class="faq-summary">How long does the examination take?</summary>
-            <div class="faq-content">The actual stomach examination procedure takes an average of 5–10 minutes. If a biopsy or polyp removal is required, the time may increase slightly. Including preparation and consultation with the doctor, expect to spend about 30–40 minutes at the clinic.</div>
-          </details>
-
-          <details class="faq-details">
-            <summary class="faq-summary">Can I drink water before EGD?</summary>
-            <div class="faq-content">In the morning on the day of the examination, drinking liquids is highly undesirable. You are allowed to take a few sips of clean, still water (for example, to wash down vital medications) no later than 2 hours before the start of the procedure.</div>
-          </details>
-        </div>
-
         <div style="margin-top: 40px; text-align: center;">
           <a href="/#appointment-section" class="btn btn--primary open-booking-modal" data-i18n="service.gastro.btn">Book a Gastroscopy</a>
         </div>
