@@ -29,3 +29,7 @@
 
 > **Rule: State Hospital Constraints**
 > Do not proactively suggest adding price tables or exact pricing sections to medical service pages if the institution is a state or public hospital. Focus on service descriptions, preparation instructions, and patient reviews instead.
+
+
+> **Rule: Deprecate Instagram Blog Integration**
+> All new blog content in this project is added manually by the admin. Do not maintain, propose, or build any features related to fetching, syncing, or displaying automatic Instagram posts. Treat the blog ecosystem as purely manual (`source: "manual"` or `source: "article"`).
