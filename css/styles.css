@@ -459,6 +459,7 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   background: none;
   border: none;
+  touch-action: manipulation;
 }
 
 .burger__line {
@@ -466,7 +467,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 2px;
   background: var(--color-text-light);
   border-radius: var(--radius-full);
-  transition: transform var(--transition-base), opacity var(--transition-base), background-color var(--transition-base);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background-color var(--transition-fast);
   transform-origin: center;
 }
 
@@ -1054,7 +1055,8 @@ h1, h2, h3, h4, h5, h6 {
     gap: var(--space-2xl);
     opacity: 0;
     visibility: hidden;
-    transition: opacity var(--transition-base), visibility var(--transition-base);
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+    will-change: opacity, visibility;
     z-index: 5;
     /* сбрасываем уплотнение, т.к. это полноэкранное меню */
     gap: var(--space-2xl);
