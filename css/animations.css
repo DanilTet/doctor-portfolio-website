@@ -42,8 +42,8 @@
 [data-animate-delay="5"] { transition-delay: 0.5s; }
 [data-animate-delay="6"] { transition-delay: 0.6s; }
 
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
+/* Reduced motion preference and Mobile Performance */
+@media (prefers-reduced-motion: reduce), (max-width: 768px) {
   [data-animate] {
     opacity: 1;
     transform: none;
