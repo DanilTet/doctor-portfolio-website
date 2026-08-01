@@ -13,6 +13,41 @@ const translations = {
     'service.colono.meta.keywords': 'колоноскопия, колоноскопия седация, колоноскопия наркоз, подготовка к колоноскопии, Изиклин, рак толстой кишки, рак кишечника, опухоль кишечника, полипы кишечника',
     'service.uzd.meta.desc': 'Ультразвуковая диагностика (УЗИ) брюшной полости, почек и мочевого пузыря в Харькове. Безопасное и безболезненное обследование внутренних органов у врача Тетерника О.А.',
     'service.uzd.meta.keywords': 'УЗИ брюшной полости, узи органов, ультразвуковая диагностика Харьков, подготовка к узи, УЗИ почек, УЗИ щитовидной железы, Тетерник Олег',
+    
+    'service.ercp.meta.desc': 'ЭРХПГ (эндоскопическая ретроградная холангиопанкреатография) в Харькове. Эндоскопическое удаление камней из желчных протоков, лечение холедохолитиаза.',
+    'service.ercp.meta.keywords': 'ЭРХПГ Харьков, ERCP Харьков, удаление камней из желчных протоков эндоскопически, холедохолитиаз, диагностика желчных протоков',
+    'service.ercp.meta.title': 'ЭРХПГ в Харькове | Врач Тетерник О.А.',
+    'service.ercp.title': 'ЭРХПГ (эндоскопическая ретроградная холангиопанкреатография)',
+    'service.ercp.subtitle': 'Высокоточная диагностика и малоинвазивное лечение заболеваний желчных протоков без разрезов.',
+    'service.ercp.btn': 'Получить консультацию по ЭРХПГ',
+    'service.ercp.toc.title': 'Путеводитель по вопросам подготовки и проведения:',
+    'service.ercp.toc.item1': '1. Что такое ЭРХПГ?',
+    'service.ercp.toc.item2': '2. Диагностическая ЭРХПГ (диагностика желчных протоков)',
+    'service.ercp.toc.item3': '3. Лечебная ЭРХПГ (эндоскопическое удаление камней)',
+    'service.ercp.toc.item4': '4. Как проходит процедура и подготовка',
+    'service.ercp.toc.item5': '5. Восстановление после ЭРХПГ',
+    'service.ercp.about.title': '1. Что такое ЭРХПГ?',
+    'service.ercp.about.p1': '<strong>ЭРХПГ (эндоскопическая ретроградная холангиопанкреатография)</strong> — это специализированная процедура, объединяющая эндоскопию и рентгеноскопию для диагностики и лечения заболеваний желчных и панкреатических протоков.',
+    'service.ercp.about.p2': 'С помощью специального эндоскопа врач достигает двенадцатиперстной кишки, находит место выхода желчных протоков (фатеров сосочек) и вводит контрастное вещество.',
+    'service.ercp.diag.title': '2. Диагностическая ЭРХПГ (диагностика желчных протоков)',
+    'service.ercp.diag.p1': 'Диагностический этап процедуры позволяет врачу визуализировать структуру желчевыводящих путей.',
+    'service.ercp.diag.li1': 'Выявление камней в желчных протоках (холедохолитиаз).',
+    'service.ercp.diag.li2': 'Определение причин механической желтухи.',
+    'service.ercp.diag.li3': 'Диагностика стриктур (сужений) желчных путей.',
+    'service.ercp.treatment.title': '3. Лечебная ЭРХПГ (эндоскопическое удаление камней)',
+    'service.ercp.treatment.p1': 'Если во время диагностики обнаруживается проблема, врач может немедленно перейти к лечебному вмешательству.',
+    'service.ercp.treatment.li1': '<strong>Эндоскопическое удаление камней:</strong> извлечение конкрементов из желчных протоков.',
+    'service.ercp.treatment.li2': '<strong>Папиллосфинктеротомия:</strong> небольшое рассечение сосочка для облегчения выхода камней.',
+    'service.ercp.treatment.li3': '<strong>Стентирование:</strong> установка пластиковых или металлических стентов.',
+    'service.ercp.prep.title': '4. Как проходит процедура и подготовка',
+    'service.ercp.prep.p1': 'ЭРХПГ — это серьезное медицинское вмешательство, которое проводится в условиях стационара.',
+    'service.ercp.prep.li1': '<strong>Строго натощак:</strong> нельзя есть минимум 8 часов и пить за 4 часа до процедуры.',
+    'service.ercp.prep.li2': '<strong>Анализы:</strong> перед ЭРХПГ обязательно сдается анализ крови, коагулограмма, ЭКГ.',
+    'service.ercp.prep.li3': '<strong>Лекарства:</strong> сообщите врачу обо всех принимаемых препаратах.',
+    'service.ercp.rec.title': '5. Восстановление после ЭРХПГ',
+    'service.ercp.rec.p1': 'После процедуры пациент остается под медицинским наблюдением в клинике.',
+    'service.ercp.rec.p2': 'В большинстве случаев выписка возможна на следующий день.',
+
     'service.surgery.meta.desc': 'Оперативная эндоскопия и малоинвазивная хирургия в Харькове. Удаление полипов кишечника (полипэктомия), остановка кровотечений, гастростома, лечение опухолей и ЭРХПГ.',
     'service.surgery.meta.keywords': 'удаление полипов кишечника, полипэктомия, оперативная эндоскопия, малоинвазивная хирургия, ЭРХПГ, желтуха Харьков, капсульная эндоскопия, гастростома, эндоскопическая гастростома',
     'logo.main': 'Эндоскопия',
@@ -160,6 +195,7 @@ const translations = {
     'topics.usg.posts_btn1': 'Статьи об УЗИ',
     'topics.usg.btn2': 'Детальнее про Хирургию',
     'topics.usg.posts_btn2': 'Статьи о Хирургии',
+    'topics.usg.btn_ercp': 'Подробнее об ЭРХПГ',
     'blog.subtitle': 'Экспертные материалы',
     'blog.title': 'Блог об эндоскопии',
     'blog.desc': 'Врач-эндоскопист Тетерник О.О. рассказывает о процедурах, развенчивает мифы и делится полезными советами по подготовке к эндоскопии.',
@@ -485,6 +521,7 @@ const translations = {
     'topics.usg.posts_btn1': 'Articles about Ultrasound',
     'topics.usg.btn2': 'Details about Surgery',
     'topics.usg.posts_btn2': 'Articles about Surgery',
+    'topics.usg.btn_ercp': 'Details about ERCP',
     'blog.subtitle': 'Expert Materials',
     'blog.title': 'Blog about Endoscopy',
     'blog.desc': 'Endoscopist Dr. Oleg Teternik explains procedures, busts myths, and shares useful tips for endoscopy preparation.',
@@ -621,6 +658,41 @@ const translations = {
     'service.uzd.adv.p1': 'Ultrasound is a primary screening tool due to its speed and high information value. Doctors prescribe it for abdominal pain, digestive disorders, discomfort during urination, swelling in soft tissues, or deviations in laboratory tests.',
     'service.uzd.adv.p2': 'The examination allows quickly establishing a preliminary diagnosis and determining further tactics of examination or therapy, without making the patient wait.',
 
+    
+    'service.ercp.meta.desc': 'ERCP in Kharkiv. Endoscopic removal of stones from bile ducts, treatment of choledocholithiasis.',
+    'service.ercp.meta.keywords': 'ERCP Kharkiv, gallstones removal, bile ducts diagnostics',
+    'service.ercp.meta.title': 'ERCP in Kharkiv | Dr. Teternik',
+    'service.ercp.title': 'ERCP (Endoscopic retrograde cholangiopancreatography)',
+    'service.ercp.subtitle': 'High-precision diagnostics and minimally invasive treatment of bile duct diseases.',
+    'service.ercp.btn': 'Get consultation for ERCP',
+    'service.ercp.toc.title': 'Preparation & Procedure Guide:',
+    'service.ercp.toc.item1': '1. What is ERCP?',
+    'service.ercp.toc.item2': '2. Diagnostic ERCP',
+    'service.ercp.toc.item3': '3. Therapeutic ERCP (stone removal)',
+    'service.ercp.toc.item4': '4. Procedure and preparation',
+    'service.ercp.toc.item5': '5. Recovery',
+    'service.ercp.about.title': '1. What is ERCP?',
+    'service.ercp.about.p1': 'ERCP is a specialized procedure that combines endoscopy and fluoroscopy to diagnose and treat diseases of the biliary or pancreatic ductal systems.',
+    'service.ercp.about.p2': 'Using a special endoscope, the doctor reaches the duodenum and injects a contrast medium.',
+    'service.ercp.diag.title': '2. Diagnostic ERCP',
+    'service.ercp.diag.p1': 'The diagnostic stage allows the doctor to visualize the structure of the biliary tract.',
+    'service.ercp.diag.li1': 'Detection of stones in bile ducts (choledocholithiasis).',
+    'service.ercp.diag.li2': 'Determining the causes of obstructive jaundice.',
+    'service.ercp.diag.li3': 'Diagnosis of strictures (narrowing) of the biliary tract.',
+    'service.ercp.treatment.title': '3. Therapeutic ERCP (stone removal)',
+    'service.ercp.treatment.p1': 'If a problem is found during diagnosis, the doctor can immediately proceed to therapeutic intervention.',
+    'service.ercp.treatment.li1': '<strong>Endoscopic stone removal:</strong> extracting calculi from bile ducts.',
+    'service.ercp.treatment.li2': '<strong>Sphincterotomy:</strong> a small incision in the papilla to facilitate the passage of stones.',
+    'service.ercp.treatment.li3': '<strong>Stenting:</strong> placement of stents to expand narrowed areas.',
+    'service.ercp.prep.title': '4. Procedure and preparation',
+    'service.ercp.prep.p1': 'ERCP is a serious medical intervention performed in a hospital setting.',
+    'service.ercp.prep.li1': '<strong>Strict fasting:</strong> no food for at least 8 hours and no liquids for 4 hours before the procedure.',
+    'service.ercp.prep.li2': '<strong>Tests:</strong> blood tests, coagulogram, and ECG are mandatory before ERCP.',
+    'service.ercp.prep.li3': '<strong>Medications:</strong> inform your doctor about all medications you are taking.',
+    'service.ercp.rec.title': '5. Recovery',
+    'service.ercp.rec.p1': 'After the procedure, the patient remains under medical supervision in the clinic.',
+    'service.ercp.rec.p2': 'In most cases, discharge is possible the next day.',
+
     'service.surgery.meta.title': 'Surgery & Minimally Invasive Interventions | Dr. Teternik O.O.',
     'service.surgery.title': 'Surgery & Minimally Invasive Interventions',
     'service.surgery.subtitle': 'Modern surgical techniques and endoscopic procedures without traditional incisions.',
@@ -725,6 +797,14 @@ function localizeLinks($, langCode) {
             $(this).attr('href', `/${langCode}/${p}/`);
         });
     });
+    
+    if (langCode === 'ru') {
+        $(`a[href^="/ercp/"]`).not('.lang-switch a').each(function() {
+            $(this).attr('href', `/ru/ercp/`);
+        });
+    } else if (langCode === 'en') {
+        $(`a[href^="/ercp/"]`).not('.lang-switch a').remove();
+    }
 }
 
 // Build all

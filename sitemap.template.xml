@@ -33,4 +33,23 @@
 
 
 
+
+  <!-- ERCP -->
+  <url>
+    <loc>https://endo.kh.ua/ercp/</loc>
+    <lastmod>2026-08-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/ercp/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/ercp/"/>
+  </url>
+  <url>
+    <loc>https://endo.kh.ua/ru/ercp/</loc>
+    <lastmod>2026-08-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://endo.kh.ua/ercp/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/ercp/"/>
+  </url>
+
 </urlset>
