@@ -3406,6 +3406,200 @@ h1, h2, h3, h4, h5, h6 {
   .topic-card,
   .service-card,
   .review-card,
+@keyframes faqPulse {
+  0%, 100% { transform: scale(1);   opacity: 0.6; }
+  50%       { transform: scale(1.2); opacity: 0;   }
+}
+
+.faq-float__btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 32px rgba(78, 205, 196, 0.65);
+}
+
+.faq-float__btn svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Hide label on very small screens to avoid clutter */
+@media (max-width: 480px) {
+  .faq-float { bottom: 1.25rem; right: 1.25rem; }
+  .faq-float__label { display: none; }
+  .faq-float__btn { width: 52px; height: 52px; }
+}
+
+
+/* ============================================================
+   QUICK-QUESTION MODAL
+   ============================================================ */
+.qq-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0 2rem 7rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.qq-modal.qq-modal--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qq-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 24, 37, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.qq-modal__box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-bg-dark-lighter);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  overflow: hidden;
+  transform: translateY(30px) scale(0.95);
+  transition: transform var(--transition-spring);
+}
+
+.qq-modal--open .qq-modal__box {
+  transform: translateY(0) scale(1);
+}
+
+/* Gradient top bar */
+.qq-modal__box::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: var(--color-primary-gradient);
+}
+
+.qq-modal__head {
+  padding: var(--space-lg) var(--space-xl) var(--space-md);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.qq-modal__title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--color-text-light);
+  line-height: 1.3;
+}
+
+.qq-modal__subtitle {
+  font-size: var(--fs-small);
+  color: var(--color-text-light-muted);
+  margin-top: 4px;
+}
+
+.qq-modal__close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-light-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: -2px;
+}
+
+.qq-modal__close:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.qq-modal__body {
+  padding: 0 var(--space-xl) var(--space-xl);
+}
+
+.qq-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Success state */
+.qq-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-xl) var(--space-2xl);
+}
+
+.qq-success__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(78, 205, 196, 0.12);
+  color: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.qq-success__title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--color-text-light);
+}
+
+.qq-success__desc {
+  font-size: var(--fs-small);
+  color: var(--color-text-light-muted);
+  max-width: 320px;
+}
+
+@media (max-width: 480px) {
+  .qq-modal {
+    padding: 0 1rem 6rem;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .qq-modal__box {
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE OVERRIDES (max-width: 768px)
+   Disabling heavy CSS effects for better scroll performance
+   ============================================================ */
+@media (max-width: 768px) {
+  :root {
+    --glass-blur: blur(0px) !important;
+    --glass-bg: rgba(7, 30, 45, 0.98) !important; /* solid color instead of glass */
+  }
+
+  .header::before,
+  .header.header--scrolled::before,
+  .modal__overlay,
+  .topic-card,
+  .service-card,
+  .review-card,
   .qq-modal {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -3415,4 +3609,20 @@ h1, h2, h3, h4, h5, h6 {
   .header.header--scrolled::before {
     background: rgba(10, 22, 40, 0.98) !important;
   }
+}
+
+/* ============================================================
+   GLOBAL PERFORMANCE OVERRIDES
+   Instantly show Hero elements without load delay
+   ============================================================ */
+.hero__badge,
+.hero__title,
+.hero__specialization,
+.hero__experience,
+.hero__actions,
+.hero__visual,
+.hero__scroll {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
