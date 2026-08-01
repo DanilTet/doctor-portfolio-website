@@ -23,6 +23,40 @@
   <link rel="stylesheet" href="/css/styles.css?v=2.0">
   <link rel="stylesheet" href="/css/animations.css?v=2.0">
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
+
+  <!-- JSON-LD: FAQ -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is a colonoscopy painful?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, the procedure is performed under medication-induced sleep (sedation). You fall asleep, feel nothing during the examination, and wake up after it is finished. This is a modern and completely painless standard."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does the procedure take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The actual examination takes about 15–30 minutes. Taking into account preparation, changing clothes, and waking up after sedation, you will spend about 1–1.5 hours at the clinic."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can polyps be removed immediately?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, if the doctor finds polyps during the colonoscopy, they are removed immediately during the same procedure (unless there are contraindications). It is painless and protects you from colon cancer in the future."
+      }
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -64,7 +98,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Back to homepage</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.colono.title">Colonoscopy (videocolonoscopy)</h1>
+      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.colono.title">Colonoscopy in Kharkiv — 17th Hospital</h1>
       <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.colono.subtitle">Effective examination of the large intestine under medical sleep.</p>
     </div>
   </section>
@@ -75,6 +109,80 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+        
+        <!-- Intro Section -->
+        <div style="margin-bottom: 40px;">
+          <h2 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.75rem; color: var(--color-text-light);">When is a colonoscopy necessary?</h2>
+          <p style="margin-bottom: 16px;">If you suffer from abdominal pain, chronic constipation, diarrhea, blood in your stool, or if you are over 45 (for prevention), you need a high-quality <strong>colonoscopy in Kharkiv</strong>.</p>
+          <p style="margin-bottom: 16px;">The procedures are performed by endoscopist <strong>Dr. Teternik Oleg</strong> using a modern video endoscope in a specially equipped room <strong>at the 17th City Hospital</strong>. The examination is performed exclusively under medication-induced sleep (sedation) — completely without pain or fear. During a single examination, the doctor can safely and painlessly remove any found polyps.</p>
+          <p style="margin-bottom: 0;">If you have any questions or want to make an appointment — click the button at the bottom of the page!</p>
+        </div>
+
+        <!-- FAQ Section -->
+        
+        <style>
+          .faq-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: background 0.3s ease;
+          }
+          .faq-details:hover {
+            background: rgba(255, 255, 255, 0.04);
+          }
+          .faq-summary {
+            padding: 12px 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .faq-summary::-webkit-details-marker {
+            display: none;
+          }
+          .faq-summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--color-primary);
+            transition: transform 0.3s ease;
+          }
+          .faq-details[open] .faq-summary::after {
+            content: '−';
+            transform: rotate(180deg);
+          }
+          .faq-content {
+            padding: 0 14px 14px 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+          }
+        </style>
+
+        <div style="margin-bottom: 24px; margin-top: 0px;">
+          <h2 style="margin-top: 0; margin-bottom: 12px; font-weight: 700; font-size: 1.25rem; color: var(--color-text-light); text-align: center;">Frequently Asked Questions (FAQ)</h2>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Is a colonoscopy painful?</summary>
+            <div class="faq-content">No, the procedure is performed under medication-induced sleep (sedation). You fall asleep, feel nothing during the examination, and wake up after it is finished. This is a modern and completely painless standard.</div>
+          </details>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">How long does the procedure take?</summary>
+            <div class="faq-content">The actual examination takes about 15–30 minutes. Taking into account preparation, changing clothes, and waking up after sedation, you will spend about 1–1.5 hours at the clinic.</div>
+          </details>
+
+          <details class="faq-details">
+            <summary class="faq-summary">Can polyps be removed immediately?</summary>
+            <div class="faq-content">Yes, if the doctor finds polyps during the colonoscopy, they are removed immediately during the same procedure (unless there are contraindications). It is painless and protects you from colon cancer in the future.</div>
+          </details>
+        </div>
+
         <!-- Table of Contents / Путівник по питанням -->
         <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
           <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.colono.toc.title">

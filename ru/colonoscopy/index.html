@@ -55,6 +55,40 @@
   <link rel="stylesheet" href="/css/styles.css?v=2.0">
   <link rel="stylesheet" href="/css/animations.css?v=2.0">
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
+
+  <!-- JSON-LD: FAQ -->
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Больно ли делать колоноскопию?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Нет, процедура проводится под медикаментозным сном (седацией). Вы засыпаете, ничего не чувствуете во время обследования, а просыпаетесь уже после его окончания. Это современный и абсолютно безболезненный стандарт."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Сколько времени занимает процедура?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Само обследование длится около 15–30 минут. С учетом подготовки, переодевания и времени на пробуждение после седации, вы проведете в клинике примерно 1–1.5 часа."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Можно ли сразу удалить полипы?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Да, если во время колоноскопии врач обнаруживает полипы, они удаляются сразу же в ходе одной процедуры (при отсутствии противопоказаний). Это безболезненно и защищает вас от рака кишечника в будущем."
+      }
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -96,7 +130,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Назад на главную</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.colono.title">Колоноскопия (видеоколоноскопия)</h1>
+      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.colono.title">Колоноскопия в Харькове — 17-я больница</h1>
       <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.colono.subtitle">Эффективное обследование толстого кишечника в состоянии медикаментозного сна.</p>
     </div>
   </section>
@@ -107,6 +141,80 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+        
+        <!-- Intro Section -->
+        <div style="margin-bottom: 40px;">
+          <h2 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.75rem; color: var(--color-text-light);">Когда необходима колоноскопия?</h2>
+          <p style="margin-bottom: 16px;">Если вас беспокоят боли в животе, хронические запоры, диарея, появление крови в стуле, или вам больше 45 лет (для профилактики), вам необходима качественная <strong>колоноскопия в Харькове</strong>.</p>
+          <p style="margin-bottom: 16px;">Процедуры проводит врач-эндоскопист <strong>Тетерник Олег Александрович</strong> на современном видеоэндоскопе в специально оборудованном кабинете <strong>в 17-й городской больнице</strong>. Исследование проводится исключительно в состоянии медикаментозного сна (седации) — абсолютно без боли и страха. За одно обследование врач может сразу безболезненно удалить найденные полипы.</p>
+          <p style="margin-bottom: 0;">Если у вас остались вопросы или вы хотите записаться — жмите на кнопку внизу страницы!</p>
+        </div>
+
+        <!-- FAQ Section -->
+        
+        <style>
+          .faq-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: background 0.3s ease;
+          }
+          .faq-details:hover {
+            background: rgba(255, 255, 255, 0.04);
+          }
+          .faq-summary {
+            padding: 12px 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .faq-summary::-webkit-details-marker {
+            display: none;
+          }
+          .faq-summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--color-primary);
+            transition: transform 0.3s ease;
+          }
+          .faq-details[open] .faq-summary::after {
+            content: '−';
+            transform: rotate(180deg);
+          }
+          .faq-content {
+            padding: 0 14px 14px 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+          }
+        </style>
+
+        <div style="margin-bottom: 24px; margin-top: 0px;">
+          <h2 style="margin-top: 0; margin-bottom: 12px; font-weight: 700; font-size: 1.25rem; color: var(--color-text-light); text-align: center;">Частые вопросы (FAQ)</h2>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Больно ли делать колоноскопию?</summary>
+            <div class="faq-content">Нет, процедура проводится под медикаментозным сном (седацией). Вы засыпаете, ничего не чувствуете во время обследования, а просыпаетесь уже после его окончания. Это современный и абсолютно безболезненный стандарт.</div>
+          </details>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Сколько времени занимает процедура?</summary>
+            <div class="faq-content">Само обследование длится около 15–30 минут. С учетом подготовки, переодевания и времени на пробуждение после седации, вы проведете в клинике примерно 1–1.5 часа.</div>
+          </details>
+
+          <details class="faq-details">
+            <summary class="faq-summary">Можно ли сразу удалить полипы?</summary>
+            <div class="faq-content">Да, если во время колоноскопии врач обнаруживает полипы, они удаляются сразу же в ходе одной процедуры (при отсутствии противопоказаний). Это безболезненно и защищает вас от рака кишечника в будущем.</div>
+          </details>
+        </div>
+
         <!-- Table of Contents / Путівник по питанням -->
         <div class="toc-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
           <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 8px;" data-i18n="service.colono.toc.title">
