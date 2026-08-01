@@ -160,6 +160,75 @@
   <section class="section" style="padding: 60px 0;">
     <div class="container">
       <div class="card" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+        
+
+        
+
+        
+        <!-- FAQ Section -->
+        
+        <style>
+          .faq-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: background 0.3s ease;
+          }
+          .faq-details:hover {
+            background: rgba(255, 255, 255, 0.04);
+          }
+          .faq-summary {
+            padding: 12px 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .faq-summary::-webkit-details-marker {
+            display: none;
+          }
+          .faq-summary::after {
+            content: '+';
+            font-size: 1.25rem;
+            line-height: 1;
+            color: var(--color-primary);
+            transition: transform 0.3s ease;
+          }
+          .faq-details[open] .faq-summary::after {
+            content: '−';
+            transform: rotate(180deg);
+          }
+          .faq-content {
+            padding: 0 14px 14px 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+          }
+        </style>
+
+        <div style="margin-bottom: 24px; margin-top: 0px;">
+          <h2 style="margin-top: 0; margin-bottom: 12px; font-weight: 700; font-size: 1.25rem; color: var(--color-text-light); text-align: center;">Частые вопросы (FAQ)</h2>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Больно ли делать гастроскопию?</summary>
+            <div class="faq-content">При проведении гастроскопии в состоянии медикаментозного сна (седации) вы не почувствуете абсолютно никакой боли или дискомфорта. Вы просто спите, пока врач проводит осмотр. При обычной процедуре используется местный анестетик (спрей лидокаина), что сводит неприятные ощущения к минимуму.</div>
+          </details>
+          
+          <details class="faq-details">
+            <summary class="faq-summary">Сколько времени занимает само обследование?</summary>
+            <div class="faq-content">Сама процедура осмотра желудка занимает в среднем 5–10 минут. Если требуется взятие биопсии или удаление полипов, время может немного увеличиться. С учетом подготовки и беседы с врачом, рассчитывайте провести в клинике около 30–40 минут.</div>
+          </details>
+
+          <details class="faq-details">
+            <summary class="faq-summary">Можно ли пить воду перед ФГДС?</summary>
+            <div class="faq-content">Утром в день исследования пить жидкости крайне нежелательно. Допускается сделать несколько глотков чистой негазированной воды (например, чтобы запить жизненно важные лекарства) не позднее, чем за 2 часа до начала процедуры.</div>
+          </details>
+        </div>
         <!-- Table of Contents / Путівник по питанням -->
         <div class="toc-card"
           style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm);">
@@ -242,74 +311,6 @@
           <p style="margin-bottom: 0;">
             Если у вас остались вопросы или вы хотите проконсультироваться перед обследованием, жмите на кнопку записи внизу страницы!
           </p>
-        </div>
-
-        
-
-        
-        <!-- FAQ Section -->
-        
-        <style>
-          .faq-details {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 8px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            transition: background 0.3s ease;
-          }
-          .faq-details:hover {
-            background: rgba(255, 255, 255, 0.04);
-          }
-          .faq-summary {
-            padding: 14px 16px;
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--color-text-light);
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          .faq-summary::-webkit-details-marker {
-            display: none;
-          }
-          .faq-summary::after {
-            content: '+';
-            font-size: 1.5rem;
-            line-height: 1;
-            color: var(--color-primary);
-            transition: transform 0.3s ease;
-          }
-          .faq-details[open] .faq-summary::after {
-            content: '−';
-            transform: rotate(180deg);
-          }
-          .faq-content {
-            padding: 0 16px 16px 16px;
-            color: var(--color-text);
-            line-height: 1.6;
-          }
-        </style>
-
-        <div style="margin-bottom: 32px; margin-top: 16px;">
-          <h2 style="margin-top: 0; margin-bottom: 16px; font-weight: 700; font-size: 1.5rem; color: var(--color-text-light); text-align: center;">Частые вопросы (FAQ)</h2>
-          
-          <details class="faq-details">
-            <summary class="faq-summary">Больно ли делать гастроскопию?</summary>
-            <div class="faq-content">При проведении гастроскопии в состоянии медикаментозного сна (седации) вы не почувствуете абсолютно никакой боли или дискомфорта. Вы просто спите, пока врач проводит осмотр. При обычной процедуре используется местный анестетик (спрей лидокаина), что сводит неприятные ощущения к минимуму.</div>
-          </details>
-          
-          <details class="faq-details">
-            <summary class="faq-summary">Сколько времени занимает само обследование?</summary>
-            <div class="faq-content">Сама процедура осмотра желудка занимает в среднем 5–10 минут. Если требуется взятие биопсии или удаление полипов, время может немного увеличиться. С учетом подготовки и беседы с врачом, рассчитывайте провести в клинике около 30–40 минут.</div>
-          </details>
-
-          <details class="faq-details">
-            <summary class="faq-summary">Можно ли пить воду перед ФГДС?</summary>
-            <div class="faq-content">Утром в день исследования пить жидкости крайне нежелательно. Допускается сделать несколько глотков чистой негазированной воды (например, чтобы запить жизненно важные лекарства) не позднее, чем за 2 часа до начала процедуры.</div>
-          </details>
         </div>
 
         
