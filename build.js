@@ -195,7 +195,9 @@ const translations = {
     'topics.usg.posts_btn1': 'Статьи об УЗИ',
     'topics.usg.btn2': 'Детальнее про Хирургию',
     'topics.usg.posts_btn2': 'Статьи о Хирургии',
-    'topics.usg.btn_ercp': 'Подробнее об ЭРХПГ',
+    'topics.ercp.title': 'ЭРХПГ',
+    'topics.ercp.description': 'Эндоскопическая ретроградная холангиопанкреатография',
+    'topics.ercp.btn': 'Подробнее об ЭРХПГ',
     'blog.subtitle': 'Экспертные материалы',
     'blog.title': 'Блог об эндоскопии',
     'blog.desc': 'Врач-эндоскопист Тетерник О.О. рассказывает о процедурах, развенчивает мифы и делится полезными советами по подготовке к эндоскопии.',
@@ -521,7 +523,9 @@ const translations = {
     'topics.usg.posts_btn1': 'Articles about Ultrasound',
     'topics.usg.btn2': 'Details about Surgery',
     'topics.usg.posts_btn2': 'Articles about Surgery',
-    'topics.usg.btn_ercp': 'Details about ERCP',
+    'topics.ercp.title': 'ERCP',
+    'topics.ercp.description': 'Endoscopic retrograde cholangiopancreatography',
+    'topics.ercp.btn': 'Details about ERCP',
     'blog.subtitle': 'Expert Materials',
     'blog.title': 'Blog about Endoscopy',
     'blog.desc': 'Endoscopist Dr. Oleg Teternik explains procedures, busts myths, and shares useful tips for endoscopy preparation.',
@@ -803,6 +807,7 @@ function localizeLinks($, langCode) {
             $(this).attr('href', `/ru/ercp/`);
         });
     } else if (langCode === 'en') {
+        $('#topic-ercp-card').remove();
         $(`a[href^="/ercp/"]`).not('.lang-switch a').remove();
     }
 }
