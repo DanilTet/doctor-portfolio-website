@@ -89,6 +89,9 @@
       border: 1px solid rgba(99, 102, 241, 0.15);
       border-radius: 12px;
       padding: 20px;
+      /* prevent overflow on narrow screens */
+      min-width: 0;
+      word-break: break-word;
     }
     .info-block--green {
       background: rgba(16, 185, 129, 0.04);
@@ -109,6 +112,26 @@
       font-size: 0.95rem;
       line-height: 1.6;
       color: var(--color-text);
+    }
+    /* 3-column examination grid */
+    .exam-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 16px;
+    }
+    @media (max-width: 500px) {
+      .exam-grid {
+        grid-template-columns: 1fr;
+      }
+      .exam-grid > div {
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .exam-grid > div:last-child {
+        border-bottom: none;
+      }
     }
     .section-h2 {
       margin-top: 0;
@@ -165,6 +188,20 @@
     }
     .internal-link-note a:hover {
       color: var(--color-primary-light);
+    }
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .cta-block {
+        padding: 24px 18px;
+      }
+      .cta-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .cta-buttons .btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -309,8 +346,7 @@
           <p style="margin-bottom: 16px;">
             Во время гастроскопии врач последовательно осматривает три отдела верхних отделов ЖКТ:
           </p>
-          <div class="local-info-grid">
-            <div class="info-block" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 16px;">
+          <div class="info-block exam-grid" style="grid-column: 1 / -1; margin-bottom: 32px;">
               <div style="text-align: center; padding: 12px;">
                 <div style="font-size: 1.8rem; margin-bottom: 8px;">🔍</div>
                 <strong style="color: var(--color-text-light);">Пищевод</strong>
@@ -327,7 +363,6 @@
                 <p style="margin: 8px 0 0; font-size: 0.85rem;">Луковица и нисходящая часть</p>
               </div>
             </div>
-          </div>
           <p style="margin-bottom: 0; margin-top: 16px;">
             Исследование позволяет выявить воспаление, эрозии, язвы, полипы, признаки рефлюкса,
             новообразования и другие изменения, которые не видны на УЗИ или рентгене. При необходимости
@@ -440,7 +475,7 @@
           </svg>
           <span>Записаться через Telegram-бот</span>
         </a>
-        <a href="/#appointment-section" class="btn btn--outline" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px;">
+        <a href="https://endo.kh.ua/#appointment" class="btn btn--outline" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px;" target="_blank" rel="noopener noreferrer">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
