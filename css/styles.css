@@ -250,19 +250,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Ghost/Outline Button */
-.btn--ghost {
-  background: transparent;
+.btn--ghost,
+.btn--outline {
+  background: rgba(255, 255, 255, 0.05);
   color: var(--color-text-light);
   border: 1.5px solid var(--color-border-primary);
 }
 
-.btn--ghost::before {
+.btn--ghost::before,
+.btn--outline::before {
   background: var(--color-primary-glow);
 }
 
-.btn--ghost:hover {
+.btn--ghost:hover,
+.btn--outline:hover {
   border-color: var(--color-primary-light);
-  color: var(--color-primary-light);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
