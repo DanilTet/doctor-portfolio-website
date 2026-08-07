@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Гастроскопия в Харькове — врач-эндоскопист Тетерник О.А., 17-я городская больница (пр. Героев Харькова, 195). Видеогастроскопия под седацией. Запись через Telegram.">
+  <meta name="description" content="Гастроскопия в Харькове — врач-эндоскопист Тетерник Олег Александрович, 17-я городская больница (пр. Героев Харькова, 195). 8 лет опыта. Видеогастроскопия под седацией. Запись онлайн.">
   <meta name="author" content="Тетерник О.А.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Гастроскопия в Харькове — врач Тетерник О.А., 17-я больница">
-  <meta property="og:description" content="Где пройти гастроскопию в Харькове? Врач-эндоскопист Тетерник О.А. проводит видеогастроскопию на базе 17-й городской больницы. Возможна седация. Запись онлайн.">
+  <meta property="og:title" content="Гастроскопия в Харькове — врач Тетерник О.А., 17-я городская больница">
+  <meta property="og:description" content="Где сделать гастроскопию в Харькове? Врач-эндоскопист и хирург Тетерник О.А. — 8 лет опыта, большой поток эндоскопических процедур. Седация с анестезиологом. Запись через сайт или Telegram.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:url" content="https://endo.kh.ua/ru/gastroscopy-kharkiv/">
@@ -19,7 +19,7 @@
   <link rel="alternate" hreflang="ru" href="https://endo.kh.ua/ru/gastroscopy-kharkiv/" />
   <link rel="alternate" hreflang="x-default" href="https://endo.kh.ua/gastroscopy-kharkiv/" />
 
-  <title>Гастроскопия в Харькове — врач Тетерник О.А., 17-я больница | Запись онлайн</title>
+  <title>Гастроскопия в Харькове — врач-эндоскопист Тетерник О.А., 17-я больница | Запись онлайн</title>
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="canonical" href="https://endo.kh.ua/ru/gastroscopy-kharkiv/">
 
@@ -75,6 +75,7 @@
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
 
   <style>
+    /* Grid layouts */
     .local-info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -84,18 +85,19 @@
     @media (max-width: 600px) {
       .local-info-grid { grid-template-columns: 1fr; }
     }
+
+    /* Info blocks */
     .info-block {
       background: rgba(99, 102, 241, 0.04);
       border: 1px solid rgba(99, 102, 241, 0.15);
       border-radius: 12px;
       padding: 20px;
-      /* prevent overflow on narrow screens */
       min-width: 0;
       word-break: break-word;
     }
     .info-block--green {
-      background: rgba(16, 185, 129, 0.04);
-      border-color: rgba(16, 185, 129, 0.15);
+      background: rgba(16, 185, 129, 0.06);
+      border-color: rgba(16, 185, 129, 0.2);
     }
     .info-block h3 {
       margin-top: 0;
@@ -113,7 +115,118 @@
       line-height: 1.6;
       color: var(--color-text);
     }
-    /* 3-column examination grid */
+
+    /* Reasons grid */
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 560px) {
+      .reasons-grid { grid-template-columns: 1fr; }
+    }
+    .reason-card {
+      background: rgba(99, 102, 241, 0.04);
+      border: 1px solid rgba(99, 102, 241, 0.13);
+      border-radius: 12px;
+      padding: 18px;
+      min-width: 0;
+    }
+    .reason-card__icon {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      line-height: 1;
+      display: block;
+    }
+    .reason-card__title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-light);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .reason-card__text {
+      font-size: 0.88rem;
+      color: var(--color-text);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .stat-item {
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.18);
+      border-radius: 12px;
+      padding: 16px 20px;
+      flex: 1 1 140px;
+      min-width: 0;
+      text-align: center;
+    }
+    .stat-item__value {
+      display: block;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #10b981;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .stat-item__label {
+      font-size: 0.8rem;
+      color: var(--color-text);
+      line-height: 1.4;
+    }
+
+    /* Steps list */
+    .steps-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      counter-reset: steps;
+    }
+    .steps-list li {
+      counter-increment: steps;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .steps-list li:last-child { border-bottom: none; }
+    .steps-list li::before {
+      content: counter(steps);
+      min-width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(99,102,241,0.18);
+      color: var(--color-primary-light);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .steps-list li > div > strong {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--color-text-light);
+      margin-bottom: 4px;
+    }
+    .steps-list li > div > span {
+      font-size: 0.88rem;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    /* 3-column exam grid */
     .exam-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -133,18 +246,22 @@
         border-bottom: none;
       }
     }
+
+    /* Typography */
     .section-h2 {
       margin-top: 0;
       margin-bottom: 16px;
       font-weight: 700;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       color: var(--color-text-light);
       padding-bottom: 10px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .content-section {
-      margin-bottom: 40px;
+      margin-bottom: 44px;
     }
+
+    /* CTA block */
     .cta-block {
       background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%);
       border: 1px solid rgba(99, 102, 241, 0.2);
@@ -162,7 +279,7 @@
     .cta-block p {
       margin: 0 0 24px;
       color: var(--color-text);
-      max-width: 460px;
+      max-width: 480px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -172,13 +289,15 @@
       justify-content: center;
       flex-wrap: wrap;
     }
+
+    /* Internal link note */
     .internal-link-note {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 10px;
       padding: 18px 20px;
       margin-top: 32px;
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       line-height: 1.7;
       color: var(--color-text);
     }
@@ -189,19 +308,27 @@
     .internal-link-note a:hover {
       color: var(--color-primary-light);
     }
-    /* Mobile adjustments */
+
+    /* Mobile */
     @media (max-width: 480px) {
-      .cta-block {
-        padding: 24px 18px;
-      }
+      .cta-block { padding: 24px 16px; }
       .cta-buttons {
         flex-direction: column;
         align-items: stretch;
       }
-      .cta-buttons .btn {
+      .cta-buttons .btn,
+      .cta-buttons button.btn {
         width: 100%;
         justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
       }
+      .stat-item { flex: 1 1 100%; }
+    }
+    @media (max-width: 360px) {
+      .section-h2 { font-size: 1.15rem; }
+      .info-block { padding: 14px; }
+      .reason-card { padding: 14px; }
     }
   </style>
 </head>
@@ -228,7 +355,7 @@
             <a href="/gastroscopy-kharkiv/" class="lang-switch__btn">UA</a>
             <a href="/ru/gastroscopy-kharkiv/" class="lang-switch__btn active">RU</a>
           </div>
-          <a href="/#appointment-section" class="btn btn--primary header__cta open-booking-modal">Записаться на приём</a>
+          <a href="#appointment-section" class="btn btn--primary header__cta open-booking-modal">Записаться на приём</a>
         </div>
       </nav>
     </div>
@@ -244,7 +371,7 @@
         <span>К странице гастроскопии</span>
       </a>
       <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.2rem);">Гастроскопия в Харькове</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 760px;">Видеогастроскопия (ВГДС / ФГДС) на базе 17-й городской больницы. Обычная процедура или в условиях медикаментозного сна — на ваш выбор.</p>
+      <p class="section-subtitle" style="text-align: left; max-width: 760px;">Видеогастроскопия (ВГДС / ФГДС) у врача-эндоскописта Тетерника О.А. на базе 17-й городской больницы. Обычная процедура или в условиях медикаментозного сна — на ваш выбор.</p>
     </div>
   </section>
 
@@ -257,27 +384,12 @@
 
         <!-- Section 1: Intro -->
         <div class="content-section" id="intro">
-          <h2 class="section-h2">Гастроскопия в Харькове</h2>
-          <p style="margin-bottom: 16px;">
-            Если вы ищете, где пройти гастроскопию в Харькове — это можно сделать у врача-эндоскописта
-            <strong>Тетерника Олега Александровича</strong> на базе 17-й городской клинической больницы.
-            Здесь проводится видеогастроскопия (ВГДС) — современное эндоскопическое исследование верхних
-            отделов желудочно-кишечного тракта.
-          </p>
-          <p style="margin-bottom: 0;">
-            Подробную информацию о показаниях, подготовке и ходе процедуры вы найдёте на
-            <a href="/ru/gastroscopy/" style="color: var(--color-primary); text-decoration: underline;">странице о гастроскопии</a>.
-            На этой странице мы отвечаем на конкретный вопрос: <strong>где, у кого и как именно проводится
-            гастроскопия в Харькове</strong>.
-          </p>
-        </div>
-
-        <!-- Section 2: Where -->
-        <div class="content-section" id="where">
-          <h2 class="section-h2">Где проводится гастроскопия</h2>
+          <h2 class="section-h2">Где, у кого и как пройти гастроскопию в Харькове</h2>
           <p style="margin-bottom: 20px;">
-            Процедура проводится на базе <strong>17-й городской клинической больницы Харькова</strong> —
-            одного из крупнейших медицинских учреждений города.
+            Гастроскопию в Харькове проводит врач-эндоскопист и хирург
+            <strong>Тетерник Олег Александрович</strong> на базе
+            <strong>17-й городской клинической больницы</strong> (пр. Героев Харькова, 195).
+            Процедура доступна в стандартном формате или в условиях медикаментозного сна с участием анестезиолога.
           </p>
           <div class="local-info-grid">
             <div class="info-block">
@@ -295,58 +407,139 @@
               <p>
                 Telegram-бот:<br>
                 <a href="https://t.me/AppointmentEndoscopyBot" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: underline;">@AppointmentEndoscopyBot</a>
+                <br><br>или через форму ниже
               </p>
             </div>
           </div>
-          <p style="margin-bottom: 0; font-size: 0.95rem; color: var(--color-text);">
-            17-я больница — профильное учреждение, где эндоскопические исследования проводятся регулярно.
-            Именно сюда направляют пациентов с гастроэнтерологическими жалобами.
+          <p style="margin-bottom: 0; font-size: 0.95rem;">
+            Подробную информацию о показаниях, подготовке и ходе процедуры вы найдёте на
+            <a href="/ru/gastroscopy/" style="color: var(--color-primary); text-decoration: underline;">странице о гастроскопии</a>.
+            Эта страница отвечает на конкретный вопрос: <strong>где, у кого и как именно проводится
+            гастроскопия в Харькове</strong>.
           </p>
         </div>
 
-        <!-- Section 3: Who -->
-        <div class="content-section" id="who">
-          <h2 class="section-h2">Кто проводит гастроскопию</h2>
-          <div class="info-block" style="margin-bottom: 20px;">
-            <h3 style="font-size: 1.05rem; color: var(--color-text-light);">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Тетерник Олег Александрович
-            </h3>
+        <!-- Section 2: Why choose -->
+        <div class="content-section" id="why">
+          <h2 class="section-h2">Почему пациенты выбирают врача Тетерника</h2>
+          <p style="margin-bottom: 20px; font-size: 0.95rem; color: var(--color-text);">
+            Ниже — конкретные факты, а не рекламные фразы.
+          </p>
+          <div class="reasons-grid">
+            <div class="reason-card">
+              <span class="reason-card__icon">🎓</span>
+              <span class="reason-card__title">Врач-эндоскопист и хирург</span>
+              <p class="reason-card__text">Тетерник О.А. — хирург по базовому образованию. Эндоскопическими исследованиями занимался ещё во время интернатуры, что дало глубокое понимание хирургической анатомии.</p>
+            </div>
+            <div class="reason-card">
+              <span class="reason-card__icon">📅</span>
+              <span class="reason-card__title">8 лет практического опыта</span>
+              <p class="reason-card__text">Значительная часть опыта — ежедневная работа с пациентами в условиях профильного стационара на базе 17-й городской больницы.</p>
+            </div>
+            <div class="reason-card">
+              <span class="reason-card__icon">🔬</span>
+              <span class="reason-card__title">Не только диагностика</span>
+              <p class="reason-card__text">Как хирург-эндоскопист, врач при необходимости выполняет лечебные вмешательства непосредственно во время эндоскопического исследования — не только осматривает, но и действует.</p>
+            </div>
+            <div class="reason-card">
+              <span class="reason-card__icon">🤝</span>
+              <span class="reason-card__title">Ведение от начала до конца</span>
+              <p class="reason-card__text">Контролирует пациента от момента обращения до завершения процедуры. После исследования объясняет результаты и даёт рекомендации по дальнейшим действиям.</p>
+            </div>
+            <div class="reason-card">
+              <span class="reason-card__icon">📚</span>
+              <span class="reason-card__title">Постоянное повышение квалификации</span>
+              <p class="reason-card__text">Регулярно участвует в профильных медицинских конференциях. Есть постоянные пациенты, которые повторно обращаются и остаются на связи после процедур.</p>
+            </div>
+            <div class="reason-card">
+              <span class="reason-card__icon">💬</span>
+              <span class="reason-card__title">Удобная связь</span>
+              <p class="reason-card__text">Важные вопросы перед процедурой можно обсудить по телефону или через Telegram — чтобы прийти подготовленным и без лишних переживаний.</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- Section 4: How it works -->
+        <div class="content-section" id="how">
+          <h2 class="section-h2">Как проходит гастроскопия</h2>
+          <p style="margin-bottom: 20px;">
+            Пошагово — от записи до рекомендаций после процедуры.
+          </p>
+          <ul class="steps-list">
+            <li>
+              <div>
+                <strong>Запись</strong>
+                <span>Выберите удобное время через Telegram-бот или форму на сайте. Если есть важные вопросы — обсудите их заранее по телефону или в Telegram.</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Подготовка</strong>
+                <span>Стандартная гастроскопия требует голодания от 8 часов. Если планируете седацию — дополнительно нужно организовать сопровождение после процедуры.</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Приезд в больницу</strong>
+                <span>17-я городская клиническая больница, пр. Героев Харькова, 195. Врач ознакомится с вашими жалобами и анамнезом перед началом процедуры.</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Проведение исследования</strong>
+                <span>Само эндоскопическое исследование занимает в среднем 5–10 минут. При необходимости сразу выполняется прицельная биопсия или лечебное вмешательство.</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Медикаментозный сон (по показаниям)</strong>
+                <span>Если выбрана гастроскопия с седацией — анестезиолог вводит пациента в медикаментозный сон. Процедура выполняется, пока пациент спит. После пробуждения пациент остаётся под наблюдением.</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Рекомендации после процедуры</strong>
+                <span>Врач объясняет результаты, описывает находки и даёт чёткие рекомендации по дальнейшим действиям — что проверить, к кому обратиться, как питаться в ближайшее время.</span>
+              </div>
+            </li>
+          </ul>
+          <p style="margin-top: 16px; margin-bottom: 0; font-size: 0.92rem;">
+            С учётом подготовки и разговора после процедуры, в целом стоит рассчитывать на
+            <strong>30–40 минут</strong> пребывания.
+          </p>
+        </div>
+
+        <!-- Section 5: Sedation -->
+        <div class="content-section" id="sedation">
+          <h2 class="section-h2">Гастроскопия во сне (медикаментозная седация)</h2>
+          <div class="info-block info-block--green" style="margin-bottom: 20px;">
             <p>
-              Врач-эндоскопист, хирург, врач УЗИ. Специализируется на эндоскопических исследованиях
-              и малоинвазивных эндоскопических вмешательствах — гастроскопии, колоноскопии, ЭРХПГ.
-              8 лет опыта в эндоскопии и хирургии.
+              Да. Гастроскопия может проводиться <strong>в условиях медикаментозного сна (седации)</strong>
+              с участием анестезиолога. Пациент просто засыпает и не чувствует никакого дискомфорта
+              во время исследования. После пробуждения врач объясняет результаты и даёт рекомендации.
             </p>
           </div>
-          <p style="margin-bottom: 0;">
-            Главный приоритет врача — максимальная безопасность и комфорт пациента во время каждой процедуры.
-            Особое внимание уделяется пациентам, которые тревожатся перед обследованием: при наличии
-            медицинских показаний процедура может проводиться в условиях седации.
+          <p style="margin-bottom: 12px;">
+            Стандартная гастроскопия без седации проводится с использованием местного анестетика
+            (спрей лидокаина), что существенно снижает неприятные ощущения.
+          </p>
+          <p style="margin-bottom: 0; font-size: 0.95rem;">
+            Вопрос о целесообразности седации в вашем конкретном случае — медицинский. Уточните у врача
+            или заранее через Telegram. Подробнее о разнице между обоими вариантами
+            читайте в статье
+            <a href="/ru/articles/gastroskopiya-kolonoskopiya-uv-sni-chy-nazhyvo" style="color: var(--color-primary); text-decoration: underline;">гастроскопия в условиях медикаментозного сна</a>.
           </p>
         </div>
 
-        <!-- Section 4: Equipment -->
-        <div class="content-section" id="equipment">
-          <h2 class="section-h2">Какое оборудование используется</h2>
-          <p style="margin-bottom: 16px;">
-            Гастроскопия проводится на современном <strong>видеоэндоскопе</strong>, который позволяет получить
-            чёткое изображение слизистой оболочки желудочно-кишечного тракта и детально оценить состояние
-            слизистых пищевода, желудка и двенадцатиперстной кишки.
-          </p>
-          <p style="margin-bottom: 0;">
-            Видеоэндоскоп передаёт изображение на монитор в режиме реального времени, что позволяет врачу
-            выявить даже незначительные изменения и при необходимости выполнить прицельную биопсию или
-            удаление небольших образований непосредственно во время процедуры.
-          </p>
-        </div>
-
-        <!-- Section 5: What is examined -->
+        <!-- Section 6: What is examined -->
         <div class="content-section" id="examination">
           <h2 class="section-h2">Что обследуется во время гастроскопии</h2>
           <p style="margin-bottom: 16px;">
             Во время гастроскопии врач последовательно осматривает три отдела верхних отделов ЖКТ:
           </p>
-          <div class="info-block exam-grid" style="grid-column: 1 / -1; margin-bottom: 32px;">
+          <div class="info-block exam-grid" style="margin-bottom: 20px;">
               <div style="text-align: center; padding: 12px;">
                 <div style="font-size: 1.8rem; margin-bottom: 8px;">🔍</div>
                 <strong style="color: var(--color-text-light);">Пищевод</strong>
@@ -363,50 +556,49 @@
                 <p style="margin: 8px 0 0; font-size: 0.85rem;">Луковица и нисходящая часть</p>
               </div>
             </div>
-          <p style="margin-bottom: 0; margin-top: 16px;">
+          <p style="margin-bottom: 0;">
             Исследование позволяет выявить воспаление, эрозии, язвы, полипы, признаки рефлюкса,
             новообразования и другие изменения, которые не видны на УЗИ или рентгене. При необходимости
             сразу выполняется прицельная биопсия для лабораторного анализа.
           </p>
         </div>
 
-        <!-- Section 6: Sedation -->
-        <div class="content-section" id="sedation">
-          <h2 class="section-h2">Можно ли пройти гастроскопию с седацией</h2>
-          <div class="info-block info-block--green" style="margin-bottom: 16px;">
-            <p>
-              Да. Гастроскопия может проводиться <strong>в условиях медикаментозного сна (седации)</strong> —
-              пациент просто засыпает на время процедуры и не чувствует никакого дискомфорта.
-              При обычной процедуре используется местный анестетик (спрей лидокаина).
-            </p>
-          </div>
-          <p style="margin-bottom: 0;">
-            Подробно о разнице между гастроскопией «вживую» и в условиях седации, о подготовке
-            и о том, чего ожидать после процедуры — читайте в статье
-            <a href="/ru/articles/gastroskopiya-kolonoskopiya-uv-sni-chy-nazhyvo" style="color: var(--color-primary); text-decoration: underline;">гастроскопия в условиях медикаментозного сна</a>.
-          </p>
-        </div>
-
-        <!-- Section 7: Duration -->
-        <div class="content-section" id="duration">
-          <h2 class="section-h2">Сколько длится гастроскопия</h2>
+        <!-- Section 7: After procedure -->
+        <div class="content-section" id="after">
+          <h2 class="section-h2">После процедуры</h2>
           <p style="margin-bottom: 16px;">
-            Само эндоскопическое исследование занимает в среднем <strong>5–10 минут</strong>.
-            Если во время осмотра выявляется необходимость в биопсии или удалении небольших образований,
-            время может немного увеличиться.
+            Исследование не заканчивается в момент извлечения эндоскопа. После гастроскопии
+            врач <strong>лично объясняет находки</strong>: что выявлено, что это означает
+            и что делать дальше — к кому обратиться, какие анализы сдать, как питаться в ближайшее время.
           </p>
-          <p style="margin-bottom: 0;">
-            С учётом предварительной подготовки и разговора с врачом после процедуры,
-            в целом стоит рассчитывать на <strong>30–40 минут</strong> пребывания.
+          <p style="margin-bottom: 0; font-size: 0.95rem;">
+            У врача Тетерника есть постоянные пациенты, которые повторно обращаются после первой
+            процедуры и остаются на связи при возникновении вопросов. Это подход, при котором пациент
+            знает: обратиться с уточнением можно и после выхода из кабинета.
           </p>
         </div>
 
-        <!-- Section 8: CTA -->
+        <!-- Section 8: Equipment -->
+        <div class="content-section" id="equipment">
+          <h2 class="section-h2">Какое оборудование используется</h2>
+          <p style="margin-bottom: 16px;">
+            Гастроскопия проводится на современном <strong>видеоэндоскопе</strong>, который позволяет получить
+            чёткое изображение слизистой оболочки и детально оценить состояние пищевода, желудка
+            и двенадцатиперстной кишки.
+          </p>
+          <p style="margin-bottom: 0;">
+            Видеоэндоскоп передаёт изображение на монитор в режиме реального времени, что позволяет врачу
+            выявить даже незначительные изменения и при необходимости выполнить прицельную биопсию или
+            удаление небольших образований непосредственно во время процедуры.
+          </p>
+        </div>
+
+        <!-- Section 9: CTA -->
         <div class="cta-block" id="appointment-section">
-          <h2>Как записаться на гастроскопию</h2>
+          <h2>Как записаться на гастроскопию в Харькове</h2>
           <p>
-            Запись на приём осуществляется через Telegram-бот или форму на сайте.
-            Никаких очередей — удобное время выберете самостоятельно.
+            Запись через Telegram-бот или форму на сайте. Удобное время выберете самостоятельно.
+            Если есть вопросы перед записью — напишите или позвоните.
           </p>
           <div class="cta-buttons">
             <a href="https://t.me/AppointmentEndoscopyBot" class="btn btn--primary" target="_blank" rel="noopener noreferrer" id="cta-telegram">
@@ -416,7 +608,7 @@
               </svg>
               Записаться через Telegram-бот
             </a>
-            <a href="/#appointment-section" class="btn btn--outline open-booking-modal" id="cta-form">
+            <button type="button" class="btn btn--outline open-booking-modal" id="cta-form">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -424,15 +616,15 @@
                 <line x1="3" y1="10" x2="21" y2="10"></line>
               </svg>
               Заполнить форму на сайте
-            </a>
+            </button>
           </div>
         </div>
 
         <!-- Internal link note -->
         <div class="internal-link-note">
-          📋 Перед записью ознакомьтесь со страницей о гастроскопии —
+          📋 Перед записью ознакомьтесь со <a href="/ru/gastroscopy/">страницей о гастроскопии</a> —
           там подробно описаны показания к процедуре, правила подготовки, что взять с собой
-          и что делать после обследования.
+          и что делать после обследования. Отзывы пациентов — на <a href="/#reviews">главной странице</a>.
         </div>
 
       </div>
@@ -452,10 +644,10 @@
   <!-- ============================================================
        APPOINTMENT BOOKING MODAL
        ============================================================ -->
-  <div class="modal" id="appointment-modal" aria-hidden="true" role="dialog">
+  <div class="modal" id="appointment-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title-ru">
     <div class="modal__overlay" data-modal-close=""></div>
     <div class="modal__window modal__window--form" style="max-width: 480px;">
-      <button class="modal__close" data-modal-close="" aria-label="Close modal">
+      <button class="modal__close" data-modal-close="" aria-label="Закрыть окно">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -463,7 +655,7 @@
       </button>
 
       <div class="modal__header" style="text-align: center; margin-bottom: 24px;">
-        <h3 class="modal__title">Запись на приём</h3>
+        <h3 class="modal__title" id="modal-title-ru">Запись на приём</h3>
         <p class="modal__subtitle" style="margin-top: 8px;">Выберите удобный для вас способ записи</p>
       </div>
 
@@ -518,6 +710,13 @@
           modal.classList.remove('modal--active');
           modal.setAttribute('aria-hidden', 'true');
         });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('modal--active')) {
+          modal.classList.remove('modal--active');
+          modal.setAttribute('aria-hidden', 'true');
+        }
       });
     });
   </script>
