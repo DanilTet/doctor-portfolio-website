@@ -57,15 +57,25 @@
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
 
   <style>
+    body { overflow-x: hidden; }
     .uzd-hero-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
       gap: 16px;
+      width: 100%;
       max-width: 680px;
       margin-top: 28px;
+      box-sizing: border-box;
     }
-    @media (max-width: 560px) {
-      .uzd-hero-grid { grid-template-columns: 1fr; max-width: 100%; }
+    .uzd-hero-grid > div {
+      min-width: 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      box-sizing: border-box;
+    }
+    @media (min-width: 600px) {
+      .uzd-hero-grid { flex-direction: row; }
+      .uzd-hero-grid > div { flex: 1; }
     }
   </style>
 </head>
@@ -103,7 +113,7 @@
   <!-- ============================================================
        HERO SECTION
        ============================================================ -->
-  <section class="section" style="padding-top: 140px; padding-bottom: 60px; overflow: hidden; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
+  <section class="section" style="padding-top: 140px; padding-bottom: 60px; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
     <div class="container">
       <a href="/" class="btn btn--ghost" style="margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
