@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ru"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" data-i18n-content="service.uzd.meta.desc" content="УЗИ (ультразвуковая диагностика) на базе 17-й городской больницы Харькова. Врач Тетерник О.А. — УЗИ брюшной полости, почек, щитовидной железы в Харькове.">
+  <meta name="description" data-i18n-content="service.uzd.meta.desc" content="УЗИ в Харькове — врач Тетерник О.А. на базе 17-й городской больницы (пр. Героев Харькова, 195). УЗИ брюшной полости, почек, щитовидной железы. Запись онлайн.">
   <meta name="keywords" data-i18n-content="service.uzd.meta.keywords" content="УЗИ Харьков, УЗИ брюшной полости, УЗИ 17 больница, ультразвуковая диагностика Харьков, подготовка к узи, УЗИ почек, УЗИ щитовидной железы, Тетерник Олег">
   <meta name="author" content="Тетерник О.А.">
 
@@ -19,7 +19,7 @@
   <link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/uzd/" />
   <link rel="alternate" hreflang="x-default" href="https://endo.kh.ua/uzd/" />
 
-  <title data-i18n="service.uzd.meta.title">УЗИ (ультразвуковая диагностика) в Харькове — 17-я больница | Врач Тетерник О.А.</title>
+  <title data-i18n="service.uzd.meta.title">УЗИ в Харькове — врач Тетерник О.А., 17-я городская больница</title>
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="canonical" href="https://endo.kh.ua/ru/uzd/">
 
@@ -55,6 +55,19 @@
   <link rel="stylesheet" href="/css/styles.css?v=2.0">
   <link rel="stylesheet" href="/css/animations.css?v=2.0">
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
+
+  <style>
+    .uzd-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 680px;
+      margin-top: 28px;
+    }
+    @media (max-width: 560px) {
+      .uzd-hero-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -96,8 +109,24 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Назад на главную</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">УЗИ (Ультразвуковая диагностика)</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.uzd.subtitle">Безопасный, безболезненный и точный метод оценки внутренних органов.</p>
+      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">УЗИ в Харькове</h1>
+      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.uzd.subtitle">Ультразвуковая диагностика у врача Тетерника Олега Александровича на базе 17-й городской клинической больницы.</p>
+
+      <!-- Коммерческий блок: место, врач, запись -->
+      <div class="uzd-hero-grid">
+        <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 12px; padding: 20px;">
+          <p style="margin: 0 0 4px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-primary); opacity: 0.85;">Место проведения</p>
+          <p style="margin: 0 0 10px; font-size: 0.95rem; line-height: 1.6; color: var(--color-text-light);">17-я городская клиническая больница<br>г. Харьков, пр. Героев Харькова, 195</p>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--color-text);">Врач: <strong>Тетерник Олег Александрович</strong><br>эндоскопист, хирург, врач УЗИ</p>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.18); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+          <div>
+            <p style="margin: 0 0 4px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #10b981; opacity: 0.9;">Запись</p>
+            <p style="margin: 0; font-size: 0.93rem; line-height: 1.6; color: var(--color-text-light);">Через Telegram-бот или форму на сайте</p>
+          </div>
+          <a href="/#appointment-section" class="btn btn--primary open-booking-modal" style="text-align: center; width: 100%; box-sizing: border-box;">Записаться на УЗИ</a>
+        </div>
+      </div>
     </div>
   </section>
 
