@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="uk"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" data-i18n-content="service.uzd.meta.desc" content="УЗД (ультразвукова діагностика) на базі 17-ї міської лікарні Харкова. Лікар Тетернік О.О. — УЗД черевної порожнини, нирок, щитовидної залози в Харкові.">
+  <meta name="description" data-i18n-content="service.uzd.meta.desc" content="УЗД у Харкові — лікар Тетернік О.О. на базі 17-ї міської лікарні (пр. Героїв Харкова, 195). УЗД черевної порожнини, нирок, щитовидної залози. Запис онлайн.">
   <meta name="keywords" data-i18n-content="service.uzd.meta.keywords" content="УЗД Харків, УЗД черевної порожнини, УЗД 17 лікарня, ультразвукова діагностика Харків, підготовка до узд, УЗД нирок, УЗД щитовидної залози, Тетернік Олег">
   <meta name="author" content="Тетернік О.О.">
 
@@ -19,7 +19,7 @@
   <link rel="alternate" hreflang="en" href="https://endo.kh.ua/en/uzd/" />
   <link rel="alternate" hreflang="x-default" href="https://endo.kh.ua/uzd/" />
 
-  <title data-i18n="service.uzd.meta.title">УЗД (ультразвукова діагностика) в Харкові — 17-а лікарня | Лікар Тетернік О.О.</title>
+  <title data-i18n="service.uzd.meta.title">УЗД у Харкові — лікар Тетернік О.О., 17-а міська лікарня</title>
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="canonical" href="https://endo.kh.ua/uzd/">
 
@@ -55,6 +55,19 @@
   <link rel="stylesheet" href="/css/styles.css?v=2.0">
   <link rel="stylesheet" href="/css/animations.css?v=2.0">
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
+
+  <style>
+    .uzd-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 680px;
+      margin-top: 28px;
+    }
+    @media (max-width: 560px) {
+      .uzd-hero-grid { grid-template-columns: 1fr; max-width: 100%; }
+    }
+  </style>
 </head>
 <body>
 
@@ -90,14 +103,30 @@
   <!-- ============================================================
        HERO SECTION
        ============================================================ -->
-  <section class="section" style="padding-top: 140px; padding-bottom: 60px; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
+  <section class="section" style="padding-top: 140px; padding-bottom: 60px; overflow: hidden; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
     <div class="container">
       <a href="/" class="btn btn--ghost" style="margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Назад на головну</span>
       </a>
-      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">УЗД (Ультразвукова діагностика)</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.uzd.subtitle">Безпечний, безболісний та точний метод оцінки внутрішніх органів.</p>
+      <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">УЗД у Харкові</h1>
+      <p class="section-subtitle" style="text-align: left; max-width: 800px; overflow-wrap: break-word; word-break: break-word;" data-i18n="service.uzd.subtitle">Ультразвукова діагностика у лікаря Тетерніка Олега Олександровича на базі 17-ї міської клінічної лікарні.</p>
+
+      <!-- Комерційний блок: місце, лікар, запис -->
+      <div class="uzd-hero-grid">
+        <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 12px; padding: 20px;">
+          <p style="margin: 0 0 4px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-primary); opacity: 0.85;">Місце проведення</p>
+          <p style="margin: 0 0 10px; font-size: 0.95rem; line-height: 1.6; color: var(--color-text-light);">17-а міська клінічна лікарня<br>м. Харків, пр. Героїв Харкова, 195</p>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--color-text);"> Лікар: <strong>Тетернік Олег Олександрович</strong><br>ендоскопіст, хірург, лікар УЗД</p>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.18); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+          <div>
+            <p style="margin: 0 0 4px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #10b981; opacity: 0.9;">Запис</p>
+            <p style="margin: 0; font-size: 0.93rem; line-height: 1.6; color: var(--color-text-light);">Через Telegram-бот або форму на сайті</p>
+          </div>
+          <a href="/#appointment-section" class="btn btn--primary open-booking-modal" style="text-align: center; width: 100%; box-sizing: border-box;">Записатися на УЗД</a>
+        </div>
+      </div>
     </div>
   </section>
 

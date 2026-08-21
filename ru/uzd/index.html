@@ -65,7 +65,7 @@
       margin-top: 28px;
     }
     @media (max-width: 560px) {
-      .uzd-hero-grid { grid-template-columns: 1fr; }
+      .uzd-hero-grid { grid-template-columns: 1fr; max-width: 100%; }
     }
   </style>
 </head>
@@ -103,14 +103,14 @@
   <!-- ============================================================
        HERO SECTION
        ============================================================ -->
-  <section class="section" style="padding-top: 140px; padding-bottom: 60px; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
+  <section class="section" style="padding-top: 140px; padding-bottom: 60px; overflow: hidden; background: radial-gradient(120% 120% at 50% 10%, #151a26 0%, #0a0d14 100%);">
     <div class="container">
       <a href="/" class="btn btn--ghost" style="margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span data-i18n="service.back">Назад на главную</span>
       </a>
       <h1 class="section-title" style="text-align: left; margin-bottom: 16px; font-size: clamp(2rem, 5vw, 3.5rem);" data-i18n="service.uzd.title">УЗИ в Харькове</h1>
-      <p class="section-subtitle" style="text-align: left; max-width: 800px;" data-i18n="service.uzd.subtitle">Ультразвуковая диагностика у врача Тетерника Олега Александровича на базе 17-й городской клинической больницы.</p>
+      <p class="section-subtitle" style="text-align: left; max-width: 800px; overflow-wrap: break-word; word-break: break-word;" data-i18n="service.uzd.subtitle">Ультразвуковая диагностика у врача Тетерника Олега Александровича на базе 17-й городской клинической больницы.</p>
 
       <!-- Коммерческий блок: место, врач, запись -->
       <div class="uzd-hero-grid">
