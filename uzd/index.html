@@ -57,14 +57,13 @@
   <link rel="stylesheet" href="/css/blog.css?v=2.0">
 
   <style>
-    body { overflow-x: hidden; }
     .uzd-hero-grid {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       width: 100%;
       max-width: 680px;
-      margin-top: 28px;
+      margin-top: 24px;
       box-sizing: border-box;
     }
     .uzd-hero-grid > div {
@@ -72,10 +71,11 @@
       word-break: break-word;
       overflow-wrap: break-word;
       box-sizing: border-box;
+      padding: 16px !important;
     }
-    @media (min-width: 600px) {
-      .uzd-hero-grid { flex-direction: row; }
-      .uzd-hero-grid > div { flex: 1; }
+    @media (min-width: 720px) {
+      .uzd-hero-grid { flex-direction: row; gap: 16px; }
+      .uzd-hero-grid > div { flex: 1; padding: 20px !important; }
     }
   </style>
 </head>
