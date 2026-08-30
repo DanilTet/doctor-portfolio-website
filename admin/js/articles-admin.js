@@ -219,6 +219,7 @@
           </button>
           <span class="article-editor-title">${isNew ? '✚ Нова стаття' : '✎ Редагувати статтю'}</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto">
+            <button id="art-ai-btn" class="btn btn--ai btn--sm" title="Автоматично згенерувати або доповнити статтю за допомогою Google Gemini">✨ ШІ Генератор</button>
             <button id="art-save-draft-btn" class="btn btn--outline btn--sm">${isNew ? '💾 Зберегти чернетку' : '💾 Зберегти як чернетку'}</button>
             <button id="art-publish-btn" class="btn btn--primary btn--sm">${isNew ? '🚀 Опублікувати статтю' : '💾 Зберегти зміни'}</button>
             ${!isNew ? `<button id="art-translate-btn" class="btn btn--secondary btn--sm" style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">🇷🇺 Перевести на RU</button>` : ''}
@@ -361,6 +362,7 @@
       <div class="card">
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end">
           <div id="art-feedback-bottom" class="article-feedback" style="flex:1"></div>
+          <button id="art-ai-btn2" class="btn btn--ai" title="Автоматично згенерувати через ШІ">✨ ШІ Генератор</button>
           <button id="art-save-draft-btn2" class="btn btn--outline">${isNew ? '💾 Зберегти чернетку' : '💾 Зберегти як чернетку'}</button>
           <button id="art-publish-btn2" class="btn btn--primary">${isNew ? '🚀 Опублікувати статтю' : '💾 Зберегти зміни'}</button>
           ${!isNew ? `<button id="art-translate-btn2" class="btn btn--secondary" style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">🇷🇺 Перевести на RU</button>` : ''}
@@ -480,8 +482,10 @@
     const removeCoverBtn = getEl('art-remove-cover');
     if (removeCoverBtn) removeCoverBtn.addEventListener('click', removeCover);
 
-    // Save / Publish buttons (both top + bottom)
+    // Save / Publish / AI buttons (both top + bottom)
     const bindBtn = (id, fn) => { const el = getEl(id); if (el) el.addEventListener('click', fn); };
+    bindBtn('art-ai-btn',          () => openAiGenerateModal());
+    bindBtn('art-ai-btn2',         () => openAiGenerateModal());
     bindBtn('art-save-draft-btn',  () => saveArticle('draft'));
     bindBtn('art-save-draft-btn2', () => saveArticle('draft'));
     bindBtn('art-publish-btn',     () => saveAndPublish());
@@ -1394,8 +1398,203 @@
     return str.toLowerCase().split('').map(c => map[c] !== undefined ? map[c] : (/[a-z0-9]/.test(c) ? c : (/\s/.test(c) ? '-' : ''))).join('').replace(/-+/g, '-').replace(/^-|-$/g, '');
   }
 
+  /* ── AI Generator Modal ──────────────────────────────────── */
+
+  function openAiGenerateModal() {
+    // Remove any existing AI modal
+    const existing = document.getElementById('ai-article-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'ai-article-modal';
+    modal.className = 'ai-modal';
+    modal.innerHTML = `
+      <div class="ai-modal__overlay"></div>
+      <div class="ai-modal__window">
+        <div class="ai-modal__header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">✨</span>
+            <span style="font-weight:700;font-size:16px;color:var(--text-primary)">Генерація статті через ШІ</span>
+            <span style="font-size:11px;background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);padding:2px 6px;border-radius:4px;font-weight:600">Google Gemini</span>
+          </div>
+          <button class="ai-modal__close btn btn--ghost btn--sm" title="Закрити" style="font-size:16px">✕</button>
+        </div>
+
+        <div class="ai-modal__body" id="ai-modal-body-content">
+          <div style="font-size:13px;line-height:1.5;color:var(--text-muted);margin-bottom:16px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:10px;padding:12px 14px">
+            💡 <strong>Як це працює:</strong> Вставте будь-який сирий текст (пост з Instagram, чернетку або тези). ШІ автоматично створить заголовок, структуру розділів, форматування (**жирний**, *курсив*, списки), SEO-опис, блок FAQ, вибере теги та <strong>розставить посилання на інші статті вашого сайту</strong>.
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label" for="ai-raw-text">Вхідний текст або пост з Instagram <span style="color:var(--danger)">*</span></label>
+            <textarea id="ai-raw-text" class="form-input" rows="8" placeholder="Вставте текст поста або чернетки сюди..." style="resize:vertical;font-size:13px;line-height:1.6"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="ai-topic-select">Пріоритетна тема (необов'язково)</label>
+            <select id="ai-topic-select" class="form-input" style="cursor:pointer">
+              <option value="">Автоматично (на розсуд ШІ)</option>
+              <option value="Гастроскопія">Гастроскопія</option>
+              <option value="Колоноскопія">Колоноскопія</option>
+              <option value="Підготовка">Підготовка</option>
+              <option value="Поліпи">Поліпи</option>
+              <option value="УЗД">УЗД</option>
+              <option value="ЕРХПГ">ЕРХПГ</option>
+              <option value="Хірургія">Хірургія</option>
+              <option value="Онкологія">Онкологія</option>
+            </select>
+          </div>
+
+          <div id="ai-modal-error" style="display:none;color:var(--danger);font-size:13px;font-weight:600;margin-top:14px;padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px"></div>
+        </div>
+
+        <div class="ai-modal__footer" id="ai-modal-footer-content">
+          <button id="ai-cancel-btn" class="btn btn--ghost">Скасувати</button>
+          <button id="ai-submit-btn" class="btn btn--ai">
+            <span>🚀</span>
+            <span>Згенерувати статтю</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const rawInput = modal.querySelector('#ai-raw-text');
+    const topicSelect = modal.querySelector('#ai-topic-select');
+    const submitBtn = modal.querySelector('#ai-submit-btn');
+    const cancelBtn = modal.querySelector('#ai-cancel-btn');
+    const closeBtn = modal.querySelector('.ai-modal__close');
+    const overlay = modal.querySelector('.ai-modal__overlay');
+    const errorEl = modal.querySelector('#ai-modal-error');
+    const bodyContent = modal.querySelector('#ai-modal-body-content');
+    const footerContent = modal.querySelector('#ai-modal-footer-content');
+
+    const closeModal = () => {
+      modal.classList.remove('ai-modal--open');
+      setTimeout(() => modal.remove(), 250);
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    submitBtn.addEventListener('click', async () => {
+      const textVal = rawInput.value.trim();
+      if (!textVal) {
+        errorEl.textContent = '⚠️ Будь ласка, вставте текст статті або поста для обробки.';
+        errorEl.style.display = 'block';
+        rawInput.focus();
+        return;
+      }
+
+      errorEl.style.display = 'none';
+
+      // Switch modal to loading view
+      bodyContent.innerHTML = `
+        <div class="ai-loading-overlay">
+          <div class="ai-spinner"></div>
+          <div class="ai-status-text" id="ai-status-text">🧠 ШІ аналізує текст та медичний контекст...</div>
+          <div class="ai-status-subtext">Зазвичай це займає 3–5 секунд</div>
+        </div>
+      `;
+      footerContent.style.display = 'none';
+
+      // Progressive status updates
+      const statusEl = modal.querySelector('#ai-status-text');
+      const t1 = setTimeout(() => { if (statusEl) statusEl.textContent = '🔍 Підбирає релевантні статті для внутрішньої перелінковки...'; }, 1800);
+      const t2 = setTimeout(() => { if (statusEl) statusEl.textContent = '✍️ Формує розділи, FAQ, виділення та SEO-опис...'; }, 3500);
+
+      try {
+        const res = await fetch('/api/articles/ai-generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Blog-Secret': SECRET()
+          },
+          body: JSON.stringify({
+            text: textVal,
+            topicHint: topicSelect.value
+          })
+        });
+
+        clearTimeout(t1);
+        clearTimeout(t2);
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+
+        const generated = data.article;
+        closeModal();
+
+        // Apply to editor
+        const isEditingExisting = currentArticle && !currentArticle.isNew;
+        const currentCover = currentArticle ? currentArticle.image_card : null;
+        const currentId = currentArticle ? currentArticle.id : null;
+        const currentDate = currentArticle ? currentArticle.date : new Date().toISOString();
+
+        const generatedId = currentId || ((window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('art-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9)));
+
+        currentArticle = {
+          id: generatedId,
+          title: generated.title || '',
+          subtitle: generated.subtitle || '',
+          seo_description: generated.seo_description || '',
+          slug: generated.slug || '',
+          tags: generated.tags || [],
+          image_card: currentCover,
+          sections: generated.sections || [],
+          faq: generated.faq || [],
+          related_articles: generated.related_articles || [],
+          internal_links: [],
+          show_final_cta: true,
+          show_in_blog: true,
+          date: currentDate,
+          isNew: !isEditingExisting
+        };
+
+        sectionCounter = 0;
+        faqCounter = 0;
+        showView('editor');
+        buildEditorForm(currentArticle);
+
+        showFeedback('✨ Статтю успішно згенеровано за допомогою ШІ! Перевірте дані, завантажте обкладинку та збережіть.', 'success');
+      } catch (err) {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        console.error('[AI Modal Error]:', err);
+        // Restore form with error
+        openAiGenerateModal();
+        const newModal = document.getElementById('ai-article-modal');
+        if (newModal) {
+          const errBox = newModal.querySelector('#ai-modal-error');
+          const inputArea = newModal.querySelector('#ai-raw-text');
+          if (inputArea) inputArea.value = textVal;
+          if (errBox) {
+            errBox.textContent = `❌ Помилка: ${err.message}`;
+            errBox.style.display = 'block';
+          }
+        }
+      }
+    });
+
+    // ESC to close
+    function onKeydown(e) {
+      if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', onKeydown); }
+    }
+    document.addEventListener('keydown', onKeydown);
+
+    requestAnimationFrame(() => {
+      modal.classList.add('ai-modal--open');
+      rawInput.focus();
+    });
+  }
+
   /* ── Expose global helpers ──────────────────────────────── */
   window.openNewArticleEditor = function () { openEditor(null); };
+  window.openAiGenerateModal = openAiGenerateModal;
 
   window.downloadFullBackup = function () {
     fetch('/api/backup/full', { headers: { 'X-Blog-Secret': SECRET() } })

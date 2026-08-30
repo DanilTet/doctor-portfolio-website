@@ -26,6 +26,7 @@ try {
 
 const { writeArticleHtml } = require('./utils/article-renderer');
 const { translateArticle } = require('./utils/article-translator');
+const { generateArticleWithAi } = require('./utils/ai-generator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1299,6 +1300,52 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
   } catch (err) {
     console.error('[Articles API] Translation error:', err.message);
     res.status(500).json({ error: `Ошибка перевода: ${err.message}` });
+  }
+});
+
+/**
+ * POST /api/articles/ai-generate
+ * Generate structured article data using Google Gemini API.
+ */
+app.post('/api/articles/ai-generate', authGuard, async (req, res) => {
+  const { text, topicHint, apiKey } = req.body || {};
+  if (!text || !text.trim()) {
+    return res.status(400).json({ error: 'Текст для генерації обов\'язковий (порожній вхідний текст).' });
+  }
+
+  try {
+    const existingArticles = readArticles();
+    console.log(`[Articles API] Generating article with AI (raw text length: ${text.length})...`);
+
+    const articleData = await generateArticleWithAi({
+      rawText: text,
+      topicHint,
+      existingArticles,
+      apiKey
+    });
+
+    console.log(`[Articles API] AI generated article: "${articleData.title}" (slug: ${articleData.slug})`);
+    res.json({ ok: true, article: articleData });
+  } catch (err) {
+    console.error('[Articles API] AI generation error:', err.message);
+
+    if (err.message === 'GEMINI_API_KEY_MISSING') {
+      return res.status(400).json({
+        error: 'API-ключ Google Gemini не налаштовано. Додайте GEMINI_API_KEY у файл server/.env.'
+      });
+    }
+    if (err.message === 'GEMINI_API_KEY_INVALID') {
+      return res.status(400).json({
+        error: 'Недійсний API-ключ Google Gemini. Перевірте ключ у файлі server/.env.'
+      });
+    }
+    if (err.message === 'GEMINI_QUOTA_EXCEEDED') {
+      return res.status(429).json({
+        error: 'Перевищено ліміт запитів Google Gemini API (Quota exceeded). Спробуйте пізніше.'
+      });
+    }
+
+    res.status(500).json({ error: `Помилка генерації через ШІ: ${err.message}` });
   }
 });
 
