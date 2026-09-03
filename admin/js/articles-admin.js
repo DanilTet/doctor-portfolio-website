@@ -1430,7 +1430,7 @@
             <textarea id="ai-raw-text" class="form-input" rows="8" placeholder="Вставте текст поста або чернетки сюди..." style="resize:vertical;font-size:13px;line-height:1.6"></textarea>
           </div>
 
-          <div class="form-group" style="margin-bottom:0">
+          <div class="form-group" style="margin-bottom:14px">
             <label class="form-label" for="ai-topic-select">Пріоритетна тема (необов'язково)</label>
             <select id="ai-topic-select" class="form-input" style="cursor:pointer">
               <option value="">Автоматично (на розсуд ШІ)</option>
@@ -1443,6 +1443,29 @@
               <option value="Хірургія">Хірургія</option>
               <option value="Онкологія">Онкологія</option>
             </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label" for="ai-model-select">Модель Google Gemini</label>
+            <select id="ai-model-select" class="form-input" style="cursor:pointer">
+              <option value="gemini-3.6-flash">Gemini 3.6 Flash (Рекомендовано Google)</option>
+              <option value="gemini-3.7-flash">Gemini 3.7 Flash (Новітня модель)</option>
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Швидка версія)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:0">
+            <details id="ai-api-key-details" style="font-size:12px;color:var(--text-muted);background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+              <summary style="cursor:pointer;color:var(--text-secondary);font-weight:600;user-select:none">
+                🔑 Власний API-ключ Gemini (необов'язково)
+              </summary>
+              <div style="margin-top:8px">
+                <input type="password" id="ai-custom-key" class="form-input" placeholder="AIzaSy... (якщо не вказано на сервері в .env)" style="font-size:12px;padding:6px 10px;font-family:monospace">
+                <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+                  Якщо вказати тут, ключ збережеться у вашому браузері і буде передаватися у запиті.
+                </div>
+              </div>
+            </details>
           </div>
 
           <div id="ai-modal-error" style="display:none;color:var(--danger);font-size:13px;font-weight:600;margin-top:14px;padding:10px 14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px"></div>
@@ -1462,6 +1485,8 @@
 
     const rawInput = modal.querySelector('#ai-raw-text');
     const topicSelect = modal.querySelector('#ai-topic-select');
+    const modelSelect = modal.querySelector('#ai-model-select');
+    const customKeyInput = modal.querySelector('#ai-custom-key');
     const submitBtn = modal.querySelector('#ai-submit-btn');
     const cancelBtn = modal.querySelector('#ai-cancel-btn');
     const closeBtn = modal.querySelector('.ai-modal__close');
@@ -1469,6 +1494,18 @@
     const errorEl = modal.querySelector('#ai-modal-error');
     const bodyContent = modal.querySelector('#ai-modal-body-content');
     const footerContent = modal.querySelector('#ai-modal-footer-content');
+
+    // Restore saved model & key from localStorage
+    try {
+      const savedModel = localStorage.getItem('ai_gemini_model');
+      if (savedModel && modelSelect) modelSelect.value = savedModel;
+      const savedKey = localStorage.getItem('ai_gemini_key');
+      if (savedKey && customKeyInput) {
+        customKeyInput.value = savedKey;
+        const keyDetails = modal.querySelector('#ai-api-key-details');
+        if (keyDetails) keyDetails.open = true;
+      }
+    } catch (_) {}
 
     const closeModal = () => {
       modal.classList.remove('ai-modal--open');
@@ -1489,6 +1526,16 @@
       }
 
       errorEl.style.display = 'none';
+
+      // Save model and key preferences
+      try {
+        if (modelSelect) localStorage.setItem('ai_gemini_model', modelSelect.value);
+        if (customKeyInput) {
+          const val = customKeyInput.value.trim();
+          if (val) localStorage.setItem('ai_gemini_key', val);
+          else localStorage.removeItem('ai_gemini_key');
+        }
+      } catch (_) {}
 
       // Switch modal to loading view
       bodyContent.innerHTML = `
@@ -1514,7 +1561,9 @@
           },
           body: JSON.stringify({
             text: textVal,
-            topicHint: topicSelect.value
+            topicHint: topicSelect.value,
+            model: modelSelect ? modelSelect.value : 'gemini-3.6-flash',
+            apiKey: (customKeyInput ? customKeyInput.value.trim() : '') || undefined
           })
         });
 

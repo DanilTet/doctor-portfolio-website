@@ -7,7 +7,7 @@
 
 const fetch = require('node-fetch');
 
-const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash';
+const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const ALLOWED_TAGS = ['Гастроскопія', 'Колоноскопія', 'УЗД', 'ЕРХПГ', 'Підготовка', 'Хірургія', 'Поліпи', 'Онкологія'];
 
 /**
@@ -18,9 +18,10 @@ const ALLOWED_TAGS = ['Гастроскопія', 'Колоноскопія', '�
  * @param {string} [params.topicHint] - Optional topic hint (e.g. 'Гастроскопія')
  * @param {Array<object>} [params.existingArticles] - Array of existing articles for internal linking
  * @param {string} [params.apiKey] - Optional explicit Gemini API key (defaults to process.env.GEMINI_API_KEY)
+ * @param {string} [params.model] - Optional Gemini model name (defaults to GEMINI_MODEL or gemini-3.6-flash)
  * @returns {Promise<object>} Generated article data formatted for articles-admin editor
  */
-async function generateArticleWithAi({ rawText, topicHint, existingArticles = [], apiKey }) {
+async function generateArticleWithAi({ rawText, topicHint, existingArticles = [], apiKey, model }) {
   const key = apiKey || process.env.GEMINI_API_KEY;
 
   if (!key) {
@@ -136,33 +137,69 @@ ${rawText}
     }
   };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    timeout: 45000
+  const requestedModel = model || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+  const candidateModels = [requestedModel];
+  ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'].forEach(m => {
+    if (!candidateModels.includes(m)) candidateModels.push(m);
   });
 
-  if (!response.ok) {
-    let errorDetails = '';
+  let response = null;
+  let lastErrorDetails = '';
+  let usedModel = requestedModel;
+
+  for (const currentModel of candidateModels) {
+    usedModel = currentModel;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${encodeURIComponent(key)}`;
     try {
-      const errJson = await response.json();
-      errorDetails = errJson.error ? errJson.error.message : JSON.stringify(errJson);
-    } catch (_) {
-      errorDetails = await response.text();
-    }
+      response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        timeout: 45000
+      });
 
-    if (response.status === 400 && errorDetails.includes('API_KEY_INVALID')) {
-      throw new Error('GEMINI_API_KEY_INVALID');
-    }
-    if (response.status === 429 || errorDetails.includes('RESOURCE_EXHAUSTED')) {
-      throw new Error('GEMINI_QUOTA_EXCEEDED');
-    }
+      if (response.ok) {
+        break;
+      }
 
-    throw new Error(`Gemini API Error (HTTP ${response.status}): ${errorDetails}`);
+      let errorDetails = '';
+      try {
+        const errJson = await response.json();
+        errorDetails = errJson.error ? errJson.error.message : JSON.stringify(errJson);
+      } catch (_) {
+        errorDetails = await response.text();
+      }
+
+      lastErrorDetails = errorDetails;
+
+      if (response.status === 400 && errorDetails.includes('API_KEY_INVALID')) {
+        throw new Error('GEMINI_API_KEY_INVALID');
+      }
+      if (response.status === 429 || errorDetails.includes('RESOURCE_EXHAUSTED')) {
+        throw new Error('GEMINI_QUOTA_EXCEEDED');
+      }
+
+      if (response.status === 404) {
+        console.warn(`[AiGenerator] Model "${currentModel}" returned 404 (${errorDetails}). Trying fallback...`);
+        continue;
+      }
+
+      throw new Error(`Gemini API Error (HTTP ${response.status}): ${errorDetails}`);
+    } catch (networkErr) {
+      if (networkErr.message === 'GEMINI_API_KEY_INVALID' || networkErr.message === 'GEMINI_QUOTA_EXCEEDED') {
+        throw networkErr;
+      }
+      if (candidateModels.indexOf(currentModel) === candidateModels.length - 1) {
+        throw networkErr;
+      }
+    }
   }
+
+  if (!response || !response.ok) {
+    throw new Error(`Gemini API Error: Не вдалося звернутися до жодної з моделей Gemini (${candidateModels.join(', ')}). Деталі: ${lastErrorDetails}`);
+  }
+
+  console.log(`[AiGenerator] Successfully generated content using model: ${usedModel}`);
 
   const resultData = await response.json();
 

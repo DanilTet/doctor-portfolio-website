@@ -1308,7 +1308,7 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
  * Generate structured article data using Google Gemini API.
  */
 app.post('/api/articles/ai-generate', authGuard, async (req, res) => {
-  const { text, topicHint, apiKey } = req.body || {};
+  const { text, topicHint, apiKey, model } = req.body || {};
   if (!text || !text.trim()) {
     return res.status(400).json({ error: 'Текст для генерації обов\'язковий (порожній вхідний текст).' });
   }
@@ -1321,7 +1321,8 @@ app.post('/api/articles/ai-generate', authGuard, async (req, res) => {
       rawText: text,
       topicHint,
       existingArticles,
-      apiKey
+      apiKey,
+      model
     });
 
     console.log(`[Articles API] AI generated article: "${articleData.title}" (slug: ${articleData.slug})`);
