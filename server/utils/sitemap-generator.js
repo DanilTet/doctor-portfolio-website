@@ -72,7 +72,7 @@ function generateSitemap() {
 
       const urlPath = isCore
         ? `${slug}/`
-        : `articles/${slug}`;
+        : `articles/${slug}/`;
 
       // Украинская версия
       dynamicUrls += `

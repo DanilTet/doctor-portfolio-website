@@ -106,6 +106,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Redirect legacy .html URLs to canonical trailing slash URLs
+app.get('/ru.html', (req, res) => res.redirect(301, '/ru/'));
+app.get('/en.html', (req, res) => res.redirect(301, '/en/'));
+
 // Handle trailing slash requests for /ru/ and /en/
 app.get('/ru/?', (req, res, next) => {
   if (req.path === '/ru' || req.path === '/ru/') return res.sendFile(path.join(ROOT_DIR, 'ru.html'));

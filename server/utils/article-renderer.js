@@ -88,14 +88,15 @@ function textToHtml(text) {
  * @param {object[]} allArticles
  * @returns {string}
  */
-function resolveInternalLinks(text, allArticles) {
+function resolveInternalLinks(text, allArticles, lang = 'uk') {
   if (!text) return text;
   let res = formatInline(text, false);
   if (!allArticles || !allArticles.length) return res;
+  const prefix = lang === 'ru' ? '/ru/articles/' : '/articles/';
   return res.replace(/\[\[LINK:([\w-]+):([^\]]+)\]\]/g, (_match, id, linkText) => {
     const target = allArticles.find(a => a.id === id);
     if (target) {
-      return `<a href="/articles/${escHtml(target.slug)}" style="color:var(--color-primary);text-decoration:underline;">${escHtml(linkText)}</a>`;
+      return `<a href="${prefix}${escHtml(target.slug)}/" style="color:var(--color-primary);text-decoration:underline;">${escHtml(linkText)}</a>`;
     }
     return escHtml(linkText);
   });
@@ -118,7 +119,7 @@ function renderFaqBlock(faq, lang, allArticles = []) {
         <span>${escHtml(item.question)}</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2.5" class="faq-chevron" style="flex-shrink:0;transition:transform .3s;"><polyline points="6 9 12 15 18 9"/></svg>
       </summary>
-      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${textToHtmlResolved(resolveInternalLinks(item.answer || '', allArticles))}</div>
+      <div style="padding:12px 20px 16px;color:var(--color-text);line-height:1.7;border-top:1px solid rgba(43,217,185,0.1);">${textToHtmlResolved(resolveInternalLinks(item.answer || '', allArticles, lang))}</div>
     </details>`).join('');
 
   return `
@@ -145,12 +146,13 @@ function renderRelatedArticles(relatedIds, allArticles, lang) {
   if (!resolved.length) return '';
 
   const heading = lang === 'ru' ? 'Читайте также' : 'Читайте також';
+  const prefix = lang === 'ru' ? '/ru/articles/' : '/articles/';
   const itemsHtml = resolved.map(a => {
     const thumb = a.image_card
       ? `<img src="${escHtml(a.image_card)}" alt="${escHtml(a.title)}" style="width:80px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
       : `<div style="width:80px;height:60px;border-radius:8px;background:rgba(43,217,185,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;">📄</div>`;
     return `
-      <a href="/articles/${escHtml(a.slug)}" style="display:flex;gap:14px;align-items:center;padding:12px 16px;border:1px solid rgba(43,217,185,0.15);border-radius:12px;text-decoration:none;color:var(--color-text-light);background:transparent;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='rgba(43,217,185,0.6)';this.style.background='rgba(43,217,185,0.05)'" onmouseout="this.style.borderColor='rgba(43,217,185,0.15)';this.style.background='transparent'">
+      <a href="${prefix}${escHtml(a.slug)}/" style="display:flex;gap:14px;align-items:center;padding:12px 16px;border:1px solid rgba(43,217,185,0.15);border-radius:12px;text-decoration:none;color:var(--color-text-light);background:transparent;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='rgba(43,217,185,0.6)';this.style.background='rgba(43,217,185,0.05)'" onmouseout="this.style.borderColor='rgba(43,217,185,0.15)';this.style.background='transparent'">
         ${thumb}
         <span style="font-weight:600;font-size:.95rem;">${escHtml(a.title)}</span>
       </a>`;
@@ -193,7 +195,7 @@ function renderSections(sections, lang, allArticles = []) {
     const mt = i === 0 ? 'margin-top:0;' : 'margin-top:32px;';
     let html = `<h3 id="section-${i + 1}" style="${mt}margin-bottom:16px;font-weight:700;font-size:1.5rem;color:var(--color-text-light);">${escHtml(s.heading || '')}</h3>`;
     // Resolve internal link placeholders in section text
-    const resolvedText = resolveInternalLinks(s.text || '', allArticles);
+    const resolvedText = resolveInternalLinks(s.text || '', allArticles, lang);
     html += textToHtmlResolved(resolvedText);
 
     // Section image — shown fully without crop or distortion
@@ -297,8 +299,8 @@ function renderArticleHtml(article, lang = 'uk', allArticles = []) {
 
   const slug = article.slug || 'article';
   const isCore = ['gastroscopy', 'colonoscopy', 'uzd', 'surgery'].includes(slug);
-  const ukUrl = isCore ? `/${slug}/` : `/articles/${slug}`;
-  const ruUrl = isCore ? `/ru/${slug}/` : `/ru/articles/${slug}`;
+  const ukUrl = isCore ? `/${slug}/` : `/articles/${slug}/`;
+  const ruUrl = isCore ? `/ru/${slug}/` : `/ru/articles/${slug}/`;
   const canonicalUrl = isRu ? ruUrl : ukUrl;
   const htmlLang = isRu ? 'ru' : 'uk';
   const backLabel = isRu ? 'Назад на главную' : 'Назад на головну';
