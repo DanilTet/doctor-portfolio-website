@@ -1454,6 +1454,36 @@
             </select>
           </div>
 
+          <div style="margin-bottom:14px">
+            <details id="ai-prompt-details" style="font-size:12px;color:var(--text-muted);background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+              <summary style="cursor:pointer;color:var(--text-secondary);font-weight:600;user-select:none;display:flex;align-items:center;justify-content:space-between">
+                <span>⚙️ Системний промпт та правила генерації (редагування)</span>
+              </summary>
+              <div style="margin-top:10px">
+                <div class="form-group" style="margin-bottom:10px">
+                  <label class="form-label" for="ai-extra-instructions" style="font-size:11px;font-weight:600;color:var(--text-primary)">
+                    ⚡ Разові вказівки до цієї статті (необов'язково)
+                  </label>
+                  <input type="text" id="ai-extra-instructions" class="form-input" placeholder="Наприклад: Зроби 8 розділів, детально розпиши дієту та підготовку..." style="font-size:12px;padding:6px 10px">
+                </div>
+                <div class="form-group" style="margin-bottom:6px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                    <label class="form-label" for="ai-custom-prompt" style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:0">
+                      Базовий системний промпт
+                    </label>
+                    <button type="button" id="ai-reset-prompt-btn" class="btn btn--ghost btn--sm" style="font-size:11px;padding:2px 6px" title="Скинути до стандартного системного промпту">
+                      ↺ Скинути до стандартного
+                    </button>
+                  </div>
+                  <textarea id="ai-custom-prompt" class="form-input" rows="10" style="resize:vertical;font-size:11px;line-height:1.5;font-family:monospace" placeholder="Завантаження системного промпту..."></textarea>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+                    Зміни зберігаються у вашому браузері. Технічні правила перелінковки та тегів додаються автоматично.
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
           <div style="margin-bottom:0">
             <details id="ai-api-key-details" style="font-size:12px;color:var(--text-muted);background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
               <summary style="cursor:pointer;color:var(--text-secondary);font-weight:600;user-select:none">
@@ -1486,6 +1516,9 @@
     const rawInput = modal.querySelector('#ai-raw-text');
     const topicSelect = modal.querySelector('#ai-topic-select');
     const modelSelect = modal.querySelector('#ai-model-select');
+    const extraInstructionsInput = modal.querySelector('#ai-extra-instructions');
+    const customPromptTextarea = modal.querySelector('#ai-custom-prompt');
+    const resetPromptBtn = modal.querySelector('#ai-reset-prompt-btn');
     const customKeyInput = modal.querySelector('#ai-custom-key');
     const submitBtn = modal.querySelector('#ai-submit-btn');
     const cancelBtn = modal.querySelector('#ai-cancel-btn');
@@ -1507,6 +1540,46 @@
       }
     } catch (_) {}
 
+    // Restore or fetch default prompt
+    async function loadDefaultPrompt(force = false) {
+      if (!force) {
+        try {
+          const savedPrompt = localStorage.getItem('ai_custom_prompt');
+          if (savedPrompt && customPromptTextarea) {
+            customPromptTextarea.value = savedPrompt;
+            return;
+          }
+        } catch (_) {}
+      }
+
+      try {
+        const res = await fetch('/api/articles/ai-default-prompt', {
+          headers: { 'X-Blog-Secret': SECRET() }
+        });
+        if (res.ok) {
+          const d = await res.json();
+          if (d && d.defaultPrompt && customPromptTextarea) {
+            customPromptTextarea.value = d.defaultPrompt;
+            if (force) {
+              try { localStorage.removeItem('ai_custom_prompt'); } catch (_) {}
+              showFeedback('↺ Системний промпт скинуто до стандартного', 'success');
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Modal] Failed to load default prompt:', err);
+      }
+    }
+
+    loadDefaultPrompt(false);
+
+    if (resetPromptBtn) {
+      resetPromptBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadDefaultPrompt(true);
+      });
+    }
+
     const closeModal = () => {
       modal.classList.remove('ai-modal--open');
       setTimeout(() => modal.remove(), 250);
@@ -1527,7 +1600,7 @@
 
       errorEl.style.display = 'none';
 
-      // Save model and key preferences
+      // Save model, key, and prompt preferences
       try {
         if (modelSelect) localStorage.setItem('ai_gemini_model', modelSelect.value);
         if (customKeyInput) {
@@ -1535,7 +1608,14 @@
           if (val) localStorage.setItem('ai_gemini_key', val);
           else localStorage.removeItem('ai_gemini_key');
         }
+        if (customPromptTextarea) {
+          const pVal = customPromptTextarea.value.trim();
+          if (pVal) localStorage.setItem('ai_custom_prompt', pVal);
+          else localStorage.removeItem('ai_custom_prompt');
+        }
       } catch (_) {}
+
+      const extraVal = extraInstructionsInput ? extraInstructionsInput.value.trim() : '';
 
       // Switch modal to loading view
       bodyContent.innerHTML = `
@@ -1550,7 +1630,7 @@
       // Progressive status updates
       const statusEl = modal.querySelector('#ai-status-text');
       const t1 = setTimeout(() => { if (statusEl) statusEl.textContent = '🔍 Підбирає релевантні статті для внутрішньої перелінковки...'; }, 1800);
-      const t2 = setTimeout(() => { if (statusEl) statusEl.textContent = '✍️ Формує розділи, FAQ, виділення та SEO-опис...'; }, 3500);
+      const t2 = setTimeout(() => { if (statusEl) statusEl.textContent = '✍️ Формує 6-10 структурованих розділів, FAQ, списки та SEO-опис...'; }, 3500);
 
       try {
         const res = await fetch('/api/articles/ai-generate', {
@@ -1563,7 +1643,9 @@
             text: textVal,
             topicHint: topicSelect.value,
             model: modelSelect ? modelSelect.value : 'gemini-3.6-flash',
-            apiKey: (customKeyInput ? customKeyInput.value.trim() : '') || undefined
+            apiKey: (customKeyInput ? customKeyInput.value.trim() : '') || undefined,
+            customPrompt: (customPromptTextarea ? customPromptTextarea.value.trim() : '') || undefined,
+            extraInstructions: extraVal || undefined
           })
         });
 
@@ -1620,7 +1702,9 @@
         if (newModal) {
           const errBox = newModal.querySelector('#ai-modal-error');
           const inputArea = newModal.querySelector('#ai-raw-text');
+          const inputExtra = newModal.querySelector('#ai-extra-instructions');
           if (inputArea) inputArea.value = textVal;
+          if (inputExtra && extraVal) inputExtra.value = extraVal;
           if (errBox) {
             errBox.textContent = `❌ Помилка: ${err.message}`;
             errBox.style.display = 'block';

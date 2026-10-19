@@ -26,7 +26,7 @@ try {
 
 const { writeArticleHtml } = require('./utils/article-renderer');
 const { translateArticle } = require('./utils/article-translator');
-const { generateArticleWithAi } = require('./utils/ai-generator');
+const { generateArticleWithAi, DEFAULT_BASE_PROMPT } = require('./utils/ai-generator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1308,11 +1308,19 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
 });
 
 /**
+ * GET /api/articles/ai-default-prompt
+ * Returns the default base system prompt for article generation.
+ */
+app.get('/api/articles/ai-default-prompt', authGuard, (req, res) => {
+  res.json({ ok: true, defaultPrompt: DEFAULT_BASE_PROMPT });
+});
+
+/**
  * POST /api/articles/ai-generate
  * Generate structured article data using Google Gemini API.
  */
 app.post('/api/articles/ai-generate', authGuard, async (req, res) => {
-  const { text, topicHint, apiKey, model } = req.body || {};
+  const { text, topicHint, apiKey, model, customPrompt, extraInstructions } = req.body || {};
   if (!text || !text.trim()) {
     return res.status(400).json({ error: 'Текст для генерації обов\'язковий (порожній вхідний текст).' });
   }
@@ -1326,7 +1334,9 @@ app.post('/api/articles/ai-generate', authGuard, async (req, res) => {
       topicHint,
       existingArticles,
       apiKey,
-      model
+      model,
+      customPrompt,
+      extraInstructions
     });
 
     console.log(`[Articles API] AI generated article: "${articleData.title}" (slug: ${articleData.slug})`);
