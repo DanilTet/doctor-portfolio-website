@@ -1446,12 +1446,20 @@
           </div>
 
           <div class="form-group" style="margin-bottom:14px">
-            <label class="form-label" for="ai-model-select">Модель Google Gemini</label>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <label class="form-label" for="ai-model-select" style="margin-bottom:0">Модель Google Gemini</label>
+              <span id="ai-models-status" style="font-size:11px;color:var(--text-muted)"></span>
+            </div>
             <select id="ai-model-select" class="form-input" style="cursor:pointer">
-              <option value="gemini-3.6-flash">Gemini 3.6 Flash (Рекомендовано Google)</option>
-              <option value="gemini-3.7-flash">Gemini 3.7 Flash (Новітня модель)</option>
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Швидка версія)</option>
+              <option value="auto">✨ Автоматично (найновіша Flash-модель)</option>
+              <option value="gemini-3.8-flash">Gemini 3.8 Flash (Рекомендовано Google)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="custom">✍️ Ввести іншу назву моделі вручну...</option>
             </select>
+            <div id="ai-custom-model-wrapper" style="display:none;margin-top:6px">
+              <input type="text" id="ai-custom-model-input" class="form-input" placeholder="Наприклад: gemini-3.8-flash" style="font-size:12px;padding:6px 10px;font-family:monospace">
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Вкажіть точний ідентифікатор моделі Google API.</div>
+            </div>
           </div>
 
           <div style="margin-bottom:14px">
@@ -1486,13 +1494,22 @@
 
           <div style="margin-bottom:0">
             <details id="ai-api-key-details" style="font-size:12px;color:var(--text-muted);background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
-              <summary style="cursor:pointer;color:var(--text-secondary);font-weight:600;user-select:none">
-                🔑 Власний API-ключ Gemini (необов'язково)
+              <summary style="cursor:pointer;color:var(--text-secondary);font-weight:600;user-select:none;display:flex;align-items:center;justify-content:space-between">
+                <span>🔑 Власний API-ключ Gemini</span>
+                <span id="ai-key-badge" style="font-size:11px;color:var(--text-muted)">необов'язково</span>
               </summary>
               <div style="margin-top:8px">
-                <input type="password" id="ai-custom-key" class="form-input" placeholder="AIzaSy... (якщо не вказано на сервері в .env)" style="font-size:12px;padding:6px 10px;font-family:monospace">
-                <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
-                  Якщо вказати тут, ключ збережеться у вашому браузері і буде передаватися у запиті.
+                <div style="display:flex;gap:6px">
+                  <input type="password" id="ai-custom-key" class="form-input" placeholder="AIzaSy... (якщо не вказано на сервері в .env)" style="font-size:12px;padding:6px 10px;font-family:monospace;flex:1">
+                  <button type="button" id="ai-refresh-models-btn" class="btn btn--secondary btn--sm" style="font-size:11px;padding:4px 10px;white-space:nowrap" title="Оновити список моделей під цей ключ">
+                    🔄 Оновити моделі
+                  </button>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:11px;flex-wrap:wrap;gap:4px">
+                  <span id="ai-key-hint" style="color:var(--text-muted)">Ключ зберігається у вашому браузері.</span>
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#818cf8;text-decoration:none;font-weight:500">
+                    Отримати ключ у Google AI Studio ↗
+                  </a>
                 </div>
               </div>
             </details>
@@ -1516,10 +1533,16 @@
     const rawInput = modal.querySelector('#ai-raw-text');
     const topicSelect = modal.querySelector('#ai-topic-select');
     const modelSelect = modal.querySelector('#ai-model-select');
+    const customModelWrapper = modal.querySelector('#ai-custom-model-wrapper');
+    const customModelInput = modal.querySelector('#ai-custom-model-input');
+    const modelsStatusEl = modal.querySelector('#ai-models-status');
     const extraInstructionsInput = modal.querySelector('#ai-extra-instructions');
     const customPromptTextarea = modal.querySelector('#ai-custom-prompt');
     const resetPromptBtn = modal.querySelector('#ai-reset-prompt-btn');
     const customKeyInput = modal.querySelector('#ai-custom-key');
+    const refreshModelsBtn = modal.querySelector('#ai-refresh-models-btn');
+    const keyBadge = modal.querySelector('#ai-key-badge');
+    const keyDetails = modal.querySelector('#ai-api-key-details');
     const submitBtn = modal.querySelector('#ai-submit-btn');
     const cancelBtn = modal.querySelector('#ai-cancel-btn');
     const closeBtn = modal.querySelector('.ai-modal__close');
@@ -1528,17 +1551,157 @@
     const bodyContent = modal.querySelector('#ai-modal-body-content');
     const footerContent = modal.querySelector('#ai-modal-footer-content');
 
-    // Restore saved model & key from localStorage
+    // Restore saved model & key from localStorage with legacy migration
+    const legacyBrokenModels = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'];
+    let savedModel = 'auto';
     try {
-      const savedModel = localStorage.getItem('ai_gemini_model');
-      if (savedModel && modelSelect) modelSelect.value = savedModel;
+      const storedModel = localStorage.getItem('ai_gemini_model');
+      if (storedModel && !legacyBrokenModels.includes(storedModel)) {
+        savedModel = storedModel;
+      } else if (storedModel && legacyBrokenModels.includes(storedModel)) {
+        localStorage.setItem('ai_gemini_model', 'auto');
+      }
+
       const savedKey = localStorage.getItem('ai_gemini_key');
       if (savedKey && customKeyInput) {
         customKeyInput.value = savedKey;
-        const keyDetails = modal.querySelector('#ai-api-key-details');
         if (keyDetails) keyDetails.open = true;
       }
     } catch (_) {}
+
+    // Toggle custom model input on change
+    modelSelect.addEventListener('change', () => {
+      if (modelSelect.value === 'custom') {
+        customModelWrapper.style.display = 'block';
+        if (customModelInput) customModelInput.focus();
+      } else {
+        customModelWrapper.style.display = 'none';
+      }
+    });
+
+    // Populate model options dynamically
+    function populateModelDropdown(modelsList, selectedValue = 'auto') {
+      const currentSelected = selectedValue || modelSelect.value || 'auto';
+      modelSelect.innerHTML = '';
+
+      // Auto option always first
+      const autoOpt = document.createElement('option');
+      autoOpt.value = 'auto';
+      autoOpt.textContent = '✨ Автоматично (найновіша Flash-модель)';
+      modelSelect.appendChild(autoOpt);
+
+      if (Array.isArray(modelsList) && modelsList.length > 0) {
+        const group = document.createElement('optgroup');
+        group.label = 'Доступні моделі для цього ключа';
+        modelsList.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.displayName || m.id;
+          group.appendChild(opt);
+        });
+        modelSelect.appendChild(group);
+      }
+
+      const customOpt = document.createElement('option');
+      customOpt.value = 'custom';
+      customOpt.textContent = '✍️ Ввести іншу назву моделі вручну...';
+      modelSelect.appendChild(customOpt);
+
+      const hasOption = Array.from(modelSelect.options).some(o => o.value === currentSelected);
+      if (hasOption) {
+        modelSelect.value = currentSelected;
+        customModelWrapper.style.display = 'none';
+      } else if (currentSelected && currentSelected !== 'auto') {
+        modelSelect.value = 'custom';
+        customModelWrapper.style.display = 'block';
+        if (customModelInput) customModelInput.value = currentSelected;
+      } else {
+        modelSelect.value = 'auto';
+        customModelWrapper.style.display = 'none';
+      }
+    }
+
+    // Function to load models dynamically from backend
+    async function loadModelsForKey(apiKey, silent = false) {
+      if (!silent && modelsStatusEl) {
+        modelsStatusEl.textContent = '⏳ Оновлення моделей...';
+      }
+      try {
+        const res = await fetch('/api/articles/ai-models', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Blog-Secret': SECRET()
+          },
+          body: JSON.stringify({ apiKey: apiKey ? apiKey.trim() : undefined })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.models)) {
+            const currentVal = modelSelect.value === 'custom' && customModelInput && customModelInput.value.trim()
+              ? customModelInput.value.trim()
+              : modelSelect.value;
+            populateModelDropdown(data.models, currentVal || savedModel);
+
+            if (data.source === 'live') {
+              if (modelsStatusEl) {
+                modelsStatusEl.innerHTML = `<span style="color:#10b981">✓ Моделей: ${data.models.length}</span>`;
+              }
+              if (keyBadge) {
+                keyBadge.textContent = '✓ підключено';
+                keyBadge.style.color = '#10b981';
+              }
+            } else {
+              if (modelsStatusEl) {
+                modelsStatusEl.textContent = '';
+              }
+              if (keyBadge) {
+                keyBadge.textContent = apiKey ? 'ключ збережено' : "необов'язково";
+                keyBadge.style.color = 'var(--text-muted)';
+              }
+            }
+            return;
+          }
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          if (errData && errData.error && errData.error.includes('Недійсний')) {
+            if (modelsStatusEl) modelsStatusEl.innerHTML = '<span style="color:var(--danger)">✗ недійсний ключ</span>';
+            if (keyBadge) {
+              keyBadge.textContent = '✗ недійсний ключ';
+              keyBadge.style.color = 'var(--danger)';
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Modal] Failed to load models:', err);
+        if (modelsStatusEl) modelsStatusEl.textContent = '';
+      }
+    }
+
+    // Load models on init (using saved key if present)
+    const initialKey = customKeyInput ? customKeyInput.value.trim() : '';
+    loadModelsForKey(initialKey, true);
+
+    // Debounced reload on key input
+    let keyDebounceTimer = null;
+    if (customKeyInput) {
+      customKeyInput.addEventListener('input', () => {
+        clearTimeout(keyDebounceTimer);
+        keyDebounceTimer = setTimeout(() => {
+          const keyVal = customKeyInput.value.trim();
+          loadModelsForKey(keyVal, false);
+        }, 600);
+      });
+    }
+
+    if (refreshModelsBtn) {
+      refreshModelsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const keyVal = customKeyInput ? customKeyInput.value.trim() : '';
+        loadModelsForKey(keyVal, false);
+      });
+    }
 
     // Restore or fetch default prompt
     async function loadDefaultPrompt(force = false) {
@@ -1601,8 +1764,13 @@
       errorEl.style.display = 'none';
 
       // Save model, key, and prompt preferences
+      let chosenModel = modelSelect ? modelSelect.value : 'auto';
+      if (chosenModel === 'custom') {
+        chosenModel = (customModelInput ? customModelInput.value.trim() : '') || 'auto';
+      }
+
       try {
-        if (modelSelect) localStorage.setItem('ai_gemini_model', modelSelect.value);
+        localStorage.setItem('ai_gemini_model', chosenModel);
         if (customKeyInput) {
           const val = customKeyInput.value.trim();
           if (val) localStorage.setItem('ai_gemini_key', val);
@@ -1642,7 +1810,7 @@
           body: JSON.stringify({
             text: textVal,
             topicHint: topicSelect.value,
-            model: modelSelect ? modelSelect.value : 'gemini-3.6-flash',
+            model: chosenModel,
             apiKey: (customKeyInput ? customKeyInput.value.trim() : '') || undefined,
             customPrompt: (customPromptTextarea ? customPromptTextarea.value.trim() : '') || undefined,
             extraInstructions: extraVal || undefined

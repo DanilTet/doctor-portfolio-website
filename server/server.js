@@ -26,7 +26,7 @@ try {
 
 const { writeArticleHtml } = require('./utils/article-renderer');
 const { translateArticle } = require('./utils/article-translator');
-const { generateArticleWithAi, DEFAULT_BASE_PROMPT } = require('./utils/ai-generator');
+const { generateArticleWithAi, fetchAvailableGeminiModels, DEFAULT_BASE_PROMPT } = require('./utils/ai-generator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1313,6 +1313,24 @@ app.post('/api/articles/:id/translate', authGuard, async (req, res) => {
  */
 app.get('/api/articles/ai-default-prompt', authGuard, (req, res) => {
   res.json({ ok: true, defaultPrompt: DEFAULT_BASE_PROMPT });
+});
+
+/**
+ * POST /api/articles/ai-models
+ * Returns available Gemini models for a specific API key (or default server key).
+ */
+app.post('/api/articles/ai-models', authGuard, async (req, res) => {
+  const { apiKey } = req.body || {};
+  try {
+    const modelsData = await fetchAvailableGeminiModels(apiKey);
+    res.json({ ok: true, ...modelsData });
+  } catch (err) {
+    if (err.message === 'GEMINI_API_KEY_INVALID') {
+      return res.status(400).json({ error: 'Недійсний API-ключ Google Gemini.' });
+    }
+    console.error('[Articles API] ai-models error:', err.message);
+    res.status(500).json({ error: `Помилка отримання моделей: ${err.message}` });
+  }
 });
 
 /**

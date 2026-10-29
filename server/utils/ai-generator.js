@@ -5,10 +5,182 @@
 
 'use strict';
 
+const crypto = require('crypto');
 const fetch = require('node-fetch');
 
-const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const ALLOWED_TAGS = ['Гастроскопія', 'Колоноскопія', 'УЗД', 'ЕРХПГ', 'Підготовка', 'Хірургія', 'Поліпи', 'Онкологія'];
+
+/**
+ * Static resilient fallback list of models used if the live models API cannot be reached.
+ */
+const STATIC_FALLBACK_MODELS = [
+  {
+    id: 'gemini-3.8-flash',
+    displayName: 'Gemini 3.8 Flash (Рекомендовано Google)',
+    description: 'Найновіша швидка та точна модель Google Gemini',
+    isFlash: true,
+    isRecommended: true
+  },
+  {
+    id: 'gemini-2.0-flash',
+    displayName: 'Gemini 2.0 Flash',
+    description: 'Швидка та стабільна модель попереднього покоління',
+    isFlash: true,
+    isRecommended: false
+  },
+  {
+    id: 'gemini-1.5-flash',
+    displayName: 'Gemini 1.5 Flash',
+    description: 'Базова легка модель',
+    isFlash: true,
+    isRecommended: false
+  }
+];
+
+// In-memory cache for available models per API key hash to prevent redundant network calls
+const modelsCache = new Map();
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+/**
+ * Fetch currently available and active models for the provided Gemini API key.
+ *
+ * @param {string} [apiKey] - Google Gemini API key
+ * @returns {Promise<{ source: string, models: Array<object>, defaultModel: string }>}
+ */
+async function fetchAvailableGeminiModels(apiKey) {
+  const key = apiKey || process.env.GEMINI_API_KEY;
+
+  if (!key) {
+    return {
+      source: 'fallback',
+      models: STATIC_FALLBACK_MODELS,
+      defaultModel: DEFAULT_GEMINI_MODEL
+    };
+  }
+
+  const cacheKey = crypto.createHash('sha256').update(key).digest('hex').substring(0, 16);
+  const cached = modelsCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data;
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`;
+  try {
+    const res = await fetch(url, { method: 'GET', timeout: 15000 });
+
+    if (!res.ok) {
+      let errDetails = '';
+      try {
+        const errJson = await res.json();
+        errDetails = errJson.error ? errJson.error.message : JSON.stringify(errJson);
+      } catch (_) {
+        errDetails = await res.text();
+      }
+
+      const lowerErr = errDetails.toLowerCase();
+      if (res.status === 400 && (lowerErr.includes('api_key_invalid') || lowerErr.includes('api key not valid') || lowerErr.includes('invalid api key'))) {
+        const keyErr = new Error('GEMINI_API_KEY_INVALID');
+        keyErr.details = errDetails;
+        throw keyErr;
+      }
+
+      console.warn(`[AiGenerator] Failed to fetch models list from Google API (HTTP ${res.status}: ${errDetails}). Using fallback list.`);
+      return {
+        source: 'fallback',
+        models: STATIC_FALLBACK_MODELS,
+        defaultModel: DEFAULT_GEMINI_MODEL
+      };
+    }
+
+    const data = await res.json();
+    const rawModels = Array.isArray(data.models) ? data.models : [];
+
+    // Filter models suitable for text & structured JSON generation
+    const validModels = rawModels
+      .filter(m => {
+        const id = (m.name || '').replace(/^models\//, '').toLowerCase();
+        const methods = Array.isArray(m.supportedGenerationMethods) ? m.supportedGenerationMethods : [];
+        if (!methods.includes('generateContent')) return false;
+        if (!id.startsWith('gemini-')) return false;
+        // Exclude non-text/specialized endpoints
+        if (
+          id.includes('embedding') ||
+          id.includes('imagen') ||
+          id.includes('aqa') ||
+          id.includes('moderation') ||
+          id.includes('learnlm') ||
+          id.includes('tts') ||
+          id.includes('whisper')
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .map(m => {
+        const cleanId = (m.name || '').replace(/^models\//, '');
+        const isFlash = cleanId.toLowerCase().includes('flash');
+        const match = cleanId.match(/gemini-(\d+(?:\.\d+)?)/i);
+        const versionNum = match ? parseFloat(match[1]) : 0;
+
+        return {
+          id: cleanId,
+          displayName: m.displayName || cleanId,
+          description: m.description || '',
+          isFlash,
+          versionNum,
+          isRecommended: false
+        };
+      });
+
+    // Sort: Flash models first, newer versions first, then other models newer versions first
+    validModels.sort((a, b) => {
+      if (a.isFlash && !b.isFlash) return -1;
+      if (!a.isFlash && b.isFlash) return 1;
+      return b.versionNum - a.versionNum;
+    });
+
+    if (validModels.length > 0) {
+      // Find the top flash model to mark as recommended
+      const topFlash = validModels.find(m => m.isFlash) || validModels[0];
+      topFlash.isRecommended = true;
+      if (!topFlash.displayName.includes('Рекомендовано')) {
+        topFlash.displayName = `${topFlash.displayName} (Рекомендовано Google)`;
+      }
+
+      const result = {
+        source: 'live',
+        models: validModels.map(({ id, displayName, description, isFlash, isRecommended }) => ({
+          id,
+          displayName,
+          description,
+          isFlash,
+          isRecommended
+        })),
+        defaultModel: topFlash.id
+      };
+
+      modelsCache.set(cacheKey, { timestamp: Date.now(), data: result });
+      return result;
+    }
+
+    return {
+      source: 'fallback',
+      models: STATIC_FALLBACK_MODELS,
+      defaultModel: DEFAULT_GEMINI_MODEL
+    };
+  } catch (err) {
+    if (err.message === 'GEMINI_API_KEY_INVALID') {
+      throw err;
+    }
+    console.warn('[AiGenerator] Exception during live models fetch:', err.message, '. Using fallback list.');
+    return {
+      source: 'fallback',
+      models: STATIC_FALLBACK_MODELS,
+      defaultModel: DEFAULT_GEMINI_MODEL
+    };
+  }
+}
 
 /**
  * Default editable base prompt defining the role, tone, and editorial structure.
@@ -180,25 +352,54 @@ ${rawText}
     }
   };
 
-  const requestedModel = model || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-  const candidateModels = [requestedModel];
-  ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'].forEach(m => {
-    if (!candidateModels.includes(m)) candidateModels.push(m);
+  // Assemble candidate models list dynamically
+  const isAuto = !model || model.trim() === '' || model.trim() === 'auto';
+  const requestedModel = isAuto ? null : model.trim();
+
+  const candidateModels = [];
+  if (requestedModel) {
+    candidateModels.push(requestedModel.replace(/^models\//, ''));
+  }
+
+  // Retrieve active models for this key to ensure smartest fallback order
+  try {
+    const liveInfo = await fetchAvailableGeminiModels(key);
+    if (liveInfo && Array.isArray(liveInfo.models)) {
+      liveInfo.models.forEach(m => {
+        const cleanId = m.id.replace(/^models\//, '');
+        if (!candidateModels.includes(cleanId) && m.isFlash) {
+          candidateModels.push(cleanId);
+        }
+      });
+    }
+  } catch (modelFetchErr) {
+    console.warn('[AiGenerator] Could not fetch live models for candidate list:', modelFetchErr.message);
+  }
+
+  // Ensure default and static fallback flash models are always in the fallback chain
+  [DEFAULT_GEMINI_MODEL, 'gemini-3.8-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'].forEach(m => {
+    const clean = m.replace(/^models\//, '');
+    if (!candidateModels.includes(clean)) {
+      candidateModels.push(clean);
+    }
   });
 
   let response = null;
   let lastErrorDetails = '';
-  let usedModel = requestedModel;
+  let usedModel = candidateModels[0] || DEFAULT_GEMINI_MODEL;
 
-  for (const currentModel of candidateModels) {
+  for (let i = 0; i < candidateModels.length; i++) {
+    const currentModel = candidateModels[i];
     usedModel = currentModel;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${encodeURIComponent(key)}`;
+    const cleanModelName = currentModel.replace(/^models\//, '');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModelName}:generateContent?key=${encodeURIComponent(key)}`;
+
     try {
       response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        timeout: 45000
+        timeout: 60000
       });
 
       if (response.ok) {
@@ -215,15 +416,37 @@ ${rawText}
 
       lastErrorDetails = errorDetails;
 
-      if (response.status === 400 && errorDetails.includes('API_KEY_INVALID')) {
+      const lowerErr = errorDetails.toLowerCase();
+      if (response.status === 400 && (lowerErr.includes('api_key_invalid') || lowerErr.includes('api key not valid') || lowerErr.includes('invalid api key'))) {
         throw new Error('GEMINI_API_KEY_INVALID');
       }
+      const isUnavailable =
+        response.status === 404 ||
+        response.status === 410 ||
+        lowerErr.includes('no longer available') ||
+        lowerErr.includes('not available') ||
+        lowerErr.includes('deprecated') ||
+        lowerErr.includes('not found') ||
+        lowerErr.includes('not supported') ||
+        lowerErr.includes('unsupported model') ||
+        lowerErr.includes('is not found for api version');
+
+      if (isUnavailable) {
+        console.warn(`[AiGenerator] Model "${currentModel}" unavailable (HTTP ${response.status}: ${errorDetails}). Trying fallback...`);
+        continue;
+      }
+
+      if ((response.status === 429 || errorDetails.includes('RESOURCE_EXHAUSTED')) && i < candidateModels.length - 1) {
+        console.warn(`[AiGenerator] Model "${currentModel}" quota exhausted. Trying fallback candidate...`);
+        continue;
+      }
+
       if (response.status === 429 || errorDetails.includes('RESOURCE_EXHAUSTED')) {
         throw new Error('GEMINI_QUOTA_EXCEEDED');
       }
 
-      if (response.status === 404) {
-        console.warn(`[AiGenerator] Model "${currentModel}" returned 404 (${errorDetails}). Trying fallback...`);
+      if (i < candidateModels.length - 1) {
+        console.warn(`[AiGenerator] Model "${currentModel}" returned HTTP ${response.status} (${errorDetails}). Trying fallback...`);
         continue;
       }
 
@@ -232,14 +455,15 @@ ${rawText}
       if (networkErr.message === 'GEMINI_API_KEY_INVALID' || networkErr.message === 'GEMINI_QUOTA_EXCEEDED') {
         throw networkErr;
       }
-      if (candidateModels.indexOf(currentModel) === candidateModels.length - 1) {
+      if (i === candidateModels.length - 1) {
         throw networkErr;
       }
+      console.warn(`[AiGenerator] Error on model "${currentModel}": ${networkErr.message}. Trying next fallback...`);
     }
   }
 
   if (!response || !response.ok) {
-    throw new Error(`Gemini API Error: Не вдалося звернутися до жодної з моделей Gemini (${candidateModels.join(', ')}). Деталі: ${lastErrorDetails}`);
+    throw new Error(`Gemini API Error: Не вдалося звернутися до жодної з моделей Gemini (${candidateModels.slice(0, 5).join(', ')}). Деталі: ${lastErrorDetails}`);
   }
 
   console.log(`[AiGenerator] Successfully generated content using model: ${usedModel}`);
@@ -302,6 +526,9 @@ ${rawText}
 
 module.exports = {
   generateArticleWithAi,
+  fetchAvailableGeminiModels,
   ALLOWED_TAGS,
-  DEFAULT_BASE_PROMPT
+  DEFAULT_BASE_PROMPT,
+  STATIC_FALLBACK_MODELS,
+  DEFAULT_GEMINI_MODEL
 };
